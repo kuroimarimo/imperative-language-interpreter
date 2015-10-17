@@ -10,7 +10,7 @@ enum {
     PODTRZITKO,     /// _
     MEZERA,         /// ' '
     TABULATOR,      /// '\t'
-/*  KONEC_RADKU,    ///   */
+    KONEC_RADKU,    /// '\n'
 
     L_ZAVORKA,      /// (
     P_ZAVORKA,      /// )
@@ -40,9 +40,14 @@ enum {
 
     JINY_ZNAK,       /// ostatni znaky
 
-/*  TOK_NULL,       /// neinicializovany token  */
+    TOK_NULL,       /// neinicializovany token  */
     TOK_PRAZDNY,    /// prazdny token
-    TOK_HOTOVY      /// naplneny token
+    TOK_HOTOVY,      /// naplneny token
+
+    IDENTIFIKATOR,  /// typ tokenu
+    INT,
+    DOUBLE,
+    AUTO
 
 };
 
@@ -50,6 +55,7 @@ typedef struct {
     char *obsah;
     int pocitadlo;
     int stav;
+    int typ;
 } tToken;
 
 

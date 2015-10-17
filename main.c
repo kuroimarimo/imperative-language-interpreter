@@ -16,11 +16,9 @@ const char *klicova_slova [POCET_KLIC_SLOV] = {
 tToken token;
 
 int initToken () {
-    token.obsah = (char *) malloc(2);
-    if (token.obsah == NULL)
-        return -1;
-        /// chyba malloc
-    token.stav = TOK_PRAZDNY;
+    token.obsah = NULL;
+    token.pocitadlo = 0;
+    token.typ = TOK_NULL;
 
     return 0;
 }
@@ -49,7 +47,7 @@ int naplnToken (char znak) {
 
 void uvolniToken () {
     free(token.obsah);
-    token.pocitadlo = 0;
+    initToken();
 }
 
 
@@ -86,10 +84,12 @@ int main(int argc, char** argv)
                 hodnota = STREDNIK;
             else if (c == '_')
                 hodnota = PODTRZITKO;
-            else if (c == ' ')
-                hodnota = MEZERA;
+            else if (c == ' ')          // preskocim znak
+                break;
             else if (c == '\t')
-                hodnota = TABULATOR;
+                break;                  // preskocim znak
+            else if (c == '\n')
+                break;                  // preskocim znak
             else if (c == '(')
                 hodnota = L_ZAVORKA;
             else if (c == ')')
@@ -120,8 +120,8 @@ int main(int argc, char** argv)
                 hodnota = RETEZEC;
             else if (c == ',')
                 hodnota = CARKA;
-         /*   else if (c == '.')
-                hodnota = TECKA;    */
+            else if (c == '.')
+                return -1; ///hodnota = TECKA;    /// Error - cislo nemuze zacinat teckou
             else if (c == '<')
                 hodnota = ROZ_MENSI;
             else if (c == '>')
@@ -132,25 +132,77 @@ int main(int argc, char** argv)
                 hodnota = JINY_ZNAK;
             printf("Pocatek %c %d \n", c, hodnota);
 
-            ungetc(c, soubor);
-        break;
+            naplnToken(c);
+            break;
 
-        case PISMENO:
+        case PISMENO:       /// identifikator, zacina pismenem nebo _
         case PODTRZITKO:
-            if (isalpha(c) || c == '_' || (isdigit(c) && (token.pocitadlo >= 1))) {
+
+            if (isalpha(c) || c == '_' || isdigit(c) )
                 naplnToken(c);
-                printf("%c", c); }
             else {
-                /// ukonci token a posli ho
+                token.typ = IDENTIFIKATOR;
+                printf("Token:%s\n", token.obsah);
+
+                    /// vynuluj token
+                    uvolniToken();
+
+                ungetc(c, soubor);
                 hodnota = POCATEK;
             }
-        break;
+            break;
 
         case CISLO:
-            printf("Precetl cislo:\n");
+            if (isdigit(c))
+                naplnToken(c);
+            else if (c == '.') {
+                hodnota = DOUBLE;
+                naplnToken(c);
+            }
+            else {
+                token.typ = INT;
+                printf("Token:%s\n", token.obsah);
 
-        break;
+                    /// vynuluj token
+                    uvolniToken();
 
+                ungetc(c, soubor);
+                hodnota = POCATEK;
+            }
+            break;
+
+        case DOUBLE:
+            if (isdigit(c))
+                naplnToken(c);
+            else if (c == '.')
+                return -1;      /// Lex_an chyba - zadana druha deseinna tecka
+            else {
+                token.typ = DOUBLE;
+                printf("Token:%s\n", token.obsah);
+
+                    /// vynuluj token
+                    uvolniToken();
+
+                ungetc(c, soubor);
+                hodnota = POCATEK;
+            }
+            break;
+
+        case RETEZEC:
+            if (c != '"')
+                naplnToken(c);
+            else {
+                naplnToken(c);
+                token.typ = RETEZEC;
+                printf("Token:%s\n", token.obsah);
+
+                    /// vynuluj token
+                    uvolniToken();
+
+                /// ungetc(c, soubor); /// vytvari nekonecny cyklus
+                hodnota = POCATEK;
+                }
+            break;
 
         }
 
@@ -160,7 +212,6 @@ int main(int argc, char** argv)
 
 
 
-    printf("Token %s\n", token.obsah);
 
     printf("\n");
     fclose(soubor);
