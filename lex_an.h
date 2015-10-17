@@ -29,19 +29,23 @@ enum {
     MODULO,         /// %
 
     VYKRICNIK,      /// !
+    NEGACE,         /// !=
     OTAZNIK,        /// ?
     RETEZEC,        /// "
     CARKA,          /// ,
 /*    TECKA,        /// .   */
 /*  DVOJTECKA       /// :   */
 
-    ROZ_MENSI,      /// < nebo <<
-    ROZ_VETSI,      /// > nebo >>
     MENSI,          /// <
     VETSI,          /// >
+    ROZ_MENSI,      /// <<
+    ROZ_VETSI,      /// >>
     ROVNITKO,       /// =
+    ROVNITKOMENSI,  /// =<
+    ROVNITKOVETSI,  //// =>
 
     JINY_ZNAK,       /// ostatni znaky
+    
 
     TOK_NULL,       /// neinicializovany token  */
     TOK_PRAZDNY,    /// prazdny token
