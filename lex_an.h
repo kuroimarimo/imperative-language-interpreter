@@ -4,7 +4,10 @@ enum {
     POCATEK,        /// Určení znaku
 
     CISLO,          /// 0..9
-    PISMENO,      /// a..z, A..Z
+    PISMENO,        /// a..z, A..Z
+    DES_CISLO,      /// 1.234
+    EXP_CISLO,      /// 1e+4 15E8
+    EXP_CISLO_ZN,   /// znamenkovy (+/-) 15E+8
 
     STREDNIK,       /// ;
     PODTRZITKO,     /// _
@@ -44,7 +47,8 @@ enum {
     TOK_PRAZDNY,    /// prazdny token
     TOK_HOTOVY,      /// naplneny token
 
-    IDENTIFIKATOR,  /// typ tokenu
+        /// typy tokenu
+    IDENTIFIKATOR,
     INT,
     DOUBLE,
     AUTO

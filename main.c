@@ -155,8 +155,12 @@ int main(int argc, char** argv)
         case CISLO:
             if (isdigit(c))
                 naplnToken(c);
-            else if (c == '.') {
-                hodnota = DOUBLE;
+            else if (c == '.') {    /// desetinne cislo -> double
+                hodnota = DES_CISLO;
+                naplnToken(c);
+            }
+            else if (c == 'e' || c == 'E') {
+                hodnota = EXP_CISLO;
                 naplnToken(c);
             }
             else {
@@ -171,7 +175,7 @@ int main(int argc, char** argv)
             }
             break;
 
-        case DOUBLE:
+        case DES_CISLO:
             if (isdigit(c))
                 naplnToken(c);
             else if (c == '.')
@@ -186,6 +190,28 @@ int main(int argc, char** argv)
                 ungetc(c, soubor);
                 hodnota = POCATEK;
             }
+            break;
+
+        case EXP_CISLO:
+            if (isdigit(c))
+                naplnToken(c);
+            else if (c == '+' || c == '-') {
+                naplnToken(c);
+                hodnota = EXP_CISLO_ZN;
+            }
+            else if (c == 'e' || c == 'E')
+                return -1;      /// Lex_an chyba - zadane druhe E
+            else {
+                token.typ = DOUBLE;
+                printf("Token:%s\n", token.obsah);
+
+                    /// vynuluj token
+                    uvolniToken();
+
+                ungetc(c, soubor);
+                hodnota = POCATEK;
+            }
+
             break;
 
         case RETEZEC:
