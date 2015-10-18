@@ -55,7 +55,7 @@ void uvolniToken () {
 int main(int argc, char** argv)
 {
     FILE *soubor;
-    if (argc == 1)
+    if (argc != 2)
     {
         printf("Neni zadan vstupni soubor! \n");
         return 1;
@@ -123,9 +123,9 @@ int main(int argc, char** argv)
             else if (c == '.')
                 return -1;          ///hodnota = TECKA;    /// Error - cislo nemuze zacinat teckou
             else if (c == '<')
-                hodnota = ROZ_MENSI;
+                hodnota = MENSI;
             else if (c == '>')
-                hodnota = ROZ_VETSI;
+                hodnota = VETSI;
             else if (c == '=')
                 hodnota = ROVNITKO;
             else
@@ -148,7 +148,7 @@ int main(int argc, char** argv)
                     uvolniToken();
 
                 ungetc(c, soubor);
-                hodnota = POCATEK;
+                hodnota = POCATEK;   /// neměl by zde být stav konec ?? ? ??????? 
             }
             break;
 
@@ -230,8 +230,15 @@ int main(int argc, char** argv)
                 ungetc(c, soubor);
                 hodnota = POCATEK;
             }
-
             break;
+        
+
+
+
+
+
+
+
 
         case RETEZEC:
             if (c != '"')
@@ -248,13 +255,90 @@ int main(int argc, char** argv)
                 }
             break;
 
+     
+    case MENSI:
+            if (c == '<')
+            {
+                hodnota= ROZ_MENSI;
+                naplnToken(c);
+                
+
+            }
+            else
+            {
+                ungetc(c,soubor);
+                test=false;
+            }
+            break;
+
+   case VETSI:
+            if (c == '>')
+            {
+                hodnota= ROZ_VETSI;
+                naplnToken(c);
+                
+
+            }
+            else
+            {
+                ungetc(c,soubor);
+                test=false;
+            }
+            break;
+
+
+    case ROVNITKO:
+            if(c == '<')
+            {
+                naplnToken(c);
+                hodnota=ROVNITKOMENSI;
+
+            }
+            else if (c== '>')
+            {
+                naplnToken(c);
+                hodnota=ROVNITKOVETSI;
+            }
+            else 
+            {
+                ungetc(c,soubor);
+                test=false; 
+            }  
+
+
+    case VYKRICNIK:
+            if (c == '=')
+            {
+                naplnToken(c);
+                hodnota=NEGACE;
+
+            }
+    
+    case STREDNIK: // koncovy stav 
+    case L_ZAVORKA:
+    case P_ZAVORKA:
+    case L_HRAN_ZAV:    
+    case P_HRAN_ZAV:     
+    case L_SLOZ_ZAV:     
+    case P_SLOZ_ZAV:
+    case PLUS:
+    case MINUS:
+    case KRAT:
+    case DELENO:
+    case MODULO:
+    case NEGACE:
+    case CARKA:
+    case ROVNITKOMENSI:
+    case ROVNITKOVETSI:
+    
+        naplnToken(c);
+        test=false;
+        break;
+        
+
         }
 
     }
-
-
-
-
 
 
     printf("\n");
