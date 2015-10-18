@@ -84,12 +84,12 @@ int main(int argc, char** argv)
                 hodnota = STREDNIK;
             else if (c == '_')
                 hodnota = PODTRZITKO;
-            else if (c == ' ')          // preskocim znak
+            else if (c == ' ')          // preskocim znak mezery
                 break;
             else if (c == '\t')
-                break;                  // preskocim znak
+                break;                  // preskocim znak tabulatoru
             else if (c == '\n')
-                break;                  // preskocim znak
+                break;                  // preskocim znak konce radku
             else if (c == '(')
                 hodnota = L_ZAVORKA;
             else if (c == ')')
@@ -130,12 +130,12 @@ int main(int argc, char** argv)
                 hodnota = ROVNITKO;
             else
                 hodnota = JINY_ZNAK;
-            printf("Pocatek %c %d \n", c, hodnota);
 
-            naplnToken(c);
+            if (hodnota != RETEZEC) /// neukladam uvozovky na zacatku retezce
+                naplnToken(c);
             break;
 
-        case PISMENO:       /// identifikator, zacina pismenem nebo _
+        case PISMENO:       /// identifikator, zacina pismenem nebo '_' ; dalsi znaky mohou byt cisla
         case PODTRZITKO:
 
             if (isalpha(c) || c == '_' || isdigit(c) )
@@ -153,6 +153,7 @@ int main(int argc, char** argv)
             break;
 
         case CISLO:
+
             if (isdigit(c))
                 naplnToken(c);
             else if (c == '.') {    /// desetinne cislo -> double
@@ -178,7 +179,7 @@ int main(int argc, char** argv)
         case DES_CISLO:
             if (isdigit(c))
                 naplnToken(c);
-            else if (c == '.')
+            else if (c == '.') /* || (c == 'e' || c == 'E'))    */
                 return -1;      /// Lex_an chyba - zadana druha deseinna tecka
             else {
                 token.typ = DOUBLE;
@@ -193,14 +194,49 @@ int main(int argc, char** argv)
             break;
 
         case EXP_CISLO:
-            if (isdigit(c))
+
+            if (isdigit(c)) {
                 naplnToken(c);
+                hodnota = EXP_CIS_KONEC;    /// za E jsou cifry
+            }
             else if (c == '+' || c == '-') {
                 naplnToken(c);
-                hodnota = EXP_CISLO_ZN;
+                hodnota = EXP_CISLO_ZN;     /// znamenkove exp. cislo
             }
+                /*
             else if (c == 'e' || c == 'E')
                 return -1;      /// Lex_an chyba - zadane druhe E
+                */
+            else {
+                    token.typ = DOUBLE;
+                    printf("Token:%s\n", token.obsah);
+
+                        /// vynuluj token
+                        uvolniToken();
+
+                    ungetc(c, soubor);
+                    hodnota = POCATEK;
+            }
+
+            break;
+
+        case EXP_CISLO_ZN:
+            if (isdigit(c)) {
+                naplnToken(c);
+                hodnota = EXP_CIS_KONEC;    /// za E jsou cifry
+                }
+            /*
+            else if (c == 'e' || c == 'E')
+                return -1;      /// Lex_an chyba - zadane druhe E
+                */
+            else
+                return -1;
+
+            break;
+
+        case EXP_CIS_KONEC:
+            if (isdigit(c))
+                naplnToken(c);
             else {
                 token.typ = DOUBLE;
                 printf("Token:%s\n", token.obsah);
@@ -218,7 +254,6 @@ int main(int argc, char** argv)
             if (c != '"')
                 naplnToken(c);
             else {
-                naplnToken(c);
                 token.typ = RETEZEC;
                 printf("Token:%s\n", token.obsah);
 

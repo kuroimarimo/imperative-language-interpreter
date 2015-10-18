@@ -8,6 +8,7 @@ enum {
     DES_CISLO,      /// 1.234
     EXP_CISLO,      /// 1e+4 15E8
     EXP_CISLO_ZN,   /// znamenkovy (+/-) 15E+8
+    EXP_CIS_KONEC,  ///
 
     STREDNIK,       /// ;
     PODTRZITKO,     /// _
