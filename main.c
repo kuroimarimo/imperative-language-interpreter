@@ -121,7 +121,7 @@ int main(int argc, char** argv)
             else if (c == ',')
                 hodnota = CARKA;
             else if (c == '.')
-                return -1; ///hodnota = TECKA;    /// Error - cislo nemuze zacinat teckou
+                return -1;          ///hodnota = TECKA;    /// Error - cislo nemuze zacinat teckou
             else if (c == '<')
                 hodnota = ROZ_MENSI;
             else if (c == '>')
@@ -194,29 +194,16 @@ int main(int argc, char** argv)
             break;
 
         case EXP_CISLO:
-
             if (isdigit(c)) {
                 naplnToken(c);
                 hodnota = EXP_CIS_KONEC;    /// za E jsou cifry
             }
             else if (c == '+' || c == '-') {
                 naplnToken(c);
-                hodnota = EXP_CISLO_ZN;     /// znamenkove exp. cislo
+                hodnota = EXP_CISLO_ZN;     /// znamenkova mocnina exp. cisla: 1E-12
             }
-                /*
-            else if (c == 'e' || c == 'E')
-                return -1;      /// Lex_an chyba - zadane druhe E
-                */
-            else {
-                    token.typ = DOUBLE;
-                    printf("Token:%s\n", token.obsah);
-
-                        /// vynuluj token
-                        uvolniToken();
-
-                    ungetc(c, soubor);
-                    hodnota = POCATEK;
-            }
+            else                /// za E nejsou cifry
+                return -1;
 
             break;
 
@@ -225,10 +212,6 @@ int main(int argc, char** argv)
                 naplnToken(c);
                 hodnota = EXP_CIS_KONEC;    /// za E jsou cifry
                 }
-            /*
-            else if (c == 'e' || c == 'E')
-                return -1;      /// Lex_an chyba - zadane druhe E
-                */
             else
                 return -1;
 
