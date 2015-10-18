@@ -15,6 +15,8 @@ const char *klicova_slova [POCET_KLIC_SLOV] = {
 
 tToken token;
 
+
+
 int initToken () {
     token.obsah = NULL;
     token.pocitadlo = 0;
@@ -331,7 +333,7 @@ int main(int argc, char** argv)
     case ROVNITKOMENSI:
     case ROVNITKOVETSI:
     
-        naplnToken(c);
+        ungetc(c,soubor);
         test=false;
         break;
         
