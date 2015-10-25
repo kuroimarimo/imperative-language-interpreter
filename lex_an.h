@@ -46,7 +46,7 @@ enum {
     ROVNITKOVETSI,  //// =>
 
     JINY_ZNAK,       /// ostatni znaky
-    
+
 
     TOK_NULL,       /// neinicializovany token  */
     TOK_PRAZDNY,    /// prazdny token
@@ -63,7 +63,6 @@ enum {
 typedef struct {
     char *obsah;
     int pocitadlo;
-    int stav;
     int typ;
 } tToken;
 
