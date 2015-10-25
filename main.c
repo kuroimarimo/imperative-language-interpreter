@@ -17,12 +17,12 @@ tToken token;
 
 
 
-int initToken () {
-    token.obsah = NULL;
+void initToken () {
+    if (token.obsah != NULL)
+        free(token.obsah);
     token.pocitadlo = 0;
     token.typ = TOK_NULL;
 
-    return 0;
 }
 
 int naplnToken (char znak) {
@@ -45,11 +45,6 @@ int naplnToken (char znak) {
     (token.pocitadlo)++;
 
     return 0;
-}
-
-void uvolniToken () {
-    free(token.obsah);
-    initToken();
 }
 
 
@@ -137,20 +132,16 @@ int main(int argc, char** argv)
                 naplnToken(c);
             break;
 
-        case PISMENO:       /// identifikator, zacina pismenem nebo '_' ; dalsi znaky mohou byt cisla
+
+       case PISMENO:       /// identifikator, zacina pismenem nebo '_' ; dalsi znaky mohou byt cisla
         case PODTRZITKO:
 
             if (isalpha(c) || c == '_' || isdigit(c) )
                 naplnToken(c);
             else {
                 token.typ = IDENTIFIKATOR;
-                printf("Token:%s\n", token.obsah);
-
-                    /// vynuluj token
-                    uvolniToken();
-
                 ungetc(c, soubor);
-                hodnota = POCATEK;   /// neměl by zde být stav konec ?? ? ??????? 
+                test = false;
             }
             break;
 
@@ -168,13 +159,9 @@ int main(int argc, char** argv)
             }
             else {
                 token.typ = INT;
-                printf("Token:%s\n", token.obsah);
-
-                    /// vynuluj token
-                    uvolniToken();
-
                 ungetc(c, soubor);
-                hodnota = POCATEK;
+                test = false;
+
             }
             break;
 
@@ -185,13 +172,8 @@ int main(int argc, char** argv)
                 return -1;      /// Lex_an chyba - zadana druha deseinna tecka
             else {
                 token.typ = DOUBLE;
-                printf("Token:%s\n", token.obsah);
-
-                    /// vynuluj token
-                    uvolniToken();
-
                 ungetc(c, soubor);
-                hodnota = POCATEK;
+                test = false;
             }
             break;
 
@@ -224,61 +206,43 @@ int main(int argc, char** argv)
                 naplnToken(c);
             else {
                 token.typ = DOUBLE;
-                printf("Token:%s\n", token.obsah);
-
-                    /// vynuluj token
-                    uvolniToken();
-
                 ungetc(c, soubor);
-                hodnota = POCATEK;
+                test = false;
             }
             break;
-        
-
-
-
-
-
-
-
 
         case RETEZEC:
             if (c != '"')
                 naplnToken(c);
             else {
                 token.typ = RETEZEC;
-                printf("Token:%s\n", token.obsah);
-
-                    /// vynuluj token
-                    uvolniToken();
-
-                /// ungetc(c, soubor); /// vytvari nekonecny cyklus
-                hodnota = POCATEK;
+                /// ungetc(c, soubor); - vytvari nekonecny cyklus
+                test = false;
                 }
             break;
 
-     
+
     case MENSI:
             if (c == '<')
             {
-                hodnota= ROZ_MENSI;
+                hodnota = ROZ_MENSI;
                 naplnToken(c);
-                
+
 
             }
             else
             {
                 ungetc(c,soubor);
-                test=false;
+                test = false;
             }
             break;
 
    case VETSI:
             if (c == '>')
             {
-                hodnota= ROZ_VETSI;
+                hodnota = ROZ_VETSI;
                 naplnToken(c);
-                
+
 
             }
             else
@@ -293,7 +257,7 @@ int main(int argc, char** argv)
             if(c == '<')
             {
                 naplnToken(c);
-                hodnota=ROVNITKOMENSI;
+                hodnota=ROVNITKOMENSI;  /// není to blbost? nemá být <= a >=
 
             }
             else if (c== '>')
@@ -301,11 +265,11 @@ int main(int argc, char** argv)
                 naplnToken(c);
                 hodnota=ROVNITKOVETSI;
             }
-            else 
+            else
             {
                 ungetc(c,soubor);
-                test=false; 
-            }  
+                test=false;
+            }
 
 
     case VYKRICNIK:
@@ -315,13 +279,13 @@ int main(int argc, char** argv)
                 hodnota=NEGACE;
 
             }
-    
-    case STREDNIK: // koncovy stav 
+
+    case STREDNIK: // koncovy stav
     case L_ZAVORKA:
     case P_ZAVORKA:
-    case L_HRAN_ZAV:    
-    case P_HRAN_ZAV:     
-    case L_SLOZ_ZAV:     
+    case L_HRAN_ZAV:
+    case P_HRAN_ZAV:
+    case L_SLOZ_ZAV:
     case P_SLOZ_ZAV:
     case PLUS:
     case MINUS:
@@ -332,11 +296,11 @@ int main(int argc, char** argv)
     case CARKA:
     case ROVNITKOMENSI:
     case ROVNITKOVETSI:
-    
-        ungetc(c,soubor);
+
+        naplnToken(c);
         test=false;
         break;
-        
+
 
         }
 
