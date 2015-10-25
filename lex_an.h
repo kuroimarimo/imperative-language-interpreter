@@ -68,16 +68,3 @@ typedef struct {
 } tToken;
 
 
-
-/**
-auto
-int
-double
-cin
-cout
-if
-else
-for
-string
-return
-*/
