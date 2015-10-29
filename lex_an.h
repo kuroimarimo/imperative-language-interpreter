@@ -44,6 +44,8 @@ enum {
     ROVNITKO,       /// =
     ROVNITKOMENSI,  /// =<
     ROVNITKOVETSI,  //// =>
+    RAD_KOMENTAR,   /// // ...
+    KOMENTAR,       /// /* ... */
 
     JINY_ZNAK,       /// ostatni znaky
 
@@ -66,4 +68,12 @@ typedef struct {
     int typ;
 } tToken;
 
+
+
+#define POCET_KLIC_SLOV 10
+
+    /// prototypy funkci
+tToken token;
+
+int scanner (FILE *soubor);
 
