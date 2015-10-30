@@ -39,20 +39,20 @@ enum {
 
     MENSI,          /// <
     VETSI,          /// >
-    ROZ_MENSI,      /// <<
-    ROZ_VETSI,      /// >>
+    C_IN,           /// <<
+    C_OUT,          /// >>
     ROVNITKO,       /// =
-    ROVNITKOMENSI,  /// =<
-    ROVNITKOVETSI,  //// =>
+    MENSI_ROVNO,    /// <=
+    VETSI_ROVNO,    /// >=
+
     RAD_KOMENTAR,   /// // ...
-    KOMENTAR,       /// /* ... */
+    KOMENTAR,       /// /* ...
+    KOMENTAR_KON,   /// ... */
 
     JINY_ZNAK,       /// ostatni znaky
 
 
-    TOK_NULL,       /// neinicializovany token  */
-    TOK_PRAZDNY,    /// prazdny token
-    TOK_HOTOVY,      /// naplneny token
+    TOK_NULL,       /// prazdny/neinicializovany token  */
 
         /// typy tokenu
     IDENTIFIKATOR,

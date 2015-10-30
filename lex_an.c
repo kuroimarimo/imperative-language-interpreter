@@ -205,37 +205,48 @@ int scanner (FILE *soubor) {
     case MENSI:
             if (c == '<')
             {
-                hodnota = ROZ_MENSI;
                 naplnToken(c);
-
-
+                hodnota = C_IN;
+            }
+            else if (c == '=')
+            {
+                naplnToken(c);
+                hodnota = MENSI_ROVNO;
             }
             else
             {
+                hodnota = MENSI;
                 ungetc(c,soubor);
-                test = false;
             }
+            test = false;
             break;
 
    case VETSI:
             if (c == '>')
             {
-                hodnota = ROZ_VETSI;
                 naplnToken(c);
-
-
+                hodnota = C_OUT;
+            }
+            else if (c == '=')
+            {
+                naplnToken(c);
+                hodnota = VETSI_ROVNO;
             }
             else
             {
+                hodnota = VETSI;
                 ungetc(c,soubor);
-                test=false;
+
             }
+            test = false;
             break;
 
     case DELENO:
         if (c != '/' && c!= '*') {
+            naplnToken('/');
+
             ungetc(c,soubor);
-            test=false;
+            test = false;
         }
         else if (c == '/')
             hodnota = RAD_KOMENTAR;
@@ -244,37 +255,38 @@ int scanner (FILE *soubor) {
         break;
 
     case RAD_KOMENTAR:
-        if (c == '\n') {
+        if (c == '\n')
             hodnota = POCATEK;
-        }
+
+        break;
+
+    case KOMENTAR:
+        if (c == '*')
+            hodnota = KOMENTAR_KON;
+        break;
+
+    case KOMENTAR_KON:
+        if (c == '/')
+            hodnota = POCATEK;
+        else
+            hodnota = KOMENTAR;
+        break;
+
 
 
     case ROVNITKO:
-            if(c == '<')
-            {
-                naplnToken(c);
-                hodnota=ROVNITKOMENSI;  /// není to blbost? nemá být <= a >=
-
-            }
-            else if (c== '>')
-            {
-                naplnToken(c);
-                hodnota=ROVNITKOVETSI;
-            }
-            else
-            {
                 ungetc(c,soubor);
                 test=false;
-            }
+        break;
 
 
     case VYKRICNIK:
             if (c == '=')
             {
                 naplnToken(c);
-                hodnota=NEGACE;
-
+                hodnota = NEGACE;
             }
+        break;
 
     case STREDNIK: // koncovy stav
     case L_ZAVORKA:
@@ -289,8 +301,6 @@ int scanner (FILE *soubor) {
     case MODULO:
     case NEGACE:
     case CARKA:
-    case ROVNITKOMENSI:
-    case ROVNITKOVETSI:
 
         naplnToken(c);
         test=false;

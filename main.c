@@ -26,20 +26,13 @@ int main(int argc, char** argv)
     bool test = true;
 
     while (test) {
+        scanner(soubor);
+        if (token.typ == EOF)
+            test = false;
 
-    scanner(soubor);
-    printf("%s", token.obsah);
-
-    if (token.typ == EOF)
-        test = false;
-    printf("\n");
-
+        printf("Tok: %s \n", token.obsah);
     }
-/*
-    scanner(soubor);
-    printf("%s", token.obsah);
-*/
-    printf("\n");
+
     fclose(soubor);
 
     return 0;
