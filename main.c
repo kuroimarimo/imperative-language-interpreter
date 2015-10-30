@@ -29,8 +29,8 @@ int main(int argc, char** argv)
         scanner(soubor);
         if (token.typ == EOF)
             test = false;
-
-        printf("Tok: %s \n", token.obsah);
+        else
+            printf("Tok: %s \n", token.obsah);
     }
 
     fclose(soubor);
