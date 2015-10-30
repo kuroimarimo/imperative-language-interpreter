@@ -56,6 +56,8 @@ enum {
 
         /// typy tokenu
     IDENTIFIKATOR,
+    KLICOVE_SLOVO,
+    VEST_FUNKCE,
     INT,
     DOUBLE,
     AUTO
@@ -71,9 +73,11 @@ typedef struct {
 
 
 #define POCET_KLIC_SLOV 10
+#define POC_VEST_FUNKCI 5
 
-    /// prototypy funkci
+    /// globalni promenne
 tToken token;
 
+    /// prototypy funkci
 int scanner (FILE *soubor);
 

@@ -7,7 +7,11 @@
 #include "lex_an.h"
 
 const char *klicova_slova [POCET_KLIC_SLOV] = {
-        "auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string"
+    "auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string"
+};
+
+const char *vestav_funkce [POC_VEST_FUNKCI] = {
+    "length", "substr", "concat", "find", "sort"
 };
 
 void initToken () {
@@ -315,6 +319,28 @@ int scanner (FILE *soubor) {
 
         }
 
+    }
+
+    for (int i = 0; i < POCET_KLIC_SLOV; i++) {
+        int test_for;
+        test_for = strcmp(token.obsah, klicova_slova[i]);
+
+        if (test_for == 0) {
+            // printf("Klic_slovo: %s\n", token.obsah);
+            token.typ = KLICOVE_SLOVO;
+            i = 10;
+        }
+    }
+
+    for (int i = 0; i < POC_VEST_FUNKCI; i++) {
+        int test_for;
+        test_for = strcmp(token.obsah, vestav_funkce[i]);
+
+        if (test_for == 0) {
+            // printf("vest fce: %s\n", token.obsah);
+            token.typ = VEST_FUNKCE;
+            i = 10;
+        }
     }
 
     if (c == EOF)
