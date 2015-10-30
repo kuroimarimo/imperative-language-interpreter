@@ -19,15 +19,21 @@ void initToken () {
 }
 
 int naplnToken (char znak) {
+    int zvetseni_tok = 0;
 
         /// prvni inicializace
     if (token.pocitadlo == 0) {
-        token.obsah = (char *) malloc(2);
+        token.obsah = (char *) malloc(3);   /// 2 znaky + \O
         if (token.obsah == NULL)
             return -1;
     }
-    else {      /// navyseni kapacity
-        token.obsah = (char *) realloc(token.obsah, token.pocitadlo + 1);
+    else if ((token.pocitadlo) % 10 == 0) {      /// navyseni kapacity na 10 nebo o + 10
+        if (token.pocitadlo < 3)
+            zvetseni_tok = 10;
+        else
+            zvetseni_tok = token.pocitadlo + 10;
+
+        token.obsah = (char *) realloc(token.obsah, zvetseni_tok + 1);
         if (token.obsah == NULL)
             return -1;
             /// chyba realloc
