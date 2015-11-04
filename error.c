@@ -3,6 +3,7 @@
 //
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "error.h"
 
 EErrorReturnValues getReturnValue (EErrorTypes value)
@@ -19,64 +20,70 @@ void printErrorDetails (SError errorDetails)
  * Prints information about the occurred error - line number and appropriate message.
  */
 {
-    printf("Error on line number %d. \n", errorDetails.line);
+    fprintf(stderr, "Error on line number %d. \n", errorDetails.line);
     
     switch (errorDetails.state) {
         case ERR_LEXICAL:
-            printf("");
+            fprintf(stderr, "");
             break;
         case ERR_SYNTAX:
-            printf("");
+            fprintf(stderr, "");
             break;
         case ERR_UndefinedFunction:
-            printf("The function has not been defined.");
+            fprintf(stderr, "The function has not been defined.");
             break;
         case ERR_AttemptedRedefFunction:
-            printf("Attempted redefinition of function.");
+            fprintf(stderr, "Attempted redefinition of function.");
             break;
         case ERR_AttemptedRedefVar:
-            printf("Attempted redefinition of variable.");
+            fprintf(stderr, "Attempted redefinition of variable.");
             break;
         case ERR_IncompatibleExpr:
-            printf("Incompatible types of expressions.");
+            fprintf(stderr, "Incompatible types of expressions.");
             break;
         case ERR_ParamNumber:
-            printf("Incorrect number of parameters.");
+            fprintf(stderr, "Incorrect number of parameters.");
             break;
         case ERR_ParamType:
-            printf("Incorrect type of parameter.");
+            fprintf(stderr, "Incorrect type of parameter.");
             break;
         case ERR_UnderivableType:
-            printf("The type of variable cannot be derived.");
+            fprintf(stderr, "The type of variable cannot be derived.");
             break;
         case ERR_AutoNoInit:
-            printf("Using \'auto\', but initialization is missing.");
+            fprintf(stderr, "Using \'auto\', but initialization is missing.");
             break;
         case ERR_OTHERSEMANTIC:
-            printf("");
+            fprintf(stderr, "");
             break;
         case ERR_ReadInput:
-            printf("Interpreter error while reading from the input.");
+            fprintf(stderr, "Interpreter error while reading from the input.");
             break;
         case ERR_UninitVar:
-            printf("Interpreter error while working with uninitialized variable.");
+            fprintf(stderr, "Interpreter error while working with uninitialized variable.");
             break;
         case ERR_ZeroDivision:
-            printf("Zero division.");
+            fprintf(stderr, "Zero division.");
             break;
         case ERR_OtherRunningErr:
-            printf("");
+            fprintf(stderr, "");
             break;
         case ERR_AllocFailed:
-            printf("Memory allocation error.");
+            fprintf(stderr, "Memory allocation error.");
             break;
         case ERR_CannotOpenFile:
-            printf("File cannot be opened.");
+            fprintf(stderr, "File cannot be opened.");
             break;
         case ERR_InvalidCommndLineArgs:
-            printf("Invalid command line arguments.");
+            fprintf(stderr, "Invalid command line arguments.");
             break;
         default:
             break;
     }
+}
+
+void fatalError (SError error)
+{
+    printErrorDetails (error);
+    exit (getReturnValue(error.state));
 }

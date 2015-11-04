@@ -69,3 +69,5 @@ EErrorReturnValues getReturnValue (EErrorTypes value);
 
 void printErrorDetails (SError errorDetails);
 
+void fatalError (SError error);
+
