@@ -7,7 +7,7 @@
 
 EErrorReturnValues getReturnValue (EErrorTypes value)
 /*
- * Function computes appropriate return value of the program based on the type of error that has occured.
+ * The function computes the appropriate return value of the program based on the type of error that has occurred.
  */
 {
     EErrorReturnValues returnValue = value/100;
@@ -16,7 +16,7 @@ EErrorReturnValues getReturnValue (EErrorTypes value)
 
 void printErrorDetails (SError errorDetails)
 /*
- * Prints information about the occured error - line number and appropriate message.
+ * Prints information about the occurred error - line number and appropriate message.
  */
 {
     printf("Error on line number %d. \n", errorDetails.line);
@@ -32,7 +32,7 @@ void printErrorDetails (SError errorDetails)
             printf("The function has not been defined.");
             break;
         case ERR_AttemptedRedefFunction:
-            printf("Attempted redifinition of function.");
+            printf("Attempted redefinition of function.");
             break;
         case ERR_AttemptedRedefVar:
             printf("Attempted redefinition of variable.");
@@ -56,10 +56,10 @@ void printErrorDetails (SError errorDetails)
             printf("");
             break;
         case ERR_ReadInput:
-            printf("Interpreter error while reading from input.");
+            printf("Interpreter error while reading from the input.");
             break;
         case ERR_UninitVar:
-            printf("Interpreter error while working with uninicialized variable.");
+            printf("Interpreter error while working with uninitialized variable.");
             break;
         case ERR_ZeroDivision:
             printf("Zero division.");
