@@ -10,15 +10,15 @@
 
 int main(int argc, char** argv)
 {
-    FILE *soubor;
+    FILE *source;
     if (argc != 2)
     {
-        printf("Neni zadan vstupni soubor! \n");
+        printf("I can't find any file! \n");
         return 1;
     }
-    if ((soubor = fopen(argv[1], "r")) == NULL)
+    if ((source = fopen(argv[1], "r")) == NULL)
     {
-        printf("Soubor se nepodarilo otevrit! \n");
+        printf("I coudn't open the file! \n");
         return 1;
     }
 
@@ -26,14 +26,14 @@ int main(int argc, char** argv)
     bool test = true;
 
     while (test) {
-        scanner(soubor);
-        if (token.typ == EOF)
+        scanner(source);
+        if (token.type == EOF)
             test = false;
         else
-            printf("Tok: %s \n", token.obsah);
+            printf("Tok: %s \n", token.area);
     }
 
-    fclose(soubor);
+    fclose(source);
 
     return 0;
 }

@@ -1,63 +1,65 @@
 
 /** jednotlivé stavy */
 enum {
-    POCATEK,        /// Určení znaku
+    START,        /// Určení znaku
 
-    CISLO,          /// 0..9
-    PISMENO,        /// a..z, A..Z
-    DES_CISLO,      /// 1.234
-    EXP_CISLO,      /// 1e+4 15E8
-    EXP_CISLO_ZN,   /// znamenkovy (+/-) 15E+8
-    EXP_CIS_KONEC,  ///
+    NUMBER,          /// 0..9
+    LETTER,        /// a..z, A..Z
+    NUMBER_START_ZERO, 
+    DEC_NUMBER,      /// 1.234
+    DEC_NUMBER_END,    /// *.123
+    EXP_NUMBER,      /// 1e+4 15E8
+    EXP_NUMBER_SING,   /// znamenkovy (+/-) 15E+8
+    EXP_NUMBER_END,  ///
 
-    STREDNIK,       /// ;
-    PODTRZITKO,     /// _
-    MEZERA,         /// ' '
+    SEMICOLON,       /// ;
+    UNDERSCORE,     /// _
+    SPACE,         /// ' '
     TABULATOR,      /// '\t'
-    KONEC_RADKU,    /// '\n'
+    END_OF_LINE,    /// '\n'
 
-    L_ZAVORKA,      /// (
-    P_ZAVORKA,      /// )
-    L_HRAN_ZAV,     /// [
-    P_HRAN_ZAV,     /// ]
-    L_SLOZ_ZAV,     /// {
-    P_SLOZ_ZAV,     /// }
+    L_BRACKET,      /// (
+    R_BRACKET,      /// )
+    L_SQUARE_BRACKET,     /// [
+    R_SQUARE_BRACKET,     /// ]
+    L_CURLY_BRACKET,     /// {
+    R_CURLY_BRACKET,     /// }
 
     PLUS,           /// +
     MINUS,          /// -
-    KRAT,           /// *
-    DELENO,         /// /
+    MULTIPLY,           /// *
+    DIVIDE,         /// /
     MODULO,         /// %
 
-    VYKRICNIK,      /// !
+    EXCLAMATION_MARK,      /// !
     NEGACE,         /// !=
-    OTAZNIK,        /// ?
-    RETEZEC,        /// "
-    CARKA,          /// ,
+    QUESTION_MARK,        /// ?
+    STRING,        /// "
+    COMMA,          /// ,
 /*    TECKA,        /// .   */
 /*  DVOJTECKA       /// :   */
 
-    MENSI,          /// <
-    VETSI,          /// >
+    LESS,          /// <
+    GREATER,          /// >
     C_IN,           /// <<
     C_OUT,          /// >>
-    ROVNITKO,       /// =
-    MENSI_ROVNO,    /// <=
-    VETSI_ROVNO,    /// >=
+    EQUAL,       /// =
+    LESS_ROVNO,    /// <=
+    GREATER_ROVNO,    /// >=
 
-    RAD_KOMENTAR,   /// // ...
-    KOMENTAR,       /// /* ...
-    KOMENTAR_KON,   /// ... */
+    LINE_COMMENT,   /// // ...
+    COMMENT,       /// /* ...
+    COMMENT_KON,   /// ... */
 
-    JINY_ZNAK,       /// ostatni znaky
+    ANOTHER_CHAR,       /// ostatni znaky
 
 
     TOK_NULL,       /// prazdny/neinicializovany token  */
 
         /// typy tokenu
-    IDENTIFIKATOR,
-    KLICOVE_SLOVO,
-    VEST_FUNKCE,
+    IDENTIFIER,
+    KEY_WORD,
+    BUILT_IN_FUNCTION,
     INT,
     DOUBLE,
     AUTO
@@ -65,19 +67,20 @@ enum {
 };
 
 typedef struct {
-    char *obsah;
-    int pocitadlo;
-    int typ;
+    char *area;
+    int counter;
+    int type;
+    int counter_of_lines;
 } tToken;
 
 
 
-#define POCET_KLIC_SLOV 10
-#define POC_VEST_FUNKCI 5
+#define COUNT_OF_KEY_WORDS 10
+#define COUNT_OF_BUILT_IN_FUNCTIONS 5
 
     /// globalni promenne
 tToken token;
 
     /// prototypy funkci
-int scanner (FILE *soubor);
+int scanner (FILE *source);
 

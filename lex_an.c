@@ -6,313 +6,361 @@
 
 #include "lex_an.h"
 
-const char *klicova_slova [POCET_KLIC_SLOV] = {
+const char *key_words [COUNT_OF_KEY_WORDS] = {
     "auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string"
 };
 
-const char *vestav_funkce [POC_VEST_FUNKCI] = {
+const char *built_in_functions [COUNT_OF_BUILT_IN_FUNCTIONS] = {
     "length", "substr", "concat", "find", "sort"
 };
 
-void initToken () {
-    if (token.obsah != NULL)
-        free(token.obsah);
-    token.pocitadlo = 0;
-    token.typ = TOK_NULL;
+
+
+void initToken () {  // inicializovat token 
+    if (token.area != NULL)
+        free(token.area);
+    token.counter = 0;
+    token.type = TOK_NULL;
+    token.counter_of_lines=0;
 
 }
 
-int naplnToken (char znak) {
-    int zvetseni_tok = 0;
+int fillToken (char character) {  // naplnit token 
+    int extension_tok = 0;
 
         /// prvni inicializace
-    if (token.pocitadlo == 0) {
-        token.obsah = (char *) malloc(3);   /// 2 znaky + \O
-        if (token.obsah == NULL)
+    if (token.counter == 0) {
+        token.area = (char *) malloc(3);   /// 2 charactery + \O
+        if (token.area == NULL)
             return -1;
     }
-    else if ((token.pocitadlo) % 10 == 0) {      /// navyseni kapacity na 10 nebo o + 10
-        if (token.pocitadlo < 3)
-            zvetseni_tok = 10;
+    else if ((token.counter) % 10 == 0) {      /// navyseni kapacity na 10 nebo o + 10
+        if (token.counter < 3)
+            extension_tok = 10;
         else
-            zvetseni_tok = token.pocitadlo + 10;
+            extension_tok = token.counter + 10;
 
-        token.obsah = (char *) realloc(token.obsah, zvetseni_tok + 1);
-        if (token.obsah == NULL)
+        token.area = (char *) realloc(token.area, extension_tok + 1);
+        if (token.area == NULL)
             return -1;
             /// chyba realloc
     }
 
-    token.obsah [token.pocitadlo] = znak;
-    token.obsah [token.pocitadlo + 1] = '\0';
-    (token.pocitadlo)++;
+    token.area [token.counter] = character;
+    token.area [token.counter + 1] = '\0';
+    (token.counter)++;
 
     return 0;
 }
 
-int scanner (FILE *soubor) {
+int scanner (FILE *source) {
     initToken();
 
     int c = 0;
-    int hodnota = POCATEK;
+    int value = START;
     bool test = true;
-    while (test && ( c = fgetc(soubor)) != EOF)
+    while (test && ( c = fgetc(source)) != EOF)
     {
-        switch (hodnota) {
-        case POCATEK:
-                /** Rozpoznani znaku */
-            if isalpha(c)
-                hodnota = PISMENO;
+        switch (value) {
+        case START:
+                /** Rozpoznani characteru */
+            if (c=='\n')   // další řádek
+                token.counter_of_lines++;
+            else if isalpha(c)
+                value = LETTER;
+            else if (c == '0') {
+                value = NUMBER_START_ZERO;
+                break;
+                }
             else if isdigit(c)
-                hodnota = CISLO;
+                value = NUMBER;
             else if (c == ';')
-                hodnota = STREDNIK;
+                value = SEMICOLON;
             else if (c == '_')
-                hodnota = PODTRZITKO;
-            else if (c == ' ')          // preskocim znak mezery
+                value = UNDERSCORE;
+            else if (c == ' ')          // preskocim character mezery
                 break;
             else if (c == '\t')
-                break;                  // preskocim znak tabulatoru
+                break;                  // preskocim character tabulatoru
             else if (c == '\n')
-                break;                  // preskocim znak konce radku
+                break;                  // preskocim character konce radku
             else if (c == '(')
-                hodnota = L_ZAVORKA;
+                value = L_BRACKET;
             else if (c == ')')
-                hodnota = P_ZAVORKA;
+                value = R_BRACKET;
             else if (c == ']')
-                hodnota = L_HRAN_ZAV;
+                value = L_SQUARE_BRACKET;
             else if (c == '[')
-                hodnota = P_HRAN_ZAV;
+                value = R_SQUARE_BRACKET;
             else if (c == '{')
-                hodnota = L_SLOZ_ZAV;
+                value = L_CURLY_BRACKET;
             else if (c == '}')
-                hodnota = P_SLOZ_ZAV;
+                value = R_CURLY_BRACKET;
             else if (c == '+')
-                hodnota = PLUS;
+                value = PLUS;
             else if (c == '-')
-                hodnota = MINUS;
+                value = MINUS;
             else if (c == '*')
-                hodnota = KRAT;
+                value = MULTIPLY;
             else if (c == '/') {
-                hodnota = DELENO;
+                value = DIVIDE;
                 break;
                 }
             else if (c == '%')
-                hodnota = MODULO;
+                value = MODULO;
             else if (c == '!')
-                hodnota = VYKRICNIK;
+                value = EXCLAMATION_MARK;  //vykřičník
             else if (c == '?')
-                hodnota = OTAZNIK;
+                value = QUESTION_MARK;
             else if (c == '"')
-                hodnota = RETEZEC;
+                value = STRING;
             else if (c == ',')
-                hodnota = CARKA;
+                value = COMMA;
             else if (c == '.')
-                return -1;          ///hodnota = TECKA;    /// Error - cislo nemuze zacinat teckou
+                return -1;          ///value = TECKA;    /// Error - cislo nemuze zacinat teckou
             else if (c == '<')
-                hodnota = MENSI;
+                value = LESS;
             else if (c == '>')
-                hodnota = VETSI;
+                value = GREATER;
             else if (c == '=')
-                hodnota = ROVNITKO;
+                value = EQUAL;
             else
-                hodnota = JINY_ZNAK;
+                value = ANOTHER_CHAR;
 
-            if (hodnota != RETEZEC) /// neukladam uvozovky na zacatku retezce
-                naplnToken(c);
+            if (value != STRING) /// neukladam uvozovky na zacatku retezce
+                fillToken(c);
             break;
 
 
-       case PISMENO:       /// identifikator, zacina pismenem nebo '_' ; dalsi znaky mohou byt cisla
-        case PODTRZITKO:
+       case LETTER:       /// identifikator, zacina pismenem nebo '_' ; dalsi charactery mohou byt cisla
+       case UNDERSCORE:
 
             if (isalpha(c) || c == '_' || isdigit(c) )
-                naplnToken(c);
+                fillToken(c);
             else {
-                token.typ = IDENTIFIKATOR;
-                ungetc(c, soubor);
+                token.type = IDENTIFIER;
+                ungetc(c, source);
                 test = false;
             }
             break;
 
-        case CISLO:
+        case NUMBER_START_ZERO:
+            if (c == '0')           /// ignoruj nulu
+                break;
+            else if ((isdigit(c))  ) {  /// 1 .. 9
+
+            }
+            else if ((c == '.') || (c == 'E') || (c == 'e') ) {
+                fillToken('0');
+            }
+            else {
+                test = false;
+                fillToken('0');
+                token.type = INT;
+            }
+
+            ungetc(c, source);
+            value = NUMBER;
+
+            break;
+
+        case NUMBER:
 
             if (isdigit(c))
-                naplnToken(c);
+                fillToken(c);
             else if (c == '.') {    /// desetinne cislo -> double
-                hodnota = DES_CISLO;
-                naplnToken(c);
+                value = DEC_NUMBER;
+                fillToken(c);
             }
             else if (c == 'e' || c == 'E') {
-                hodnota = EXP_CISLO;
-                naplnToken(c);
+                value = EXP_NUMBER;
+                fillToken(c);
             }
             else {
-                token.typ = INT;
-                ungetc(c, soubor);
+                token.type = INT;
+                ungetc(c, source);
                 test = false;
 
             }
             break;
 
-        case DES_CISLO:
-            if (isdigit(c))
-                naplnToken(c);
-            else if (c == '.') /* || (c == 'e' || c == 'E'))    */
-                return -1;      /// Lex_an chyba - zadana druha deseinna tecka
-            else {
-                token.typ = DOUBLE;
-                ungetc(c, soubor);
-                test = false;
-            }
-            break;
-
-        case EXP_CISLO:
+        case DEC_NUMBER:
             if (isdigit(c)) {
-                naplnToken(c);
-                hodnota = EXP_CIS_KONEC;    /// za E jsou cifry
+                fillToken(c);
+                value = DEC_NUMBER_END;
+            }
+            else if (c == '.')  /** || (c == 'e' || c == 'E'))    */
+                return -1;      /// Lex_an chyba - zadana druha desetinna tecka
+            else {
+                token.type = DOUBLE;
+                ungetc(c, source);
+                test = false;
+            }
+            break;
+
+        case DEC_NUMBER_END:
+            if (isdigit(c))
+                fillToken(c);  /// Lex_an chyba - zadana druha desetinna tecka
+            else if (c == '.')
+                return -1;
+            else if ((c == 'e' || c == 'E')) {
+                fillToken(c);
+                value = EXP_NUMBER;
+            }
+            else {
+                token.type = DOUBLE;
+                ungetc(c, source);
+                test = false;
+            }
+
+            break;
+
+        case EXP_NUMBER:
+            if (isdigit(c)) {
+                fillToken(c);
+                value = EXP_NUMBER_END;    /// za E jsou cifry
             }
             else if (c == '+' || c == '-') {
-                naplnToken(c);
-                hodnota = EXP_CISLO_ZN;     /// znamenkova mocnina exp. cisla: 1E-12
+                fillToken(c);
+                value = EXP_NUMBER_SING;     /// znamenkova mocnina exp. cisla: 1E-12
             }
             else                /// za E nejsou cifry
                 return -1;
 
             break;
 
-        case EXP_CISLO_ZN:
+        case EXP_NUMBER_SING:
             if (isdigit(c)) {
-                naplnToken(c);
-                hodnota = EXP_CIS_KONEC;    /// za E jsou cifry
+                fillToken(c);
+                value = EXP_NUMBER_END;    /// za E jsou cifry
                 }
             else
                 return -1;
 
             break;
 
-        case EXP_CIS_KONEC:
+        case EXP_NUMBER_END:
             if (isdigit(c))
-                naplnToken(c);
+                fillToken(c);
             else {
-                token.typ = DOUBLE;
-                ungetc(c, soubor);
+                token.type = DOUBLE;
+                ungetc(c, source);
                 test = false;
             }
             break;
 
-        case RETEZEC:
+        case STRING:
             if (c != '"')
-                naplnToken(c);
+                fillToken(c);
             else {
-                token.typ = RETEZEC;
-                /// ungetc(c, soubor); - vytvari nekonecny cyklus
+                token.type = STRING;
+                /// ungetc(c, source); - vytvari nekonecny cyklus
                 test = false;
                 }
             break;
 
 
-    case MENSI:
+    case LESS:
             if (c == '<')
             {
-                naplnToken(c);
-                hodnota = C_IN;
+                fillToken(c);
+                value = C_IN;
             }
             else if (c == '=')
             {
-                naplnToken(c);
-                hodnota = MENSI_ROVNO;
+                fillToken(c);
+                value = LESS_ROVNO;
             }
             else
             {
-                hodnota = MENSI;
-                ungetc(c,soubor);
+                value = LESS;
+                ungetc(c,source);
             }
             test = false;
             break;
 
-   case VETSI:
+   case GREATER:
             if (c == '>')
             {
-                naplnToken(c);
-                hodnota = C_OUT;
+                fillToken(c);
+                value = C_OUT;
             }
             else if (c == '=')
             {
-                naplnToken(c);
-                hodnota = VETSI_ROVNO;
+                fillToken(c);
+                value = GREATER_ROVNO;
             }
             else
             {
-                hodnota = VETSI;
-                ungetc(c,soubor);
+                value = GREATER;
+                ungetc(c,source);
 
             }
             test = false;
             break;
 
-    case DELENO:
+    case DIVIDE:
         if (c != '/' && c!= '*') {
-            naplnToken('/');
+            fillToken('/');
 
-            ungetc(c,soubor);
+            ungetc(c,source);
             test = false;
         }
         else if (c == '/')
-            hodnota = RAD_KOMENTAR;
+            value = LINE_COMMENT;
         else
-            hodnota = KOMENTAR;
+            value = COMMENT;
         break;
 
-    case RAD_KOMENTAR:
+    case LINE_COMMENT:
         if (c == '\n')
-            hodnota = POCATEK;
+            value = START;
 
         break;
 
-    case KOMENTAR:
+    case COMMENT:
         if (c == '*')
-            hodnota = KOMENTAR_KON;
+            value = COMMENT_KON;
         break;
 
-    case KOMENTAR_KON:
+    case COMMENT_KON:
         if (c == '/')
-            hodnota = POCATEK;
+            value = START;
         else
-            hodnota = KOMENTAR;
+            value = COMMENT;
         break;
 
 
 
-    case ROVNITKO:
-                ungetc(c,soubor);
+    case EQUAL:
+                ungetc(c,source);
                 test=false;
         break;
 
 
-    case VYKRICNIK:
+    case EXCLAMATION_MARK:
             if (c == '=')
             {
-                naplnToken(c);
-                hodnota = NEGACE;
+                fillToken(c);
+                value = NEGACE;
             }
         break;
 
-    case STREDNIK: // koncovy stav
-    case L_ZAVORKA:
-    case P_ZAVORKA:
-    case L_HRAN_ZAV:
-    case P_HRAN_ZAV:
-    case L_SLOZ_ZAV:
-    case P_SLOZ_ZAV:
+    case SEMICOLON: // koncovy stav
+    case L_BRACKET:
+    case R_BRACKET:
+    case L_SQUARE_BRACKET:
+    case R_SQUARE_BRACKET:
+    case L_CURLY_BRACKET:
+    case R_CURLY_BRACKET:
     case PLUS:
     case MINUS:
-    case KRAT:
+    case MULTIPLY:
     case MODULO:
     case NEGACE:
-    case CARKA:
+    case COMMA:
 
-        naplnToken(c);
+        fillToken(c);
         test=false;
         break;
 
@@ -321,30 +369,30 @@ int scanner (FILE *soubor) {
 
     }
 
-    for (int i = 0; i < POCET_KLIC_SLOV; i++) {
+    for (int i = 0; i < COUNT_OF_KEY_WORDS; i++) {
         int test_for;
-        test_for = strcmp(token.obsah, klicova_slova[i]);
+        test_for = strcmp(token.area, key_words[i]);
 
         if (test_for == 0) {
-            // printf("Klic_slovo: %s\n", token.obsah);
-            token.typ = KLICOVE_SLOVO;
+            // printf("Klic_slovo: %s\n", token.area);
+            token.type = KEY_WORD;
             i = 10;
         }
     }
 
-    for (int i = 0; i < POC_VEST_FUNKCI; i++) {
+    for (int i = 0; i < COUNT_OF_BUILT_IN_FUNCTIONS; i++) {
         int test_for;
-        test_for = strcmp(token.obsah, vestav_funkce[i]);
+        test_for = strcmp(token.area, built_in_functions[i]);
 
         if (test_for == 0) {
-            // printf("vest fce: %s\n", token.obsah);
-            token.typ = VEST_FUNKCE;
+            // printf("vest fce: %s\n", token.area);
+            token.type = BUILT_IN_FUNCTION;
             i = 10;
         }
     }
 
     if (c == EOF)
-        token.typ = EOF;
+        token.type = EOF;
 
     return 0;
 }
