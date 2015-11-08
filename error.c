@@ -24,58 +24,58 @@ void printErrorDetails (SError errorDetails)
     
     switch (errorDetails.state) {
         case ERR_LEXICAL:
-            fprintf(stderr, "");
+            fprintf(stderr, "\n");
             break;
         case ERR_SYNTAX:
-            fprintf(stderr, "");
+            fprintf(stderr, "Syntax error.\n");
             break;
         case ERR_UndefinedFunction:
-            fprintf(stderr, "The function has not been defined.");
+            fprintf(stderr, "The function has not been defined.\n");
             break;
         case ERR_AttemptedRedefFunction:
-            fprintf(stderr, "Attempted redefinition of function.");
+            fprintf(stderr, "Attempted redefinition of function.\n");
             break;
         case ERR_AttemptedRedefVar:
-            fprintf(stderr, "Attempted redefinition of variable.");
+            fprintf(stderr, "Attempted redefinition of variable.\n");
             break;
         case ERR_IncompatibleExpr:
-            fprintf(stderr, "Incompatible types of expressions.");
+            fprintf(stderr, "Incompatible types of expressions.\n");
             break;
         case ERR_ParamNumber:
-            fprintf(stderr, "Incorrect number of parameters.");
+            fprintf(stderr, "Incorrect number of parameters.\n");
             break;
         case ERR_ParamType:
-            fprintf(stderr, "Incorrect type of parameter.");
+            fprintf(stderr, "Incorrect type of parameter.\n");
             break;
         case ERR_UnderivableType:
-            fprintf(stderr, "The type of variable cannot be derived.");
+            fprintf(stderr, "The type of variable cannot be derived.\n");
             break;
         case ERR_AutoNoInit:
-            fprintf(stderr, "Using \'auto\', but initialization is missing.");
+            fprintf(stderr, "Using \'auto\', but initialization is missing.\n");
             break;
         case ERR_OTHERSEMANTIC:
-            fprintf(stderr, "");
+            fprintf(stderr, "\n");
             break;
         case ERR_ReadInput:
-            fprintf(stderr, "Interpreter error while reading from the input.");
+            fprintf(stderr, "Interpreter error while reading from the input.\n");
             break;
         case ERR_UninitVar:
-            fprintf(stderr, "Interpreter error while working with uninitialized variable.");
+            fprintf(stderr, "Interpreter error while working with uninitialized variable.\n");
             break;
         case ERR_ZeroDivision:
-            fprintf(stderr, "Zero division.");
+            fprintf(stderr, "Zero division.\n");
             break;
         case ERR_OtherRunningErr:
-            fprintf(stderr, "");
+            fprintf(stderr, "\n");
             break;
         case ERR_AllocFailed:
-            fprintf(stderr, "Memory allocation error.");
+            fprintf(stderr, "Memory allocation error.\n");
             break;
         case ERR_CannotOpenFile:
-            fprintf(stderr, "File cannot be opened.");
+            fprintf(stderr, "File cannot be opened.\n");
             break;
         case ERR_InvalidCommndLineArgs:
-            fprintf(stderr, "Invalid command line arguments.");
+            fprintf(stderr, "Invalid command line arguments.\n");
             break;
         default:
             break;

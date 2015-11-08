@@ -2,6 +2,9 @@
 //  error.h
 //
 
+#ifndef ERROR_H
+#define ERROR_H
+
 
 typedef enum
 {
@@ -71,3 +74,4 @@ void printErrorDetails (SError errorDetails);
 
 void fatalError (SError error);
 
+#endif

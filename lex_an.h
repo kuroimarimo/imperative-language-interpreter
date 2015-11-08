@@ -1,3 +1,5 @@
+#ifndef LEX_AN_H
+#define LEX_AN_H
 
 /** jednotlivé stavy */
 enum {
@@ -84,3 +86,4 @@ tToken token;
     /// prototypy funkci
 int scanner (FILE *source);
 
+#endif

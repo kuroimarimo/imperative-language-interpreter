@@ -5,12 +5,16 @@
 #include <ctype.h>
 
 #include "lex_an.h"
+#include "error.h"
+#include "parser.h"
 
 
 
 int main(int argc, char** argv)
 {
     FILE *source;
+    SError errorState;
+
     if (argc != 2)
     {
         printf("I can't find any file! \n");
@@ -23,7 +27,7 @@ int main(int argc, char** argv)
     }
 
 
-    bool test = true;
+    /*bool test = true;
 
     while (test) {
         scanner(source);
@@ -31,9 +35,17 @@ int main(int argc, char** argv)
             test = false;
         else
             printf("Tok: %s \n", token.area);
-    }
+    }*/
+
+    errorState.state = parse(source);               // parse the code 
+    errorState.line = token.counter_of_lines;       // this stuff doesn't work the way I'd like it to work
+
+    if (errorState.state != ERR_None)
+        printErrorDetails(errorState);
+    else
+        printf("Syntax OK.\n");
 
     fclose(source);
 
-    return 0;
+    return getReturnValue(errorState.state);
 }
