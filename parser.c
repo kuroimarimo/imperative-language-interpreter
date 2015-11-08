@@ -38,19 +38,15 @@ int rule_funcdef()
         return ERR_SYNTAX;
 
     //vytvorenie polozky TS pre funkciu
-printf("koala\n");
     scanner(srcFile);
     printf("Token: %s \n", token.area);
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
 
     //pridanie ID funkcie
-printf("cajka\n");
     int error = rule_paramList();
     if (error != ERR_None)
         return error;
-
-printf("avokado\n");
 
     error = rule_funcDefined();
     if (error != ERR_None)
@@ -131,7 +127,6 @@ int rule_paramNext()
     
     if (strcmp(token.area, ",") == 0)
     {
-        printf("Som tu!\n");
 
         scanner(srcFile);
         printf("Token paramnext next: **%s** \n", token.area);
@@ -148,8 +143,6 @@ int rule_paramNext()
 
     else 
     {
-
-        printf("BAD WOLF\n");
         if (strcmp(token.area, ")") == 0)
             return ERR_None;
     }
