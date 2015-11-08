@@ -360,7 +360,8 @@ int scanner (FILE *source) {
     case NEGACE:
     case COMMA:
 
-        fillToken(c);
+        //  fillToken(c);
+        ungetc(c, source);
         test=false;
         break;
 
