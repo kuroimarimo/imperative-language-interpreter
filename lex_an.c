@@ -16,7 +16,7 @@ const char *built_in_functions [COUNT_OF_BUILT_IN_FUNCTIONS] = {
 
 
 
-void initToken () {  // inicializovat token 
+void initToken () {  // inicializovat token
     if (token.area != NULL)
         free(token.area);
     token.counter = 0;
@@ -25,7 +25,7 @@ void initToken () {  // inicializovat token
 
 }
 
-int fillToken (char character) {  // naplnit token 
+int fillToken (char character) {  // naplnit token
     int extension_tok = 0;
 
         /// prvni inicializace
@@ -64,9 +64,7 @@ int scanner (FILE *source) {
         switch (value) {
         case START:
                 /** Rozpoznani characteru */
-            if (c=='\n')   // další řádek
-                token.counter_of_lines++;
-            else if isalpha(c)
+            if isalpha(c)
                 value = LETTER;
             else if (c == '0') {
                 value = NUMBER_START_ZERO;
@@ -82,8 +80,10 @@ int scanner (FILE *source) {
                 break;
             else if (c == '\t')
                 break;                  // preskocim character tabulatoru
-            else if (c == '\n')
+            else if (c == '\n') {
+                token.counter_of_lines++;
                 break;                  // preskocim character konce radku
+                }
             else if (c == '(')
                 value = L_BRACKET;
             else if (c == ')')
