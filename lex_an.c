@@ -26,7 +26,7 @@ void initToken () {  // inicializovat token
 }
 
 int fillToken (char character) {  // naplnit token
-    int extension_tok = 0;
+    // int extension_tok = 0;
 
         /// prvni inicializace
     if (token.counter == 0) {
@@ -34,13 +34,10 @@ int fillToken (char character) {  // naplnit token
         if (token.area == NULL)
             return -1;
     }
-    else if ((token.counter) % 10 == 0) {      /// navyseni kapacity na 10 nebo o + 10
-        if (token.counter < 3)
-            extension_tok = 10;
-        else
-            extension_tok = token.counter + 10;
+    else if (token.counter == token.sizeof_area) {      /// navyseni kapacity o druhou mocninu
+        token.sizeof_area = token.sizeof_area * token.sizeof_area;
 
-        token.area = (char *) realloc(token.area, extension_tok + 1);
+        token.area = (char *) realloc(token.area, (token.sizeof_area + 1));
         if (token.area == NULL)
             return -1;
             /// chyba realloc
