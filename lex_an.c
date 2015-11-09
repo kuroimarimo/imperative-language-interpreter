@@ -19,6 +19,7 @@ const char *built_in_functions [COUNT_OF_BUILT_IN_FUNCTIONS] = {
 void initToken () {  // inicializovat token
     if (token.area != NULL)
         free(token.area);
+    token.area = NULL;
     token.counter = 0;
     token.type = TOK_NULL;
     token.counter_of_lines=0;
@@ -31,11 +32,12 @@ int fillToken (char character) {  // naplnit token
         /// prvni inicializace
     if (token.counter == 0) {
         token.area = (char *) malloc(3);   /// 2 charactery + \O
+        token.sizeof_area = 2;
         if (token.area == NULL)
             return -1;
     }
     else if (token.counter == token.sizeof_area) {      /// navyseni kapacity o druhou mocninu
-        token.sizeof_area = token.sizeof_area * token.sizeof_area;
+        token.sizeof_area = token.sizeof_area * 2;
 
         token.area = (char *) realloc(token.area, (token.sizeof_area + 1));
         if (token.area == NULL)
@@ -69,8 +71,6 @@ int scanner (FILE *source) {
                 }
             else if isdigit(c)
                 value = NUMBER;
-            else if (c == ';')
-                value = SEMICOLON;
             else if (c == '_')
                 value = UNDERSCORE;
             else if (c == ' ')          // preskocim character mezery
@@ -81,38 +81,17 @@ int scanner (FILE *source) {
                 token.counter_of_lines++;
                 break;                  // preskocim character konce radku
                 }
-            else if (c == '(')
-                value = L_BRACKET;
-            else if (c == ')')
-                value = R_BRACKET;
-            else if (c == ']')
-                value = L_SQUARE_BRACKET;
-            else if (c == '[')
-                value = R_SQUARE_BRACKET;
-            else if (c == '{')
-                value = L_CURLY_BRACKET;
-            else if (c == '}')
-                value = R_CURLY_BRACKET;
-            else if (c == '+')
-                value = PLUS;
-            else if (c == '-')
-                value = MINUS;
-            else if (c == '*')
-                value = MULTIPLY;
             else if (c == '/') {
                 value = DIVIDE;
                 break;
                 }
-            else if (c == '%')
-                value = MODULO;
             else if (c == '!')
                 value = EXCLAMATION_MARK;  //vykřičník
             else if (c == '?')
                 value = QUESTION_MARK;
             else if (c == '"')
                 value = STRING;
-            else if (c == ',')
-                value = COMMA;
+
             else if (c == '.')
                 return -1;          ///value = TECKA;    /// Error - cislo nemuze zacinat teckou
             else if (c == '<')
@@ -121,8 +100,40 @@ int scanner (FILE *source) {
                 value = GREATER;
             else if (c == '=')
                 value = EQUAL;
-            else
-                value = ANOTHER_CHAR;
+            else {              /// jednoznakove tokeny
+                test = false;
+
+                if (c == ';')
+                    token.type = SEMICOLON;
+                else if (c == ',')
+                    token.type = COMMA;
+                else if (c == '(')
+                    token.type = L_BRACKET;
+                else if (c == ')')
+                    token.type = R_BRACKET;
+                else if (c == ']')
+                    token.type = L_SQUARE_BRACKET;
+                else if (c == '[')
+                    token.type = R_SQUARE_BRACKET;
+                else if (c == '{')
+                    token.type = L_CURLY_BRACKET;
+                else if (c == '}')
+                    token.type = R_CURLY_BRACKET;
+                else if (c == '+')
+                    token.type = PLUS;
+                else if (c == '-')
+                    token.type = MINUS;
+                else if (c == '*')
+                    token.type = MULTIPLY;
+                else if (c == '%')
+                    token.type = MODULO;
+                else
+                    token.type = ANOTHER_CHAR;  /// má smysl?
+
+                /// break;
+            }
+
+
 
             if (value != STRING) /// neukladam uvozovky na zacatku retezce
                 fillToken(c);
@@ -342,7 +353,7 @@ int scanner (FILE *source) {
                 value = NEGACE;
             }
         break;
-
+/*
     case SEMICOLON: // koncovy stav
     case L_BRACKET:
     case R_BRACKET:
@@ -354,8 +365,9 @@ int scanner (FILE *source) {
     case MINUS:
     case MULTIPLY:
     case MODULO:
-    case NEGACE:
     case COMMA:
+*/
+    case NEGACE:
 
         //  fillToken(c);
         ungetc(c, source);
@@ -366,26 +378,27 @@ int scanner (FILE *source) {
         }
 
     }
+    if (token.area != NULL) {
+        for (int i = 0; i < COUNT_OF_KEY_WORDS; i++) {
+            int test_for;
+            test_for = strcmp(token.area, key_words[i]);
 
-    for (int i = 0; i < COUNT_OF_KEY_WORDS; i++) {
-        int test_for;
-        test_for = strcmp(token.area, key_words[i]);
-
-        if (test_for == 0) {
-            // printf("Klic_slovo: %s\n", token.area);
-            token.type = KEY_WORD;
-            i = 10;
+            if (test_for == 0) {
+                // printf("Klic_slovo: %s\n", token.area);
+                token.type = KEY_WORD;
+                i = 10;
+            }
         }
-    }
 
-    for (int i = 0; i < COUNT_OF_BUILT_IN_FUNCTIONS; i++) {
-        int test_for;
-        test_for = strcmp(token.area, built_in_functions[i]);
+        for (int i = 0; i < COUNT_OF_BUILT_IN_FUNCTIONS; i++) {
+            int test_for;
+            test_for = strcmp(token.area, built_in_functions[i]);
 
-        if (test_for == 0) {
-            // printf("vest fce: %s\n", token.area);
-            token.type = BUILT_IN_FUNCTION;
-            i = 10;
+            if (test_for == 0) {
+                // printf("vest fce: %s\n", token.area);
+                token.type = BUILT_IN_FUNCTION;
+                i = 10;
+            }
         }
     }
 
