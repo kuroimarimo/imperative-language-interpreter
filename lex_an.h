@@ -7,7 +7,7 @@ enum {
 
     NUMBER,          /// 0..9
     LETTER,        /// a..z, A..Z
-    NUMBER_START_ZERO, 
+    NUMBER_START_ZERO,
     DEC_NUMBER,      /// 1.234
     DEC_NUMBER_END,    /// *.123
     EXP_NUMBER,      /// 1e+4 15E8
@@ -71,6 +71,7 @@ enum {
 typedef struct {
     char *area;
     int counter;
+    int sizeof_area;
     int type;
     int counter_of_lines;
 } tToken;
