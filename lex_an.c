@@ -36,7 +36,7 @@ int fillToken (char character) {  // naplnit token
         if (token.area == NULL)
             return -1;
     }
-    else if (token.counter == token.sizeof_area) {      /// navyseni kapacity o druhou mocninu
+    else if (token.counter == token.sizeof_area) {      /// navyseni kapacity o dvojnasobek
         token.sizeof_area = token.sizeof_area * 2;
 
         token.area = (char *) realloc(token.area, (token.sizeof_area + 1));
@@ -378,15 +378,14 @@ int scanner (FILE *source) {
         }
 
     }
-    if (token.area != NULL) {
+    if ((token.type == IDENTIFIER) && (token.area != NULL)) {
         for (int i = 0; i < COUNT_OF_KEY_WORDS; i++) {
             int test_for;
             test_for = strcmp(token.area, key_words[i]);
 
             if (test_for == 0) {
-                // printf("Klic_slovo: %s\n", token.area);
                 token.type = KEY_WORD;
-                i = 10;
+                i = 10;     /// ukončím for smyčku
             }
         }
 
@@ -395,9 +394,8 @@ int scanner (FILE *source) {
             test_for = strcmp(token.area, built_in_functions[i]);
 
             if (test_for == 0) {
-                // printf("vest fce: %s\n", token.area);
                 token.type = BUILT_IN_FUNCTION;
-                i = 10;
+                i = 10;     /// ukončím for smyčku
             }
         }
     }
