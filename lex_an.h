@@ -64,12 +64,26 @@ enum {
 
 };
 
+union unie {
+    int int_number;
+    double double_number;
+    char *area;
+};
+
+//unie *tunie;
+
 typedef struct {
     char *area;
     int counter;
     int sizeof_area;
     int type;
     int counter_of_lines;
+
+    union {
+        int int_number;
+        double double_number;
+        char *area;
+        } unie;
 } tToken;
 
 

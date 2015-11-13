@@ -54,6 +54,7 @@ int fillToken (char character) {  // naplnit token
 
 int scanner (FILE *source) {
     initToken();
+    token.unie.int_number = 5;
 
     int c = 0;
     int value = START;
