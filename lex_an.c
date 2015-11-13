@@ -22,7 +22,12 @@ void initToken () {  // inicializovat token
     token.area = NULL;
     token.counter = 0;
     token.type = TOK_NULL;
-    token.counter_of_lines=0;
+     static int pomocna=0;
+    if(!pomocna){
+        token.counter_of_lines=1;
+        pomocna++;
+    }
+    
 
 }
 
