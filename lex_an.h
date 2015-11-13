@@ -3,68 +3,64 @@
 
 /** jednotlivé stavy */
 enum {
-    START,        /// Určení znaku
+    START,              /// 0       Určení znaku
 
-    NUMBER,          /// 0..9
-    LETTER,        /// a..z, A..Z
+    NUMBER,             /// 1       0..9
+    LETTER,             /// 2       a..z, A..Z
     NUMBER_START_ZERO,
-    DEC_NUMBER,      /// 1.234
-    DEC_NUMBER_END,    /// *.123
-    EXP_NUMBER,      /// 1e+4 15E8
-    EXP_NUMBER_SING,   /// znamenkovy (+/-) 15E+8
-    EXP_NUMBER_END,  ///
+    DEC_NUMBER,         /// 4       1.234
+    DEC_NUMBER_END,     /// 5       *.123
+    EXP_NUMBER,         /// 6       1e+4 15E8
+    EXP_NUMBER_SING,    /// 7       znamenkovy (+/-) 15E+8
+    EXP_NUMBER_END,     /// 8
 
-    SEMICOLON,       /// ;
-    UNDERSCORE,     /// _
-    SPACE,         /// ' '
-    TABULATOR,      /// '\t'
-    END_OF_LINE,    /// '\n'
+    SEMICOLON,          /// 9       ;
+    UNDERSCORE,         /// 10      _
 
-    L_BRACKET,      /// (
-    R_BRACKET,      /// )
-    L_SQUARE_BRACKET,     /// [
-    R_SQUARE_BRACKET,     /// ]
-    L_CURLY_BRACKET,     /// {
-    R_CURLY_BRACKET,     /// }
+    L_BRACKET,          /// 11      (
+    R_BRACKET,          /// 12      )
+    L_SQUARE_BRACKET,   /// 13      [
+    R_SQUARE_BRACKET,   /// 14      ]
+    L_CURLY_BRACKET,    /// 15      {
+    R_CURLY_BRACKET,    /// 16      }
 
-    PLUS,           /// +
-    MINUS,          /// -
-    MULTIPLY,           /// *
-    DIVIDE,         /// /
-    MODULO,         /// %
+    PLUS,               /// 17      +
+    MINUS,              /// 18      -
+    MULTIPLY,           /// 19      *
+    DIVIDE,             /// 20      /
+    MODULO,             /// 21      %
 
-    EXCLAMATION_MARK,      /// !
-    NEGACE,         /// !=
-    QUESTION_MARK,        /// ?
-    STRING,        /// "
-    COMMA,          /// ,
-/*    TECKA,        /// .   */
-/*  DVOJTECKA       /// :   */
+    EXCLAMATION_MARK,   /// 22      !
+    NEGACE,             /// 23      !=
+    QUESTION_MARK,      /// 24      ?
+    STRING,             /// 25      "
+    COMMA,              /// 26      ,
 
-    LESS,          /// <
-    GREATER,          /// >
-    C_IN,           /// <<
-    C_OUT,          /// >>
-    EQUAL,       /// =
-    LESS_ROVNO,    /// <=
-    GREATER_ROVNO,    /// >=
+    LESS,               /// 27      <
+    GREATER,            /// 28      >
+    C_IN,               /// 29      <<
+    C_OUT,              /// 30      >>
+    ASSIGNMENT,         /// 31      =
+    EQUAL,              /// 32      ==
+    LESS_ROVNO,         /// 33      <=
+    GREATER_ROVNO,      /// 34      >=
 
-    LINE_COMMENT,   /// // ...
-    COMMENT,       /// /* ...
-    COMMENT_KON,   /// ... */
+    LINE_COMMENT,       /// 35      // ...
+    COMMENT,            /// 36      /* ...
+    COMMENT_KON,        /// 37      ... */
 
-    ANOTHER_CHAR,       /// ostatni znaky
+    ANOTHER_CHAR,       /// 38      ostatni znaky
 
 
-    TOK_NULL,       /// prazdny/neinicializovany token  */
+    TOK_NULL,           /// 39      prazdny/neinicializovany token  */
 
         /// typy tokenu
-    IDENTIFIER,
-    KEY_WORD,
-    BUILT_IN_FUNCTION,
-    INT,
-    DOUBLE,
-    AUTO
+    IDENTIFIER,         /// 40
+    KEY_WORD,           /// 41
+    BUILT_IN_FUNCTION,  /// 42
+    INT,                /// 43
+    DOUBLE,             /// 44
+    AUTO                /// 45
 
 };
 

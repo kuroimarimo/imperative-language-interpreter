@@ -99,7 +99,7 @@ int scanner (FILE *source) {
             else if (c == '>')
                 value = GREATER;
             else if (c == '=')
-                value = EQUAL;
+                value = ASSIGNMENT;
             else {              /// jednoznakove tokeny
                 test = false;
 
@@ -340,9 +340,17 @@ int scanner (FILE *source) {
 
 
 
-    case EQUAL:
+    case ASSIGNMENT:
+            if (c == '=') {
+                fillToken(c);
+                token.type = EQUAL;
+            }
+            else {
                 ungetc(c,source);
-                test=false;
+                token.type = ASSIGNMENT;
+            }
+
+            test=false;
         break;
 
 
@@ -350,8 +358,13 @@ int scanner (FILE *source) {
             if (c == '=')
             {
                 fillToken(c);
-                value = NEGACE;
+                token.type = NEGACE;
             }
+            else {
+                ungetc(c, source);
+            }
+                test = false;
+
         break;
 /*
     case SEMICOLON: // koncovy stav
@@ -366,14 +379,14 @@ int scanner (FILE *source) {
     case MULTIPLY:
     case MODULO:
     case COMMA:
-*/
+
     case NEGACE:
 
         //  fillToken(c);
         ungetc(c, source);
         test=false;
         break;
-
+*/
 
         }
 
