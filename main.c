@@ -26,18 +26,18 @@ int main(int argc, char** argv)
         return 1;
     }
 
-
-    /*bool test = true;
+/*
+    bool test = true;
 
     while (test) {
         scanner(source);
         if (token.type == EOF)
             test = false;
-        else
-            printf("Tok: %s \n", token.area);
-    }*/
-
-    errorState.state = parse(source);               // parse the code 
+        else if (token.unie.area != NULL)
+            printf("Tok: %s %d\n", token.unie.area, token.type);
+    }
+*/
+    errorState.state = parse(source);               // parse the code
     errorState.line = token.counter_of_lines;       // this stuff doesn't work the way I'd like it to work
 
     if (errorState.state != ERR_None)

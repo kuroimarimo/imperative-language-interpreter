@@ -17,9 +17,9 @@ const char *built_in_functions [COUNT_OF_BUILT_IN_FUNCTIONS] = {
 
 
 void initToken () {  // inicializovat token
-    if (token.area != NULL)
-        free(token.area);
-    token.area = NULL;
+    if (token.unie.area != NULL)
+        free(token.unie.area);
+    token.unie.area = NULL;
     token.counter = 0;
     token.type = TOK_NULL;
      static int pomocna=0;
@@ -27,7 +27,7 @@ void initToken () {  // inicializovat token
         token.counter_of_lines=1;
         pomocna++;
     }
-    
+
 
 }
 
@@ -36,22 +36,22 @@ int fillToken (char character) {  // naplnit token
 
         /// prvni inicializace
     if (token.counter == 0) {
-        token.area = (char *) malloc(3);   /// 2 charactery + \O
+        token.unie.area = (char *) malloc(3);   /// 2 charactery + \O
         token.sizeof_area = 2;
-        if (token.area == NULL)
+        if (token.unie.area == NULL)
             return -1;
     }
     else if (token.counter == token.sizeof_area) {      /// navyseni kapacity o dvojnasobek
         token.sizeof_area = token.sizeof_area * 2;
 
-        token.area = (char *) realloc(token.area, (token.sizeof_area + 1));
-        if (token.area == NULL)
+        token.unie.area = (char *) realloc(token.unie.area, (token.sizeof_area + 1));
+        if (token.unie.area == NULL)
             return -1;
             /// chyba realloc
     }
 
-    token.area [token.counter] = character;
-    token.area [token.counter + 1] = '\0';
+    token.unie.area [token.counter] = character;
+    token.unie.area [token.counter + 1] = '\0';
     (token.counter)++;
 
     return 0;
@@ -59,7 +59,6 @@ int fillToken (char character) {  // naplnit token
 
 int scanner (FILE *source) {
     initToken();
-    token.unie.int_number = 5;
 
     int c = 0;
     int value = START;
@@ -372,35 +371,14 @@ int scanner (FILE *source) {
                 test = false;
 
         break;
-/*
-    case SEMICOLON: // koncovy stav
-    case L_BRACKET:
-    case R_BRACKET:
-    case L_SQUARE_BRACKET:
-    case R_SQUARE_BRACKET:
-    case L_CURLY_BRACKET:
-    case R_CURLY_BRACKET:
-    case PLUS:
-    case MINUS:
-    case MULTIPLY:
-    case MODULO:
-    case COMMA:
-
-    case NEGACE:
-
-        //  fillToken(c);
-        ungetc(c, source);
-        test=false;
-        break;
-*/
 
         }
 
     }
-    if ((token.type == IDENTIFIER) && (token.area != NULL)) {
+    if ((token.type == IDENTIFIER) && (token.unie.area != NULL)) {
         for (int i = 0; i < COUNT_OF_KEY_WORDS; i++) {
             int test_for;
-            test_for = strcmp(token.area, key_words[i]);
+            test_for = strcmp(token.unie.area, key_words[i]);
 
             if (test_for == 0) {
                 token.type = KEY_WORD;
@@ -410,7 +388,7 @@ int scanner (FILE *source) {
 
         for (int i = 0; i < COUNT_OF_BUILT_IN_FUNCTIONS; i++) {
             int test_for;
-            test_for = strcmp(token.area, built_in_functions[i]);
+            test_for = strcmp(token.unie.area, built_in_functions[i]);
 
             if (test_for == 0) {
                 token.type = BUILT_IN_FUNCTION;
