@@ -33,44 +33,47 @@ enum {
     EXCLAMATION_MARK,   /// 22      !
     NEGACE,             /// 23      !=
     QUESTION_MARK,      /// 24      ?
-    STRING,             /// 25      "
-    COMMA,              /// 26      ,
+    STRING,             /// 25      ".."
+    STRING_ESCAPE,      /// 26
+    STRING_ESCAPE2,     /// 27
+    COMMA,              /// 28      ,
 
-    LESS,               /// 27      <
-    GREATER,            /// 28      >
-    C_IN,               /// 29      <<
-    C_OUT,              /// 30      >>
-    ASSIGNMENT,         /// 31      =
-    EQUAL,              /// 32      ==
-    LESS_ROVNO,         /// 33      <=
-    GREATER_ROVNO,      /// 34      >=
+    LESS,               /// 29      <
+    GREATER,            /// 30      >
+    C_IN,               /// 31      <<
+    C_OUT,              /// 32      >>
+    ASSIGNMENT,         /// 33      =
+    EQUAL,              /// 34      ==
+    LESS_ROVNO,         /// 35      <=
+    GREATER_ROVNO,      /// 36      >=
 
-    LINE_COMMENT,       /// 35      // ...
-    COMMENT,            /// 36      /* ...
-    COMMENT_KON,        /// 37      ... */
+    LINE_COMMENT,       /// 37      // ...
+    COMMENT,            /// 38      /* ...
+    COMMENT_KON,        /// 39      ... */
 
-    ANOTHER_CHAR,       /// 38      ostatni znaky
+    ANOTHER_CHAR,       /// 40      ostatni znaky
 
 
-    TOK_NULL,           /// 39      prazdny/neinicializovany token  */
+    TOK_NULL,           /// 41      prazdny/neinicializovany token  */
 
         /// typy tokenu
-    IDENTIFIER,         /// 40
-    KEY_WORD,           /// 41
-    BUILT_IN_FUNCTION,  /// 42
-    INT,                /// 43
-    DOUBLE,             /// 44
-    AUTO                /// 45
+    IDENTIFIER,         /// 42
+    KEY_WORD,           /// 43
+    BUILT_IN_FUNCTION,  /// 44
+    INT,                /// 45
+    DOUBLE,             /// 46
+    AUTO                /// 47
 
 };
 
+/*
 union unie {
     int int_number;
     double double_number;
     char *area;
-};
+} unie;
+*/
 
-//unie *tunie;
 
 typedef struct {
     char *area;

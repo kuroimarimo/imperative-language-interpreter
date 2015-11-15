@@ -263,8 +263,11 @@ int scanner (FILE *source) {
             break;
 
         case STRING:
-            if (c != '"')
+            if (c == '\\')
+                value = STRING_ESCAPE;
+            else if (c != '"')
                 fillToken(c);
+
             else {
                 token.type = STRING;
                 /// ungetc(c, source); - vytvari nekonecny cyklus
@@ -272,6 +275,24 @@ int scanner (FILE *source) {
                 }
             break;
 
+        case STRING_ESCAPE:
+            value = STRING;
+
+            if (c == 'n')
+                fillToken('\n');
+            else if (c == 't')
+                fillToken('\t');
+            else if (c == '\\')
+                fillToken('\\');
+            else if (c == '"')
+                fillToken('\"');
+            else if (c == 'x')
+                value == STRING_ESCAPE2;
+
+            break;
+
+        case STRING_ESCAPE2:
+            value = STRING;
 
     case LESS:
             if (c == '<')
@@ -382,7 +403,7 @@ int scanner (FILE *source) {
 
             if (test_for == 0) {
                 token.type = KEY_WORD;
-                i = 10;     /// ukončím for smyčku
+                i = COUNT_OF_KEY_WORDS;     /// ukončím for smyčku
             }
         }
 
@@ -392,7 +413,7 @@ int scanner (FILE *source) {
 
             if (test_for == 0) {
                 token.type = BUILT_IN_FUNCTION;
-                i = 10;     /// ukončím for smyčku
+                i = COUNT_OF_BUILT_IN_FUNCTIONS;    /// ukončím for smyčku
             }
         }
     }
