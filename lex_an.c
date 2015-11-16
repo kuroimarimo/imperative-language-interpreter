@@ -338,7 +338,7 @@ int scanner (FILE *source) {
     case DIVIDE:
         if (c != '/' && c!= '*') {
             fillToken('/');
-            token.type
+            token.type = DIVIDE;
 
             ungetc(c,source);
             test = false;
@@ -445,7 +445,7 @@ int scanner (FILE *source) {
         cislo = (int) cel_cislo;
 
 
-        printf("Cislo: %d \n", cislo);
+        //printf("Cislo: %d \n", cislo);
 
 
     }
