@@ -40,8 +40,8 @@ enum {
 
     LESS,               /// 29      <
     GREATER,            /// 30      >
-    C_IN,               /// 31      <<
-    C_OUT,              /// 32      >>
+    C_IN,               /// 31      >>
+    C_OUT,              /// 32      <<
     ASSIGNMENT,         /// 33      =
     EQUAL,              /// 34      ==
     LESS_ROVNO,         /// 35      <=
@@ -62,7 +62,8 @@ enum {
     BUILT_IN_FUNCTION,  /// 44
     INT,                /// 45
     DOUBLE,             /// 46
-    AUTO                /// 47
+    AUTO,               /// 47
+
 
 };
 

@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
+#include <errno.h>
 
 #include "lex_an.h"
 
@@ -287,7 +289,7 @@ int scanner (FILE *source) {
             else if (c == '"')
                 fillToken('\"');
             else if (c == 'x')
-                value == STRING_ESCAPE2;
+                value = STRING_ESCAPE2;
 
             break;
 
@@ -298,16 +300,16 @@ int scanner (FILE *source) {
             if (c == '<')
             {
                 fillToken(c);
-                value = C_IN;
+                token.type = C_OUT;
             }
             else if (c == '=')
             {
                 fillToken(c);
-                value = LESS_ROVNO;
+                token.type = LESS_ROVNO;
             }
             else
             {
-                value = LESS;
+                token.type = LESS;
                 ungetc(c,source);
             }
             test = false;
@@ -317,16 +319,16 @@ int scanner (FILE *source) {
             if (c == '>')
             {
                 fillToken(c);
-                value = C_OUT;
+                token.type = C_IN;
             }
             else if (c == '=')
             {
                 fillToken(c);
-                value = GREATER_ROVNO;
+                token.type = GREATER_ROVNO;
             }
             else
             {
-                value = GREATER;
+                token.type = GREATER;
                 ungetc(c,source);
 
             }
@@ -336,6 +338,7 @@ int scanner (FILE *source) {
     case DIVIDE:
         if (c != '/' && c!= '*') {
             fillToken('/');
+            token.type
 
             ungetc(c,source);
             test = false;
@@ -396,6 +399,8 @@ int scanner (FILE *source) {
         }
 
     }
+
+
     if ((token.type == IDENTIFIER) && (token.unie.area != NULL)) {
         for (int i = 0; i < COUNT_OF_KEY_WORDS; i++) {
             int test_for;
@@ -416,6 +421,33 @@ int scanner (FILE *source) {
                 i = COUNT_OF_BUILT_IN_FUNCTIONS;    /// ukončím for smyčku
             }
         }
+    }
+
+    if ((token.type == INT) && (token.unie.area != NULL))
+    {
+        long cel_cislo;
+        int cislo;
+        errno = 0;
+
+        cel_cislo = strtol(token.unie.area, NULL, 10);
+
+        if ((errno == ERANGE && (cel_cislo == LONG_MAX)) || (errno != 0 && cel_cislo == 0))
+        {
+            printf("Nevejde se do longu.\n");
+            return -1;
+        }
+        else if (cel_cislo > INT_MAX)
+        {
+            printf("Nevejde se do integeru.\n");
+            return -1;
+        }
+
+        cislo = (int) cel_cislo;
+
+
+        printf("Cislo: %d \n", cislo);
+
+
     }
 
     if (c == EOF)
