@@ -9,7 +9,7 @@
 #include "lex_an.h"
 
 const char *key_words [COUNT_OF_KEY_WORDS] = {
-    "auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string"
+    "auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string", "while", "do"
 };
 
 const char *built_in_functions [COUNT_OF_BUILT_IN_FUNCTIONS] = {
@@ -19,9 +19,9 @@ const char *built_in_functions [COUNT_OF_BUILT_IN_FUNCTIONS] = {
 
 
 void initToken () {  // inicializovat token
-    if (token.unie.area != NULL)
-        free(token.unie.area);
-    token.unie.area = NULL;
+    if (token.area != NULL)
+        free(token.area);
+    token.area = NULL;
     token.counter = 0;
     token.type = TOK_NULL;
      static int pomocna=0;
@@ -38,22 +38,22 @@ int fillToken (char character) {  // naplnit token
 
         /// prvni inicializace
     if (token.counter == 0) {
-        token.unie.area = (char *) malloc(3);   /// 2 charactery + \O
+        token.area = (char *) malloc(3);   /// 2 charactery + \O
         token.sizeof_area = 2;
-        if (token.unie.area == NULL)
+        if (token.area == NULL)
             return -1;
     }
     else if (token.counter == token.sizeof_area) {      /// navyseni kapacity o dvojnasobek
         token.sizeof_area = token.sizeof_area * 2;
 
-        token.unie.area = (char *) realloc(token.unie.area, (token.sizeof_area + 1));
-        if (token.unie.area == NULL)
+        token.area = (char *) realloc(token.area, (token.sizeof_area + 1));
+        if (token.area == NULL)
             return -1;
             /// chyba realloc
     }
 
-    token.unie.area [token.counter] = character;
-    token.unie.area [token.counter + 1] = '\0';
+    token.area [token.counter] = character;
+    token.area [token.counter + 1] = '\0';
     (token.counter)++;
 
     return 0;
@@ -63,8 +63,10 @@ int scanner (FILE *source) {
     initToken();
 
     int c = 0;
+    char array_x [3];
     int value = START;
     bool test = true;
+
     while (test && ( c = fgetc(source)) != EOF)
     {
         switch (value) {
@@ -107,6 +109,10 @@ int scanner (FILE *source) {
                 value = GREATER;
             else if (c == '=')
                 value = ASSIGNMENT;
+            else if (c == '+')
+                    value = PLUS;
+            else if (c == '-')
+                    value = MINUS;
             else {              /// jednoznakove tokeny
                 test = false;
 
@@ -126,10 +132,6 @@ int scanner (FILE *source) {
                     token.type = L_CURLY_BRACKET;
                 else if (c == '}')
                     token.type = R_CURLY_BRACKET;
-                else if (c == '+')
-                    token.type = PLUS;
-                else if (c == '-')
-                    token.type = MINUS;
                 else if (c == '*')
                     token.type = MULTIPLY;
                 else if (c == '%')
@@ -171,7 +173,7 @@ int scanner (FILE *source) {
             else {
                 test = false;
                 fillToken('0');
-                token.type = INT;
+                token.type = INT_NUMBER;
             }
 
             ungetc(c, source);
@@ -192,7 +194,7 @@ int scanner (FILE *source) {
                 fillToken(c);
             }
             else {
-                token.type = INT;
+                token.type = INT_NUMBER;
                 ungetc(c, source);
                 test = false;
 
@@ -207,7 +209,7 @@ int scanner (FILE *source) {
             else if (c == '.')  /** || (c == 'e' || c == 'E'))    */
                 return -1;      /// Lex_an chyba - zadana druha desetinna tecka
             else {
-                token.type = DOUBLE;
+                token.type = DOUBLE_NUMBER;
                 ungetc(c, source);
                 test = false;
             }
@@ -223,7 +225,7 @@ int scanner (FILE *source) {
                 value = EXP_NUMBER;
             }
             else {
-                token.type = DOUBLE;
+                token.type = DOUBLE_NUMBER;
                 ungetc(c, source);
                 test = false;
             }
@@ -258,7 +260,7 @@ int scanner (FILE *source) {
             if (isdigit(c))
                 fillToken(c);
             else {
-                token.type = DOUBLE;
+                token.type = DOUBLE_NUMBER;
                 ungetc(c, source);
                 test = false;
             }
@@ -289,12 +291,36 @@ int scanner (FILE *source) {
             else if (c == '"')
                 fillToken('\"');
             else if (c == 'x')
-                value = STRING_ESCAPE2;
+                value = STRING_ESCAPE_x1;
 
             break;
 
-        case STRING_ESCAPE2:
-            value = STRING;
+        case STRING_ESCAPE_x1:
+            if (isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+            {
+
+
+                array_x [0] = c;
+                array_x [1] = '\0';
+                value = STRING_ESCAPE_x2;
+            }
+            else
+                return -1;
+
+            break;
+
+        case STRING_ESCAPE_x2:
+            if (isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+            {
+                array_x [1] = c;
+                array_x [2] = '\0';
+
+                //printf("\\X: %s\n", array_x);
+
+                value = STRING;
+            }
+            else
+                return -1;
 
     case LESS:
             if (c == '<')
@@ -396,62 +422,102 @@ int scanner (FILE *source) {
 
         break;
 
+    case PLUS:
+        if (c == '+') {
+            fillToken(c);
+            token.type = INCREMENT;
+        }
+        else {
+            token.type = PLUS;
+            ungetc(c, source);
+        }
+
+        test = false;
+
+        break;
+
+    case MINUS:
+        if (c == '-') {
+            fillToken(c);
+            token.type = DECREMENT;
+        }
+        else {
+            token.type = MINUS;
+            ungetc(c, source);
+        }
+
+        test = false;
+
+        break;
+
         }
 
     }
 
-
-    if ((token.type == IDENTIFIER) && (token.unie.area != NULL)) {
-        for (int i = 0; i < COUNT_OF_KEY_WORDS; i++) {
-            int test_for;
-            test_for = strcmp(token.unie.area, key_words[i]);
-
-            if (test_for == 0) {
-                token.type = KEY_WORD;
-                i = COUNT_OF_KEY_WORDS;     /// ukončím for smyčku
-            }
-        }
-
-        for (int i = 0; i < COUNT_OF_BUILT_IN_FUNCTIONS; i++) {
-            int test_for;
-            test_for = strcmp(token.unie.area, built_in_functions[i]);
-
-            if (test_for == 0) {
-                token.type = BUILT_IN_FUNCTION;
-                i = COUNT_OF_BUILT_IN_FUNCTIONS;    /// ukončím for smyčku
-            }
-        }
-    }
-
-    if ((token.type == INT) && (token.unie.area != NULL))
+    if (token.area != NULL)
     {
-        long cel_cislo;
-        int cislo;
-        errno = 0;
-
-        cel_cislo = strtol(token.unie.area, NULL, 10);
-
-        if ((errno == ERANGE && (cel_cislo == LONG_MAX)) || (errno != 0 && cel_cislo == 0))
+        if (token.type == IDENTIFIER)
         {
-            printf("Nevejde se do longu.\n");
-            return -1;
+            for (int i = 0; i < COUNT_OF_KEY_WORDS; i++) {
+                int test_for;
+                test_for = strcmp(token.area, key_words[i]);
+
+                if (test_for == 0) {
+                    token.type = K_AUTO + i;
+                    i = COUNT_OF_KEY_WORDS;     /// ukončím for smyčku
+                }
+            }
+
+            for (int i = 0; i < COUNT_OF_BUILT_IN_FUNCTIONS; i++) {
+                int test_for;
+                test_for = strcmp(token.area, built_in_functions[i]);
+
+                if (test_for == 0) {
+                    token.type = B_LENGTH + i;
+                    i = COUNT_OF_BUILT_IN_FUNCTIONS;    /// ukončím for smyčku
+                }
+            }
         }
-        else if (cel_cislo > INT_MAX)
+
+
+        if (token.type == INT_NUMBER)
         {
-            printf("Nevejde se do integeru.\n");
-            return -1;
+            long cel_cislo;
+            errno = 0;
+
+            cel_cislo = strtol(token.area, NULL, 10);
+
+            if ((errno == ERANGE && (cel_cislo == LONG_MAX)) || (errno != 0 && cel_cislo == 0))
+            {
+                //printf("Warning: Nevejde se do integeru.\n");
+            }
+            else if (cel_cislo > INT_MAX)
+            {
+                //printf("Warning: Nevejde se do integeru.\n");
+            }
+
+            token.int_numb = (int) cel_cislo;
         }
 
-        cislo = (int) cel_cislo;
+        if (token.type == DOUBLE_NUMBER)
+        {
+            double des_cislo;
+            char *ptr;
 
-
-        //printf("Cislo: %d \n", cislo);
-
+            des_cislo = strtod(token.area, &ptr);
+            token.double_numb = des_cislo;
+        }
 
     }
+
 
     if (c == EOF)
         token.type = EOF;
+
+    if (c == INT_NUMBER || c == DOUBLE_NUMBER)
+        token.expression = IDENTIFIER;
+    else
+        token.expression = token.type;
 
     return 0;
 }

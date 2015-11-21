@@ -26,6 +26,8 @@ enum {
 
     PLUS,               /// 17      +
     MINUS,              /// 18      -
+    INCREMENT,          /// 19      ++
+    DECREMENT,          /// 20      --
     MULTIPLY,           /// 19      *
     DIVIDE,             /// 20      /
     MODULO,             /// 21      %
@@ -35,7 +37,8 @@ enum {
     QUESTION_MARK,      /// 24      ?
     STRING,             /// 25      ".."
     STRING_ESCAPE,      /// 26
-    STRING_ESCAPE2,     /// 27
+    STRING_ESCAPE_x1,   /// 27
+    STRING_ESCAPE_x2,   /// 27
     COMMA,              /// 28      ,
 
     LESS,               /// 29      <
@@ -60,10 +63,31 @@ enum {
     IDENTIFIER,         /// 42
     KEY_WORD,           /// 43
     BUILT_IN_FUNCTION,  /// 44
-    INT,                /// 45
-    DOUBLE,             /// 46
-    AUTO,               /// 47
+    INT_NUMBER,         /// 45
+    DOUBLE_NUMBER,      /// 46
 
+        /// klicova slova
+    K_AUTO,             /// 47
+    K_CIN,              ///
+    K_COUT,             ///
+    K_DOUBLE,           ///
+    K_ELSE,             ///
+    K_FOR,              ///
+    K_IF,               ///
+    K_INT,              ///
+    K_RETURN,           ///
+    K_STRING,           /// 56
+    K_WHILE,            /// 57
+    K_DO,               /// 58
+
+        /// vestavene funkce
+    B_LENGTH,           /// 59
+    B_SUBSTR,           ///
+    B_CONCAT,           ///
+    B_FIND,             ///
+    B_SORT,             /// 63
+
+    MAX_OF_ENUM         ///
 
 };
 
@@ -78,21 +102,19 @@ union unie {
 
 typedef struct {
     char *area;
-    int counter;
-    int sizeof_area;
+    int int_numb;
+    double double_numb;
+
     int type;
+    int expression;
     int counter_of_lines;
 
-    union {
-        int int_number;
-        double double_number;
-        char *area;
-        } unie;
+    int counter;
+    int sizeof_area;
 } tToken;
 
 
-
-#define COUNT_OF_KEY_WORDS 10
+#define COUNT_OF_KEY_WORDS 12
 #define COUNT_OF_BUILT_IN_FUNCTIONS 5
 
     /// globalni promenne
