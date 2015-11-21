@@ -28,46 +28,46 @@ enum {
     MINUS,              /// 18      -
     INCREMENT,          /// 19      ++
     DECREMENT,          /// 20      --
-    MULTIPLY,           /// 19      *
-    DIVIDE,             /// 20      /
-    MODULO,             /// 21      %
+    MULTIPLY,           /// 21      *
+    DIVIDE,             /// 22      /
+    MODULO,             /// 23      %
 
-    EXCLAMATION_MARK,   /// 22      !
-    NEGACE,             /// 23      !=
-    QUESTION_MARK,      /// 24      ?
-    STRING,             /// 25      ".."
-    STRING_ESCAPE,      /// 26
-    STRING_ESCAPE_x1,   /// 27
-    STRING_ESCAPE_x2,   /// 27
-    COMMA,              /// 28      ,
+    EXCLAMATION_MARK,   /// 24      !
+    NEGACE,             /// 25      !=
+    QUESTION_MARK,      /// 26      ?
+    STRING,             /// 27      ".."
+    STRING_ESCAPE,      /// 28
+    STRING_ESCAPE_x1,   /// 29
+    STRING_ESCAPE_x2,   /// 30
+    COMMA,              /// 31      ,
 
-    LESS,               /// 29      <
-    GREATER,            /// 30      >
-    C_IN,               /// 31      >>
-    C_OUT,              /// 32      <<
-    ASSIGNMENT,         /// 33      =
-    EQUAL,              /// 34      ==
-    LESS_ROVNO,         /// 35      <=
-    GREATER_ROVNO,      /// 36      >=
+    LESS,               /// 32      <
+    GREATER,            /// 33      >
+    C_IN,               /// 34      >>
+    C_OUT,              /// 35      <<
+    ASSIGNMENT,         /// 36      =
+    EQUAL,              /// 37      ==
+    LESS_ROVNO,         /// 38      <=
+    GREATER_ROVNO,      /// 39      >=
 
-    LINE_COMMENT,       /// 37      // ...
-    COMMENT,            /// 38      /* ...
-    COMMENT_KON,        /// 39      ... */
+    LINE_COMMENT,       /// 40      // ...
+    COMMENT,            /// 41      /* ...
+    COMMENT_KON,        /// 42      ... */
 
-    ANOTHER_CHAR,       /// 40      ostatni znaky
+    ANOTHER_CHAR,       /// 43      ostatni znaky
 
 
-    TOK_NULL,           /// 41      prazdny/neinicializovany token  */
+    TOK_NULL,           /// 44      prazdny/neinicializovany token  */
 
         /// typy tokenu
-    IDENTIFIER,         /// 42
-    KEY_WORD,           /// 43
-    BUILT_IN_FUNCTION,  /// 44
-    INT_NUMBER,         /// 45
-    DOUBLE_NUMBER,      /// 46
+    IDENTIFIER,         /// 45
+    KEY_WORD,           /// 46
+    BUILT_IN_FUNCTION,  /// 47
+    INT_NUMBER,         /// 48
+    DOUBLE_NUMBER,      /// 49
 
         /// klicova slova
-    K_AUTO,             /// 47
+    K_AUTO,             /// 50
     K_CIN,              ///
     K_COUT,             ///
     K_DOUBLE,           ///
@@ -76,16 +76,16 @@ enum {
     K_IF,               ///
     K_INT,              ///
     K_RETURN,           ///
-    K_STRING,           /// 56
-    K_WHILE,            /// 57
-    K_DO,               /// 58
+    K_STRING,           ///
+    K_WHILE,            ///
+    K_DO,               /// 61
 
         /// vestavene funkce
-    B_LENGTH,           /// 59
+    B_LENGTH,           /// 62
     B_SUBSTR,           ///
     B_CONCAT,           ///
     B_FIND,             ///
-    B_SORT,             /// 63
+    B_SORT,             /// 66
 
     MAX_OF_ENUM         ///
 
