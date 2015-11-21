@@ -298,8 +298,6 @@ int scanner (FILE *source) {
         case STRING_ESCAPE_x1:
             if (isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
             {
-
-
                 array_x [0] = c;
                 array_x [1] = '\0';
                 value = STRING_ESCAPE_x2;
@@ -315,12 +313,19 @@ int scanner (FILE *source) {
                 array_x [1] = c;
                 array_x [2] = '\0';
 
-                //printf("\\X: %s\n", array_x);
+                int number = (int) strtol(array_x, NULL, 16);
+
+                if (number >= 1 && number <= 255)
+                    fillToken(number + '\0');
+                else
+                    return -1;
 
                 value = STRING;
             }
             else
                 return -1;
+
+            break;
 
     case LESS:
             if (c == '<')
