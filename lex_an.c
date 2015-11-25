@@ -16,7 +16,38 @@ const char *built_in_functions [COUNT_OF_BUILT_IN_FUNCTIONS] = {
     "length", "substr", "concat", "find", "sort"
 };
 
+void tokenCopy (tToken *dst, tToken src)
+{
+    dst->area = src.area;
+    dst->int_numb = src.int_numb;
+    dst->double_numb = src.double_numb;
+    dst->type = src.type;
+    dst->expression = src.expression;
+    dst->counter_of_lines = src.counter_of_lines;
+    dst->counter = src.counter;
+    dst->sizeof_area = src.sizeof_area;
 
+    return;
+}
+
+void tokenSwap()
+{
+    tToken temp;
+
+    tokenCopy(&temp, token);
+    tokenCopy(&token, oldToken);
+    tokenCopy(&oldToken, temp);
+
+    return;
+}
+
+void ungetToken()
+{
+    tokenSwap();
+    ungotToken = 1;
+
+    return;
+}
 
 void initToken () {  // inicializovat token
     if (token.area != NULL)
@@ -60,6 +91,16 @@ int fillToken (char character) {  // naplnit token
 }
 
 int scanner (FILE *source) {
+
+    if (ungotToken)             //ungetToken was called the last time
+    {
+        tokenSwap();
+        ungotToken = 0;
+        return 0;
+    }
+
+    tokenCopy(&oldToken, token);
+
     initToken();
 
     int c = 0;

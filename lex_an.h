@@ -118,9 +118,14 @@ typedef struct {
 #define COUNT_OF_BUILT_IN_FUNCTIONS 5
 
     /// globalni promenne
-tToken token;
+tToken token, oldToken;
 
     /// prototypy funkci
 int scanner (FILE *source);
+void ungetToken();               //ungets the latest token, can be used only once in a row
+void tokenSwap();
+void tokenCopy (tToken *dst, tToken src);   //"copies" the contents of src token to the dst token
+
+int ungotToken;                 //TODO: inicializovať na 0 >_<
 
 #endif
