@@ -428,6 +428,8 @@ int scanner (FILE *source) {
         break;
 
     case COMMENT:
+        if (c == '\n')
+            token.counter_of_lines++;
         if (c == '*')
             value = COMMENT_KON;
         break;
