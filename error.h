@@ -5,7 +5,6 @@
 #ifndef ERROR_H
 #define ERROR_H
 
-
 typedef enum
 {
     ERR_None,
@@ -67,6 +66,8 @@ typedef struct
     EErrorTypes state;          // what kind of error has occurred
     unsigned line;              // on what line of code
 } SError;
+
+SError errorState;
 
 EErrorReturnValues getReturnValue (EErrorTypes value);
 
