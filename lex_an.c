@@ -425,9 +425,10 @@ int scanner (FILE *source) {
         break;
 
     case LINE_COMMENT:
-        if (c == '\n')
-            value = START;
-                
+        if (c == '\n'){
+           value = START;
+           token.counter_of_lines++;
+        }
         break;
 
                 
