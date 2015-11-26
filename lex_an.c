@@ -6,6 +6,7 @@
 #include <limits.h>
 #include <errno.h>
 
+#include "error.h"
 #include "lex_an.h"
 
 const char *key_words [COUNT_OF_KEY_WORDS] = {
@@ -55,10 +56,10 @@ void initToken () {  // inicializovat token
     token.area = NULL;
     token.counter = 0;
     token.type = TOK_NULL;
-     static int pomocna=0;
-    if(!pomocna){
+     static int tmp = 0;
+    if(!tmp){
         token.counter_of_lines=1;
-        pomocna++;
+        tmp++;
     }
 
 
@@ -92,7 +93,7 @@ int fillToken (char character) {  // naplnit token
 
 int scanner (FILE *source) {
 
-    if (ungotToken)             //ungetToken was called the last time
+    if (ungotToken)             //ungetToken was called
     {
         tokenSwap();
         ungotToken = 0;
@@ -112,14 +113,14 @@ int scanner (FILE *source) {
     {
         switch (value) {
         case START:
-                /** Rozpoznani characteru */
-            if isalpha(c)
+                /* Rozpoznani characteru */
+            if (isalpha(c))
                 value = LETTER;
             else if (c == '0') {
                 value = NUMBER_START_ZERO;
                 break;
                 }
-            else if isdigit(c)
+            else if (isdigit(c))
                 value = NUMBER;
             else if (c == '_')
                 value = UNDERSCORE;
@@ -178,8 +179,7 @@ int scanner (FILE *source) {
                 else if (c == '%')
                     token.type = MODULO;
                 else
-                    token.type = ANOTHER_CHAR;  /// má smysl?
-
+                    token.type = ANOTHER_CHAR;  /// má smysl?       V: Život? Vaše komentáre? ... ^__^
                 /// break;
             }
 
@@ -280,14 +280,14 @@ int scanner (FILE *source) {
             }
             else if (c == '+' || c == '-') {
                 fillToken(c);
-                value = EXP_NUMBER_SING;     /// znamenkova mocnina exp. cisla: 1E-12
+                value = EXP_NUMBER_SIGN;     /// znamenkova mocnina exp. cisla: 1E-12
             }
             else                /// za E nejsou cifry
                 return -1;
 
             break;
 
-        case EXP_NUMBER_SING:
+        case EXP_NUMBER_SIGN:
             if (isdigit(c)) {
                 fillToken(c);
                 value = EXP_NUMBER_END;    /// za E jsou cifry
@@ -345,7 +345,7 @@ int scanner (FILE *source) {
             }
             else
                 return -1;
-
+        
             break;
 
         case STRING_ESCAPE_x2:
@@ -365,7 +365,7 @@ int scanner (FILE *source) {
             }
             else
                 return -1;
-
+                
             break;
 
     case LESS:
@@ -377,7 +377,7 @@ int scanner (FILE *source) {
             else if (c == '=')
             {
                 fillToken(c);
-                token.type = LESS_ROVNO;
+                token.type = LESS_EQUAL;
             }
             else
             {
@@ -385,6 +385,7 @@ int scanner (FILE *source) {
                 ungetc(c,source);
             }
             test = false;
+                
             break;
 
    case GREATER:
@@ -396,7 +397,7 @@ int scanner (FILE *source) {
             else if (c == '=')
             {
                 fillToken(c);
-                token.type = GREATER_ROVNO;
+                token.type = GREATER_EQUAL;
             }
             else
             {
@@ -405,6 +406,7 @@ int scanner (FILE *source) {
 
             }
             test = false;
+                
             break;
 
     case DIVIDE:
@@ -419,28 +421,32 @@ int scanner (FILE *source) {
             value = LINE_COMMENT;
         else
             value = COMMENT;
+                
         break;
 
     case LINE_COMMENT:
         if (c == '\n')
             value = START;
-
+                
         break;
 
+                
     case COMMENT:
         if (c == '\n')
             token.counter_of_lines++;
         if (c == '*')
-            value = COMMENT_KON;
+            value = COMMENT_END;
+                
         break;
 
-    case COMMENT_KON:
+                
+    case COMMENT_END:
         if (c == '/')
             value = START;
         else
             value = COMMENT;
+                
         break;
-
 
 
     case ASSIGNMENT:
@@ -454,6 +460,7 @@ int scanner (FILE *source) {
             }
 
             test=false;
+                
         break;
 
 
@@ -461,15 +468,16 @@ int scanner (FILE *source) {
             if (c == '=')
             {
                 fillToken(c);
-                token.type = NEGACE;
+                token.type = NEGATION;
             }
             else {
                 ungetc(c, source);
             }
                 test = false;
-
+                
         break;
 
+                
     case PLUS:
         if (c == '+') {
             fillToken(c);
@@ -484,6 +492,7 @@ int scanner (FILE *source) {
 
         break;
 
+                
     case MINUS:
         if (c == '-') {
             fillToken(c);
@@ -497,11 +506,10 @@ int scanner (FILE *source) {
         test = false;
 
         break;
-
         }
-
     }
 
+    
     if (token.area != NULL)
     {
         if (token.type == IDENTIFIER)
@@ -530,32 +538,31 @@ int scanner (FILE *source) {
 
         if (token.type == INT_NUMBER)
         {
-            long cel_cislo;
+            long integer;
             errno = 0;
 
-            cel_cislo = strtol(token.area, NULL, 10);
+            integer = strtol(token.area, NULL, 10);
 
-            if ((errno == ERANGE && (cel_cislo == LONG_MAX)) || (errno != 0 && cel_cislo == 0))
+            if ((errno == ERANGE && (integer == LONG_MAX)) || (errno != 0 && integer == 0))
             {
                 //printf("Warning: Nevejde se do integeru.\n");
             }
-            else if (cel_cislo > INT_MAX)
+            else if (integer > INT_MAX)
             {
                 //printf("Warning: Nevejde se do integeru.\n");
             }
 
-            token.int_numb = (int) cel_cislo;
+            token.int_numb = (int) integer;
         }
 
         if (token.type == DOUBLE_NUMBER)
         {
-            double des_cislo;
+            double real_number;
             char *ptr;
 
-            des_cislo = strtod(token.area, &ptr);
-            token.double_numb = des_cislo;
+            real_number = strtod(token.area, &ptr);
+            token.double_numb = real_number;
         }
-
     }
 
 
@@ -567,5 +574,5 @@ int scanner (FILE *source) {
     else
         token.expression = token.type;
 
-    return 0;
+    return ERR_None;
 }
