@@ -12,9 +12,9 @@
 
 int main(int argc, char** argv)
 {
-    FILE *source;
-    SError errorState;
 
+    FILE *source;
+    
     if (argc != 2)
     {
         printf("I can't find any file! \n");
@@ -25,7 +25,7 @@ int main(int argc, char** argv)
         printf("I coudn't open the file! \n");
         return 1;
     }
-
+    
 /*
     bool test = true;
 
@@ -37,8 +37,9 @@ int main(int argc, char** argv)
             printf("Tok: %s %d\n", token.unie.area, token.type);
     }
 */
+    
     errorState.state = parse(source);               // parse the code
-    errorState.line = token.counter_of_lines;       // this stuff doesn't work the way I'd like it to work
+    errorState.line = token.counter_of_lines;
 
     if (errorState.state != ERR_None)
         printErrorDetails(errorState);
