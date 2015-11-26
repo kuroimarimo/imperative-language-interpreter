@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+
 #include "parser.h"
 #include "lex_an.h"
 #include "error.h"
@@ -10,13 +11,18 @@
 
 FILE* srcFile;
 
+int isKeyword(int tokenType)
+{
+    return (tokenType >= K_AUTO) && (tokenType <= K_DO);
+}
+
 int parse(FILE *source)
 {
     srcFile = source;
 
     int returnValue = ERR_None;
 
-    while ((returnValue == ERR_None))           //no errors so far
+    while (returnValue == ERR_None)           //no errors so far
     {
         scanner(srcFile);                       //get next token
         if (token.type == EOF)
@@ -31,7 +37,7 @@ int parse(FILE *source)
 // rule:    <prog> -> type id <param-list> <func-defined> 
 int rule_funcdef()
 {
-    if ((token.type =! KEY_WORD) || ( (strcmp(token.unie.area, "int") != 0) && (strcmp(token.unie.area, "double") != 0) && (strcmp(token.unie.area, "string") != 0)) )//((token.type =! KEY_WORD) || ( (token.type != INT) && (token.type != DOUBLE) && (token.type != STRING)) )
+    if ((token.type != K_INT) && (token.type != K_DOUBLE) && (token.type != K_STRING))
         return ERR_SYNTAX;
 
     //vytvorenie polozky TS pre funkciu
@@ -50,7 +56,6 @@ int rule_funcdef()
     if (error != ERR_None)
         return error;
 
-
     return ERR_None;
 }
 
@@ -65,6 +70,7 @@ int rule_funcDefined()
     if (token.type != L_CURLY_BRACKET)
         return ERR_SYNTAX;
 
+    scanner(srcFile);
     int error = rule_stList();
     if (error != ERR_None)
         return error;
@@ -97,7 +103,7 @@ int rule_paramList()
 //rule:     <param> -> type id
 int rule_param()    
 {
-    if ((token.type =! KEY_WORD) || ( (strcmp(token.unie.area, "int") != 0) && (strcmp(token.unie.area, "double") != 0) && (strcmp(token.unie.area, "string") != 0)) )//((token.type =! KEY_WORD) || ( (token.type != INT) && (token.type != DOUBLE) && (token.type != STRING)))
+    if ((token.type != K_INT) && (token.type != K_DOUBLE) && (token.type != K_STRING))
         return ERR_SYNTAX;
 
     // ulozenie typu parametra do tabulky
@@ -144,16 +150,16 @@ int rule_paramNext()
 int rule_stList()
 {
     int error;
-
-    scanner(srcFile);
+    
 
     if (token.type == R_CURLY_BRACKET)
         return ERR_None;
-
+    
     error = rule_statement();
         if (error != ERR_None)
             return error;
 
+    scanner(srcFile);
     error = rule_stList();
         if (error != ERR_None)
             return error;
@@ -164,35 +170,25 @@ int rule_stList()
 //rule:     <statement> -> type id <var-decl> ;   ||      id <assignment> ;      ||        id (<param-list> ;       ||      <keyword>   || { <st-list>
 int rule_statement()
 {
-
-    int error = ERR_SYNTAX;
-
-    if ((token.type == KEY_WORD) && ( (strcmp(token.unie.area, "int") == 0) || (strcmp(token.unie.area, "double") == 0) || (strcmp(token.unie.area, "string") == 0)) )
+    if (token.type == IDENTIFIER)
     {
         scanner(srcFile);
-
-        if (token.type != IDENTIFIER)
-            return ERR_SYNTAX;
-        error = rule_varDecl();
+        if (token.type == ASSIGNMENT)
+            return rule_expression();
     }
 
-    else 
-        if (token.type == IDENTIFIER)
-        {
-            scanner(srcFile);
-            if (token.type == ASSIGNMENT)
-                error = rule_expression();
-        }
+    else if (isKeyword(token.type))
+    {
+        return rule_keyword();
+    }
 
-        else if (token.type == KEY_WORD)
-        {
-            return rule_keyword();
-        }
+    else if (token.type == L_CURLY_BRACKET)
+    {
+        scanner(srcFile);
+        return rule_stList();
+    }
 
-        else if (token.type == L_CURLY_BRACKET)
-            error = rule_stList();
-
-    return error;
+    return ERR_SYNTAX;
 }
 
 //rule:     <var-decl> -> ;    |   = <expression> ;
@@ -212,7 +208,7 @@ int rule_varDecl()
 int rule_expression()
 {
     scanner(srcFile);
-    if (strcmp(token.unie.area, "__vyraz__") != 0)
+    if (strcmp(token.area, "__vyraz__") != 0)
         return ERR_SYNTAX;
 
     scanner(srcFile);
@@ -273,7 +269,7 @@ int rule_cout()
         return ERR_SYNTAX;
 
     scanner(srcFile);
-    if ((token.type != IDENTIFIER) && (token.type != STRING) && (token.type != INT) && (token.type != DOUBLE))
+    if ((token.type != IDENTIFIER) && (token.type != STRING) && (token.type != INT_NUMBER) && (token.type != DOUBLE_NUMBER))
         return ERR_SYNTAX;
 
     return ERR_None;
@@ -312,21 +308,18 @@ int rule_if()
         return ERR_SYNTAX;
 
     scanner(srcFile);
-    if (token.type != L_CURLY_BRACKET)
-        return ERR_SYNTAX;
-
-    if ((error = rule_stList()) != ERR_None)
+    if ((error = rule_statement()) != ERR_None)
         return error;
 
     scanner(srcFile);
-    if (strcmp(token.unie.area, "else") != 0)
-        return ERR_SYNTAX;
-
+    if (token.type != K_ELSE)
+    {
+        ungetToken();
+        return ERR_None;
+    }
+    
     scanner(srcFile);
-    if (token.type != L_CURLY_BRACKET)
-        return ERR_SYNTAX;
-
-    if ((error = rule_stList()) != ERR_None)
+    if ((error = rule_statement()) != ERR_None)
         return error;
 
     return ERR_None;
@@ -346,7 +339,7 @@ int rule_for()
         return ERR_SYNTAX;
 
     scanner(srcFile);
-    if ((token.type =! KEY_WORD) || ( (strcmp(token.unie.area, "int") != 0) && (strcmp(token.unie.area, "double") != 0) && (strcmp(token.unie.area, "string") != 0)) )//((token.type =! KEY_WORD) || ( (token.type != INT) && (token.type != DOUBLE) && (token.type != STRING)) )
+    if ((token.type != K_INT) && (token.type != K_DOUBLE) && (token.type != K_STRING))
         return ERR_SYNTAX;
 
     scanner(srcFile);
@@ -377,10 +370,7 @@ int rule_for()
         return ERR_SYNTAX;
 
     scanner(srcFile);
-    if (token.type != L_CURLY_BRACKET)
-        return ERR_SYNTAX;
-
-    return rule_stList();
+    return rule_statement();
 }
 
 
@@ -390,7 +380,17 @@ int rule_keyword()
 {
     int error;
 
-    if (strcmp(token.unie.area, "cin") == 0)
+    if ((token.type == K_INT) || (token.type == K_DOUBLE) || (token.type == K_STRING))
+    {
+        scanner(srcFile);
+
+        if (token.type != IDENTIFIER)
+            return ERR_SYNTAX;
+
+        return rule_varDecl();
+    }
+
+    else if (token.type == K_CIN)
     {
 
         scanner(srcFile);
@@ -400,7 +400,7 @@ int rule_keyword()
             return rule_cinList();
     }
 
-    else if (strcmp(token.unie.area, "cout") == 0)
+    else if (token.type == K_COUT)
     {
         scanner(srcFile);
 
@@ -410,25 +410,91 @@ int rule_keyword()
             return rule_coutList();
     }
 
-    else if (strcmp(token.unie.area, "if") == 0)
+    else if (token.type == K_IF)
     {
         return rule_if();
     }
 
-    else if (strcmp(token.unie.area, "for") == 0)
+    else if (token.type == K_FOR)
     {
         return rule_for();
     }
 
-    else if (strcmp(token.unie.area, "return") == 0)
+    else if (token.type == K_WHILE)
+    {
+        return rule_while();
+    }
+
+    else if (token.type == K_DO)
+    {
+        return rule_do();
+    }
+
+    else if (token.type == K_RETURN)
     {
         return rule_return();
     }
 
-    else if (strcmp(token.unie.area, "auto") == 0)
+    else if (token.type == K_AUTO)
     {
         return rule_auto();
     }
 
     else return ERR_SYNTAX;
+}
+
+//rule:      <while-loop> -> ( <expression> ) <statement>
+int rule_while()
+{
+    scanner(srcFile);
+    if (token.type != L_BRACKET)
+        return ERR_SYNTAX;
+
+    int error;
+    if ((error = rule_expression()) != ERR_None)
+        return error;
+
+    scanner(srcFile);
+    if (token.type != R_BRACKET)
+        return ERR_SYNTAX;
+
+    scanner(srcFile);
+    if ((error = rule_statement()) != ERR_None)
+        return error;
+
+    //generovanie skoku and stuff
+
+    return ERR_None;
+}
+
+//rule:     <do-loop> -> <statement> while ( <expression> );
+int rule_do()
+{
+    int error;
+    
+    
+    scanner(srcFile);
+    if ((error = rule_statement()) != ERR_None)
+        return error;
+
+    scanner(srcFile);
+    if (token.type != K_WHILE)
+        return ERR_SYNTAX;
+
+    scanner(srcFile);
+    if (token.type != L_BRACKET)
+        return ERR_SYNTAX;
+
+    if ((error = rule_expression()) != ERR_None)
+        return error;
+
+    scanner(srcFile);
+    if (token.type != R_BRACKET)
+        return ERR_SYNTAX;
+
+    scanner(srcFile);
+    if (token.type != SEMICOLON)
+        return ERR_SYNTAX;
+
+    return ERR_None;
 }
