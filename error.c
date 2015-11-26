@@ -24,7 +24,7 @@ void printErrorDetails (SError errorDetails)
     
     switch (errorDetails.state) {
         case ERR_LEXICAL:
-            fprintf(stderr, "\n");
+            fprintf(stderr, "Lexical error\n");
             break;
         case ERR_SYNTAX:
             fprintf(stderr, "Syntax error.\n");
