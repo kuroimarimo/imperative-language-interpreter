@@ -45,4 +45,9 @@ void removeElem (hTab * table, char * key);
 
 void hTabFree (hTab * table);
 
+
+char *substr (char *s, int i, int n);
+char *sort(char *s);
+char *sort_recursive(char *s, int left_poc, int right_poc);
+
 #endif
