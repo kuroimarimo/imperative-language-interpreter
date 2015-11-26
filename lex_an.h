@@ -11,7 +11,7 @@ enum {
     DEC_NUMBER,         /// 4       1.234
     DEC_NUMBER_END,     /// 5       *.123
     EXP_NUMBER,         /// 6       1e+4 15E8
-    EXP_NUMBER_SING,    /// 7       znamenkovy (+/-) 15E+8
+    EXP_NUMBER_SIGN,    /// 7       znamenkovy (+/-) 15E+8
     EXP_NUMBER_END,     /// 8
 
     SEMICOLON,          /// 9       ;
@@ -33,7 +33,7 @@ enum {
     MODULO,             /// 23      %
 
     EXCLAMATION_MARK,   /// 24      !
-    NEGACE,             /// 25      !=
+    NEGATION,           /// 25      !=
     QUESTION_MARK,      /// 26      ?
     STRING,             /// 27      ".."
     STRING_ESCAPE,      /// 28
@@ -47,12 +47,12 @@ enum {
     C_OUT,              /// 35      <<
     ASSIGNMENT,         /// 36      =
     EQUAL,              /// 37      ==
-    LESS_ROVNO,         /// 38      <=
-    GREATER_ROVNO,      /// 39      >=
+    LESS_EQUAL,         /// 38      <=
+    GREATER_EQUAL,      /// 39      >=
 
     LINE_COMMENT,       /// 40      // ...
     COMMENT,            /// 41      /* ...
-    COMMENT_KON,        /// 42      ... */
+    COMMENT_END,        /// 42      ... */
 
     ANOTHER_CHAR,       /// 43      ostatni znaky
 
