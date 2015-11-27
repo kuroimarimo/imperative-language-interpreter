@@ -20,6 +20,7 @@ typedef enum
     ERR_UndefinedFunction   = 300,
     ERR_AttemptedRedefFunction,
     ERR_AttemptedRedefVar,
+    ERR_UndefinedVariable,
     
     // semantic type compatibility errors
     ERR_IncompatibleExpr    = 400,
