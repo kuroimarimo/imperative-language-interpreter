@@ -21,10 +21,19 @@ void printErrorDetails (SError errorDetails)
  */
 {
     fprintf(stderr, "Error on line number %d. \n", errorDetails.line);
-    
+
     switch (errorDetails.state) {
         case ERR_LEXICAL:
             fprintf(stderr, "Lexical error\n");
+            break;
+        case ERR_NumberShape:
+            fprintf(stderr, "Number is in wrong shape.\n");
+            break;
+        case ERR_StringEscape:
+            fprintf(stderr, "Error escaping string.\n");
+            break;
+        case ERR_UnknownChar:
+            fprintf(stderr, "Unknown character.\n");
             break;
         case ERR_SYNTAX:
             fprintf(stderr, "Syntax error.\n");
