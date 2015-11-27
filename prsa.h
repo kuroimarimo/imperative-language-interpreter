@@ -76,7 +76,10 @@ char OperatorToIndex (tExpr* op) {
         case STRING:
         case IDENTIFIER:    return 12;  // i    = 12 <----- dodelat
         case SEMICOLON:     return 13;  // ;    = 13
-        default error;
+        default:
+            errorState.state = errcode;
+            errorState.line = token.counter_of_lines;
+            fatalError(errorState);
     }
 }
 
