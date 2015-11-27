@@ -23,7 +23,7 @@ void tokenCopy (tToken *dst, tToken src)
     dst->int_numb = src.int_numb;
     dst->double_numb = src.double_numb;
     dst->type = src.type;
-   // dst->expression = src.expression;  je stále potřeba ... případvně vymazat z tokenu 
+   // dst->expression = src.expression;  je stále potřeba ... případvně vymazat z tokenu
     dst->counter_of_lines = src.counter_of_lines;
     dst->counter = src.counter;
     dst->sizeof_area = src.sizeof_area;
@@ -73,18 +73,18 @@ void fillToken (char character) {  // naplnit token
         token.area = (char *) malloc(3);   /// 2 charactery + \O
         token.sizeof_area = 2;
         if (token.area == NULL){
-            errorState.state= ERR_AllocFailed; 
+            errorState.state= ERR_AllocFailed;
             errorState.line=token.counter_of_lines;
             fatalError (errorState);
-            }   
-            
+            }
+
     }
     else if (token.counter == token.sizeof_area) {      /// navyseni kapacity o dvojnasobek
         token.sizeof_area = token.sizeof_area * 2;
 
         token.area = (char *) realloc(token.area, (token.sizeof_area + 1));
         if (token.area == NULL){
-            errorState.state= ERR_AllocFailed; 
+            errorState.state= ERR_AllocFailed;
             errorState.line=token.counter_of_lines;
             fatalError (errorState);
             }
@@ -149,9 +149,9 @@ int scanner (FILE *source) {
                 value = QUESTION_MARK;
             else if (c == '"')
                 value = STRING;
-
-            else if (c == '.')
+            /*else if (c == '.')
                 return -1;          ///value = TECKA;    /// Error - cislo nemuze zacinat teckou
+            */
             else if (c == '<')
                 value = LESS;
             else if (c == '>')
@@ -187,10 +187,10 @@ int scanner (FILE *source) {
                     token.type = MODULO;
                 else
                     {
-                        errorState.state=ERR_LEXICAL; 
+                        errorState.state=ERR_LEXICAL;
                         errorState.line=token.counter_of_lines;
                         fatalError (errorState);
-                    }   
+                    }
                   //token.type = ANOTHER_CHAR;  má smysl?       V: Život? Vaše komentáre? ... ^__^
                 /// break;
             }
@@ -224,7 +224,7 @@ int scanner (FILE *source) {
                 fillToken('0');
             }
             else if (isalpha(c)){
-                errorState.state=ERR_LEXICAL; 
+                errorState.state=ERR_LEXICAL;
                 errorState.line=token.counter_of_lines;
                 fatalError (errorState);
 
@@ -253,7 +253,7 @@ int scanner (FILE *source) {
                 fillToken(c);
             }
             else if (isalpha(c)){
-                errorState.state=ERR_LEXICAL; 
+                errorState.state=ERR_LEXICAL;
                 errorState.line=token.counter_of_lines;
                 fatalError (errorState);
 
@@ -273,7 +273,7 @@ int scanner (FILE *source) {
             }
             else if (c == '.')  /** || (c == 'e' || c == 'E'))    */
                 {
-                        errorState.state=ERR_LEXICAL; 
+                        errorState.state=ERR_LEXICAL;
                         errorState.line=token.counter_of_lines;
                         fatalError (errorState);
                     }       /// Lex_an chyba - zadana druha desetinna tecka
@@ -286,13 +286,13 @@ int scanner (FILE *source) {
 
         case DEC_NUMBER_END:
             if (isdigit(c))
-                fillToken(c);  /// Lex_an chyba - zadana druha desetinna tecka
-            else if (c == '.')
+                fillToken(c);
+            else if (c == '.')  /// Lex_an chyba - zadana druha desetinna tecka
                {
-                        errorState.state=ERR_LEXICAL; 
+                        errorState.state=ERR_LEXICAL;
                         errorState.line=token.counter_of_lines;
                         fatalError (errorState);
-                    }  
+                    }
             else if ((c == 'e' || c == 'E')) {
                 fillToken(c);
                 value = EXP_NUMBER;
@@ -316,10 +316,10 @@ int scanner (FILE *source) {
             }
             else                /// za E nejsou cifry
                 {
-                        errorState.state=ERR_LEXICAL; 
+                        errorState.state=ERR_LEXICAL;
                         errorState.line=token.counter_of_lines;
                         fatalError (errorState);
-                    }  
+                    }
 
             break;
 
@@ -330,26 +330,26 @@ int scanner (FILE *source) {
                 }
             else
                {
-                        errorState.state=ERR_LEXICAL; 
+                        errorState.state=ERR_LEXICAL;
                         errorState.line=token.counter_of_lines;
                         fatalError (errorState);
-                    }  
+                    }
 
             break;
 
         case EXP_NUMBER_END:
             if (isdigit(c))
                 fillToken(c);
-            else if (c==' '||c== ';'||c== '+'||c== '-'||c== '/'||c== '*'||c== '%'||c== '>'||c== '<') {
+            else /*if (c==' '||c== ';'||c== '+'||c== '-'||c== '/'||c== '*'||c== '%'||c== '>'||c== '<'||c == ')'||c == '=') */ {
                 token.type = DOUBLE_NUMBER;
                 ungetc(c, source);
                 test = false;
-            }
+            }   /*
             else {
-                        errorState.state=ERR_LEXICAL; 
+                        errorState.state=ERR_LEXICAL;
                         errorState.line=token.counter_of_lines;
                         fatalError (errorState);
-                    } 
+                    }   */
             break;
 
         case STRING:
@@ -378,6 +378,11 @@ int scanner (FILE *source) {
                 fillToken('\"');
             else if (c == 'x')
                 value = STRING_ESCAPE_x1;
+            else {
+                errorState.state=ERR_LEXICAL;
+                errorState.line=token.counter_of_lines;
+                fatalError (errorState);
+            }
 
             break;
 
@@ -390,11 +395,11 @@ int scanner (FILE *source) {
             }
             else
                 {
-                        errorState.state=ERR_LEXICAL; 
+                        errorState.state=ERR_LEXICAL;
                         errorState.line=token.counter_of_lines;
                         fatalError (errorState);
-                    }  
-        
+                    }
+
             break;
 
         case STRING_ESCAPE_x2:
@@ -409,20 +414,20 @@ int scanner (FILE *source) {
                     fillToken(number + '\0');
                 else
                    {
-                        errorState.state=ERR_LEXICAL; 
+                        errorState.state=ERR_LEXICAL;
                         errorState.line=token.counter_of_lines;
                         fatalError (errorState);
-                    }  
+                    }
 
                 value = STRING;
             }
             else
                {
-                        errorState.state=ERR_LEXICAL; 
+                        errorState.state=ERR_LEXICAL;
                         errorState.line=token.counter_of_lines;
                         fatalError (errorState);
-                    }  
-                
+                    }
+
             break;
 
     case LESS:
@@ -442,7 +447,7 @@ int scanner (FILE *source) {
                 ungetc(c,source);
             }
             test = false;
-                
+
             break;
 
    case GREATER:
@@ -463,7 +468,7 @@ int scanner (FILE *source) {
 
             }
             test = false;
-                
+
             break;
 
     case DIVIDE:
@@ -478,7 +483,7 @@ int scanner (FILE *source) {
             value = LINE_COMMENT;
         else
             value = COMMENT;
-                
+
         break;
 
     case LINE_COMMENT:
@@ -488,22 +493,22 @@ int scanner (FILE *source) {
         }
         break;
 
-                
+
     case COMMENT:
         if (c == '\n')
             token.counter_of_lines++;
         if (c == '*')
             value = COMMENT_END;
-                
+
         break;
 
-                
+
     case COMMENT_END:
         if (c == '/')
             value = START;
         else
             value = COMMENT;
-                
+
         break;
 
 
@@ -518,7 +523,7 @@ int scanner (FILE *source) {
             }
 
             test=false;
-                
+
         break;
 
 
@@ -532,10 +537,10 @@ int scanner (FILE *source) {
                 ungetc(c, source);
             }
                 test = false;
-                
+
         break;
 
-                
+
     case PLUS:
         if (c == '+') {
             fillToken(c);
@@ -550,7 +555,7 @@ int scanner (FILE *source) {
 
         break;
 
-                
+
     case MINUS:
         if (c == '-') {
             fillToken(c);
@@ -567,7 +572,7 @@ int scanner (FILE *source) {
         }
     }
 
-    
+
     if (token.area != NULL)
     {
         if (token.type == IDENTIFIER)
@@ -600,7 +605,7 @@ int scanner (FILE *source) {
             errno = 0;
 
             integer = strtol(token.area, NULL, 10);
-
+            /*
             if ((errno == ERANGE && (integer == LONG_MAX)) || (errno != 0 && integer == 0))
             {
                 //printf("Warning: Nevejde se do integeru.\n");
@@ -609,7 +614,7 @@ int scanner (FILE *source) {
             {
                 //printf("Warning: Nevejde se do integeru.\n");
             }
-
+            */
             token.int_numb = (int) integer;
         }
 
