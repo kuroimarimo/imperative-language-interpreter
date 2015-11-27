@@ -310,7 +310,7 @@ if (gramatika != 11) { // !!!!!!!!!!!!!!!! ACHTUNG
                 case INT_NUMBER: struktura->type = INT_NUMBER; break;
                 case DOUBLE_NUMBER: struktura->type = DOUBLE_NUMBER; break;
                 case STRING: struktura->type = STRING; break;
-                default Error(ERR_IncompatibleExpr);
+                default: Error(ERR_IncompatibleExpr);
             }
             TrojAdres(gramatika, expr1.data, NULL, struktura.data);
         break;
@@ -319,9 +319,10 @@ if (gramatika != 11) { // !!!!!!!!!!!!!!!! ACHTUNG
                 case INT_NUMBER: struktura->type = INT_NUMBER); break;
                 case DOUBLE_NUMBER: struktura->type = DOUBLE_NUMBER); break;
                 case STRING: struktura->type = STRING; break;
-                default Error(ERR_IncompatibleExpr);
+                default: Error(ERR_IncompatibleExpr);
             }
             TrojAdres(gramatika, expr2, NULL, struktura);
+        break;
     }
     return struktura;
 }
