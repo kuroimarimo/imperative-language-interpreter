@@ -1,14 +1,15 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<stdarg.h>
 #ifndef PRSA_H
 #define PRSA_H
 
-#include ial.h
-#include lex_an.h
-#include error.h
-#include parser.h
-#include 3ak.h
+#include<stdio.h>
+#include<stdlib.h>
+#include<stdarg.h>
+
+#include "ial.h"
+#include "lex_an.h"
+#include "error.h"
+#include "parser.h"
+#include "3ak.h"
 
 #define NETERMINAL 500
 #define TERMINAL 501
