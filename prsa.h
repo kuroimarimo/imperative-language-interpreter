@@ -1,8 +1,15 @@
+#ifndef PRSA_H
+#define PRSA_H
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<stdarg.h>
-#ifndef PRSA_H
-#define PRSA_H
+
+#include "ial.h"
+#include "lex_an.h"
+#include "error.h"
+#include "parser.h"
+#include "3ak.h"
 
 #define NETERMINAL 500
 #define TERMINAL 501
@@ -84,5 +91,10 @@ char OperatorToIndex (tExpr* op) {
 }
 
 int PrecedencniSA ();
+void Dispose (tList *Z);
+void InitList (tInstrList *L);
+void DisposeList (tInstrList *L);
+void InsertLast (tInstrList *L, tInstruction *data);
+tInstruction* GetFirst (tInstrList *L);
 
 #endif
