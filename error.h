@@ -8,10 +8,13 @@
 typedef enum
 {
     ERR_None,
-    
+
     //// LEXIS
     ERR_LEXICAL             = 100,          // TODO prepisat ked budeme mat konkretne chybove stavy
-    
+    ERR_NumberShape,
+    ERR_StringEscape,
+    ERR_UnknownChar,
+
     //// SYNTAX
     ERR_SYNTAX              = 200,          // TODO prepisat ked budeme mat konkretne chybove stavy
 
@@ -21,25 +24,25 @@ typedef enum
     ERR_AttemptedRedefFunction,
     ERR_AttemptedRedefVar,
     ERR_UndefinedVariable,
-    
+
     // semantic type compatibility errors
     ERR_IncompatibleExpr    = 400,
     ERR_ParamNumber,
     ERR_ParamType,
-    
+
     // type derivation errors
     ERR_UnderivableType     = 500,
     ERR_AutoNoInit,
-    
+
     // other semantic errors
     ERR_OTHERSEMANTIC       = 600,              // TODO prepisat ked budeme mat konkretne chybove stavy
-    
+
     //// INTERPRETER
     ERR_ReadInput           = 700,
     ERR_UninitVar           = 800,
     ERR_ZeroDivision        = 900,
     ERR_OtherRunningErr     = 1000,            // TODO prepisat ked budeme mat konkretne chybove stavy
-    
+
     //// INTERNAL INTERPRETER ERRORS
     ERR_AllocFailed         = 9900,
     ERR_CannotOpenFile,
