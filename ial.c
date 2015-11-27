@@ -196,7 +196,7 @@ void hTabFree (hTab * table)
 
 int lenght(char *s)
 {
-    return strlen(s);
+    return (int) strlen(s);
 /*int x=0;
 int pocet=0;
 
@@ -222,7 +222,7 @@ return pocet;*/
 
 char *substr (char *s, int i, int n) {
 
-    int len = strlen(s);    /// length of string
+    int len = (int) strlen(s);    /// length of string
     char * subs = NULL;
     subs = malloc((len + 1)*sizeof(char));
 
@@ -238,7 +238,7 @@ char *substr (char *s, int i, int n) {
 
 char *sort (char *s) {
     int left = 0;
-    int right = strlen(s) - 1;
+    int right = (int) (strlen(s)) - 1;
 
     sort_recursive(s, left, right);
 
