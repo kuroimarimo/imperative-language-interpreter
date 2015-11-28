@@ -15,7 +15,7 @@
 
 hTab * globalST;				// global symbol table
 hTab * localST;					// local symbol table for the currently parsed function
-hashElem activeElem;			// symbol table element being modified
+//hashElem activeElem;			// symbol table element being modified
 //tData STdata;					// tData being created
 
                                                     /*Function definitions*/
@@ -31,11 +31,11 @@ int rule_stList();              // <st-list> -> <statement> <st-list>     |   }
 int rule_statement();           // <statement> -> type id <var-def> ;   ||      id = <expression> ;      ||        id (<param-list>) ;      ||      <keyword>	|| { <st-list>
 int rule_varDecl();             // <var-decl> -> ;    |   = <expression> ;
 
-int rule_funcdef();             // <prog> -> type id <param-list> <func-defined> 
-int rule_funcDefined();         // <func-defined> -> { <st-list> <prog>     ||      ; <prog>
-int rule_paramList();           // <param-list> -> ( <param> <param-next>
-int rule_param();               // <param> -> type id
-int rule_paramNext();           // <param-next> -> , <param> <param-next>       |   )
+int rule_funcdef(hashElem * activeElem);             // <prog> -> type id <param-list> <func-defined> 
+int rule_funcDefined(hashElem * activeElem);         // <func-defined> -> { <st-list> <prog>     ||      ; <prog>
+int rule_paramList(hashElem * activeElem);           // <param-list> -> ( <param> <param-next>
+int rule_param(hashElem * activeElem);               // <param> -> type id
+int rule_paramNext(hashElem * activeElem);           // <param-next> -> , <param> <param-next>       |   )
 
 int rule_keyword();             // <keyword> -> auto <auto-decl>    ||      cin <cin> <cin-list>    ||  cout <cout> <cout-list>
                                 // ||   for <for-decl>  ||  if <if-decl>    ||  return <rule-return>	|| while <while_loop>	|| do <do-loop>
@@ -59,6 +59,6 @@ char * appendChar(char * string, char c);
 char paramTypeToChar(int type);
 int paramTypeToInt(char c);
 
-int compareSymbol(hashElem * elem);                          //compares elem with global variable activeElem
+int compareSymbol(hashElem * elem, hashElem * activeElem);                          //compares elem with global variable activeElem
 
 #endif
