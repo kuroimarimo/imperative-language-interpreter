@@ -13,6 +13,7 @@
 
 #define INIT_ST_SIZE	16
 
+FILE* srcFile;
 hTab * globalST;				// global symbol table
 hTab * localST;					// local symbol table for the currently parsed function
 //hashElem activeElem;			// symbol table element being modified
