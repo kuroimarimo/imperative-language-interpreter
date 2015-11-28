@@ -1,8 +1,5 @@
 #include "parser.h"
 
-
-FILE* srcFile;
-
 int isKeyword(int tokenType)
 {
     return (tokenType >= K_AUTO) && (tokenType <= K_DO);
