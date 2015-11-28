@@ -5,8 +5,6 @@
 #ifndef ERROR_H
 #define ERROR_H
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -41,7 +39,8 @@ typedef enum
 
     // other semantic errors
     ERR_OTHERSEMANTIC       = 600,              // TODO prepisat ked budeme mat konkretne chybove stavy
-
+    ERR_NFunction,                              // precedence analysis is unable to process function call, syntax has to handle it
+    
     //// INTERPRETER
     ERR_ReadInput           = 700,
     ERR_UninitVar           = 800,
