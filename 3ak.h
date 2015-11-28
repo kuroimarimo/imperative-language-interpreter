@@ -1,4 +1,4 @@
-enum 3ak {
+enum adressCode {
 OP_ASSIGN = 0,	// prirazeni in1 -> out
 OP_SUM,			// secteni in1, in2 -> out
 OP_MINUS,		// odecteni in1, in2 -> out
