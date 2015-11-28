@@ -48,5 +48,12 @@ int main(int argc, char** argv)
 
     fclose(source);
 
+    // cleanup
+    initToken();
+    hashElemInit(&activeElem);
+    hTabFree(globalST);
+    if (oldToken.area != NULL)
+        free(oldToken.area);
+
     return getReturnValue(errorState.state);
 }
