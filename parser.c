@@ -1,12 +1,4 @@
-#include <stdio.h>
-#include <stdbool.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-
 #include "parser.h"
-#include "lex_an.h"
-#include "error.h"
 
 
 FILE* srcFile;
@@ -20,33 +12,40 @@ int parse(FILE *source)
 {
     srcFile = source;
 
-    int returnValue = ERR_None;
+    globalST = hTabInit(INIT_ST_SIZE);
 
-    while (returnValue == ERR_None)           //no errors so far
-    {
-        scanner(srcFile);                       //get next token
-        if (token.type == EOF)
-            break;
+    int returnValue = rule_funcdef();
 
-        returnValue = rule_funcdef(srcFile);        //start parsing recursively
-    }
+    hashElemInit(&activeElem);
 
     return returnValue;
 }
 
-// rule:    <prog> -> type id <param-list> <func-defined> 
+// rule:    <prog> -> type id <param-list> <func-defined>   || EOF
 int rule_funcdef()
 {
+    hashElemInit(&activeElem);
+
+    scanner(srcFile);
+    if (token.type == EOF)
+        return ERR_None;
+
     if ((token.type != K_INT) && (token.type != K_DOUBLE) && (token.type != K_STRING))
         return ERR_SYNTAX;
 
-    //vytvorenie polozky TS pre funkciu
+
+    activeElem.data.type = func;
+    activeElem.data.state = declared;
+
+    activeElem.data.fParamTypes = appendChar(activeElem.data.fParamTypes, paramTypeToChar(token.type));    //set function type
     
     scanner(srcFile);
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
 
-    //pridanie ID funkcie
+    if (NULL == (activeElem.key = malloc((strlen(token.area) + 1) * sizeof(char))))
+        return ERR_AllocFailed;
+    strcpy(activeElem.key, token.area);                                     //save the function name
     
     int error = rule_paramList();
     if (error != ERR_None)
@@ -56,19 +55,58 @@ int rule_funcdef()
     if (error != ERR_None)
         return error;
 
-    return ERR_None;
+    return rule_funcdef();
 }
 
-//rule:     <func-defined> -> { <st-list> <prog>        ||      ; <prog>
+//rule:     <func-defined> -> { <st-list>        ||      ; 
 int rule_funcDefined()
 {
     scanner(srcFile);
 
-    if (token.type == SEMICOLON)
-        return ERR_None;
+    if (!strcmp(activeElem.key, "main") && (strcmp(activeElem.data.fParamTypes, "i")))      //main should be of type int and with no parameters
+    {
+        return ERR_UndefinedFunction;
+    }
+
+    hashElem * temp = findElem(globalST, activeElem.key);                           //check whether there already is a function with given name
+
+    if (token.type == SEMICOLON)                                                    //the current function has been declared, not defined
+    {
+        if (temp == NULL)                                                           //there's no such function declared in symbol table
+        {
+            if (addElem(globalST, activeElem.key, activeElem.data) == NULL)
+                    return ERR_AllocFailed;
+
+            return ERR_None;
+        }
+
+        // the function has already been declared   
+        else if (compareSymbol(temp))
+            return ERR_None;
+
+        else 
+        { 
+            return ERR_AttemptedRedefFunction;
+        }
+    }
 
     if (token.type != L_CURLY_BRACKET)
         return ERR_SYNTAX;
+
+    activeElem.data.state = defined;
+
+    if ((temp != NULL) && (temp->data.state == defined))
+        return ERR_AttemptedRedefFunction;
+    
+    else if (temp == NULL)
+        temp = addElem(globalST, activeElem.key, activeElem.data);
+
+    temp->data.state = defined;
+
+    if ((temp->data.localTable = hTabInit(INIT_ST_SIZE)) == NULL)           //init the functions local symbol table
+        return ERR_AllocFailed;
+    localST = temp->data.localTable;
+
 
     scanner(srcFile);
     int error = rule_stList();
@@ -98,6 +136,7 @@ int rule_paramList()
         return error;
 
     return ERR_None;
+
 }
 
 //rule:     <param> -> type id
@@ -106,7 +145,7 @@ int rule_param()
     if ((token.type != K_INT) && (token.type != K_DOUBLE) && (token.type != K_STRING))
         return ERR_SYNTAX;
 
-    // ulozenie typu parametra do tabulky
+    activeElem.data.fParamTypes = appendChar(activeElem.data.fParamTypes, paramTypeToChar(token.type));    //add param type
 
     scanner(srcFile);
     if (token.type != IDENTIFIER)
@@ -380,67 +419,60 @@ int rule_keyword()
 {
     int error;
 
-    if ((token.type == K_INT) || (token.type == K_DOUBLE) || (token.type == K_STRING))
+    switch (token.type)
     {
-        scanner(srcFile);
+        case K_INT:
+        case K_DOUBLE:
+        case K_STRING:
+        {
+                scanner(srcFile);
+        
+                if (token.type != IDENTIFIER)
+                    return ERR_SYNTAX;
+        
+                return rule_varDecl();
+        }
 
-        if (token.type != IDENTIFIER)
+        case K_CIN:
+        {
+            scanner(srcFile);
+            if ((error = rule_cin()) != ERR_None)
+                return error;
+            else 
+                return rule_cinList();
+        }
+
+        case K_COUT:
+        {
+            scanner(srcFile);
+    
+            if ((error = rule_cout()) != ERR_None)
+                return error;
+            else 
+                return rule_coutList();
+        }
+    
+        case K_IF:
+            return rule_if();
+    
+        case K_FOR:
+            return rule_for();
+    
+        case K_WHILE:
+            return rule_while();
+    
+        case K_DO:
+            return rule_do();
+    
+        case K_RETURN:
+            return rule_return();
+    
+        case K_AUTO:
+            return rule_auto();
+    
+        default:
             return ERR_SYNTAX;
-
-        return rule_varDecl();
     }
-
-    else if (token.type == K_CIN)
-    {
-
-        scanner(srcFile);
-        if ((error = rule_cin()) != ERR_None)
-            return error;
-        else 
-            return rule_cinList();
-    }
-
-    else if (token.type == K_COUT)
-    {
-        scanner(srcFile);
-
-        if ((error = rule_cout()) != ERR_None)
-            return error;
-        else 
-            return rule_coutList();
-    }
-
-    else if (token.type == K_IF)
-    {
-        return rule_if();
-    }
-
-    else if (token.type == K_FOR)
-    {
-        return rule_for();
-    }
-
-    else if (token.type == K_WHILE)
-    {
-        return rule_while();
-    }
-
-    else if (token.type == K_DO)
-    {
-        return rule_do();
-    }
-
-    else if (token.type == K_RETURN)
-    {
-        return rule_return();
-    }
-
-    else if (token.type == K_AUTO)
-    {
-        return rule_auto();
-    }
-
-    else return ERR_SYNTAX;
 }
 
 //rule:      <while-loop> -> ( <expression> ) <statement>
@@ -497,4 +529,81 @@ int rule_do()
         return ERR_SYNTAX;
 
     return ERR_None;
+}
+
+int getType(int tokenType)
+{
+    switch (tokenType)
+    {
+        case K_INT:
+            return var_int;
+
+        case K_DOUBLE:
+            return var_double;
+
+        case K_STRING:
+            return var_string;
+
+        default:
+            return -1;
+    }
+}
+
+char paramTypeToChar(int type)
+{
+    switch (type)
+    {
+        case K_INT:
+            return 'i';
+
+        case K_DOUBLE:
+            return 'd';
+
+        case K_STRING:
+            return 's';
+
+        default:
+            return -1;
+    }
+}
+
+char * appendChar(char * string, char c)
+{
+    if (string == NULL)
+    {
+        string = malloc(2 * sizeof(char));
+        if (string == NULL)
+            return NULL;
+        
+        string[0] = c;
+        string[1] = '\0';
+    }
+
+    else
+    { 
+        char * temp = realloc (string, (strlen(string) + 2) * sizeof(char) );
+        if (temp == NULL)
+            return NULL;
+
+        string = temp;
+        unsigned long a = strlen(string);
+        string[a] = c;
+        string[a+1] = '\0';
+    }
+
+    return string;
+}
+
+int compareSymbol(hashElem * elem)                          //compares elem with global variable activeElem
+{
+    if (elem->data.type != activeElem.data.type)
+        return 0;
+
+    /*if ((elem->data.fParamTypes == NULL) || (activeElem.data.fParamTypes == NULL))
+        return 1;*/
+
+    if (strcmp(elem->data.fParamTypes, activeElem.data.fParamTypes) != 0)
+     return 0;
+
+    return 1;
 }
