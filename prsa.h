@@ -75,12 +75,15 @@ char precedencni_tabulka[14][14] = {
 /* ;  */ {'<','<','<','<','<','<','<','<','<','<','<',' ','<',' '}
 };
 
+// GLOBALNA PREMENNA
+tInstrList instructionList;
+
 // OPERACE TABULKY
 char OperatorToIndex (tExpr* op);
 
-tInstruction * instrListInit(tInstrList *L);
-void addInstruction(tInstruction * instr);
-void expandInstrList(tInstruction * array, int size);
+bool expandInstrList();
+bool addInstruction(tInstruction * instr);
+bool initInstrList();
 
 int PrecedencniSA ();
 void Dispose (tList *Z);

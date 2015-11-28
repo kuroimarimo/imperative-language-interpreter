@@ -158,22 +158,38 @@ tExpr* Pop (tList *Z) {
 //     INSTRUCTION ARRAY    //
 //--------------------------//
 
-void expandInstrList(tInstruction * array, int size)
+/* Dynamically expands the array where the instructions are stored.
+ Returns true upon successful completion, else returns false. (realloc failed) */
+bool expandInstrList()
 {
-    instructionList = realloc(instructionList, size * 2 * sizeof(tInstruction));
-    if (!instructionList)
-    {
-                                                                                        //V: ERROR malloc failed
-        return;
-    }
+    int size = instructionList.lenght;
+    instructionList.array = realloc(instructionList.array, size * 2 * sizeof(tInstruction));
+    return instructionList.array;        // allocation failed = false
 }
 
-void addInstruction(tInstruction * instr)
+
+/* Adds instruction to the global instruction list.
+ Returns true upon successful completion, else returns false. (realloc failed) */
+bool addInstruction(tInstruction * instr)
 {
-    if (instructionList.lenght < (instructionList.occupied + 1))
-        instructionList.array = expandInstrList(instructionList.array, instructionList.lenght);
+    if (instructionList.lenght < (instructionList.occupied + 1) && !expandInstrList())
+        return false;
     instructionList.array[instructionList.occupied] = * instr;
     ++instructionList.occupied;
+    return true;
+}
+
+
+/* Initialises the instruction list.
+ Returns true upon successful completion, else returns false. (malloc failed)*/
+bool initInstrList()
+{
+    int size = INITIAL_SIZE
+    if ((instructionList.array = malloc(size * sizeof(tInstruction))) == NULL)
+        return false;
+    instructionList.lenght = size;
+    instructionList.occupied = 0;
+    return true;
 }
 
 //--------------------------//
