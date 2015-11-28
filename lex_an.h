@@ -123,7 +123,7 @@ tToken token, oldToken;
 int scanner (FILE *source);
 void ungetToken();               //ungets the latest token, can be used only once in a row
 void tokenSwap();
-void tokenCopy (tToken *dst, tToken src);   //"copies" the contents of src token to the dst token
+int tokenCopy (tToken *dst, tToken src);   //"copies" the contents of src token to the dst token
 void initToken (); // function for inicialization Token .. it's called when you need delete old variables
 void fillToken (char character); // comes some character and function saves it to variable 
 int scanner (FILE *source);  // its scanner, heart of lex_an ... it's automata 

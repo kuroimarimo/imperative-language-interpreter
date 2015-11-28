@@ -17,7 +17,7 @@ const char *built_in_functions [COUNT_OF_BUILT_IN_FUNCTIONS] = {
     "length", "substr", "concat", "find", "sort"
 };
 
-void tokenCopy (tToken *dst, tToken src)
+int tokenCopy (tToken *dst, tToken src)
 {
     if (dst->area != NULL)
         free(dst->area);
@@ -37,7 +37,7 @@ void tokenCopy (tToken *dst, tToken src)
     dst->counter = src.counter;
     dst->sizeof_area = src.sizeof_area;
 
-    return;
+    return ERR_None;
 }
 
 void tokenSwap()
