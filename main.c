@@ -50,7 +50,6 @@ int main(int argc, char** argv)
 
     // cleanup
     initToken();
-    hashElemInit(&activeElem);
     hTabFree(globalST);
     if (oldToken.area != NULL)
         free(oldToken.area);
