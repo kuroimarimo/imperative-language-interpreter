@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+#include "error.h"
+
 typedef enum {var_int, var_double, var_string, func} tSymbolType;
 typedef union {int int_value; double double_value; char * string_value;} tSymbolValue;
 typedef enum  {declared, defined} tState;
@@ -15,6 +17,9 @@ typedef struct data
     tSymbolType type;
     tState state;
     tSymbolValue value;
+    char * fParamTypes;
+    struct hTab * localTable;
+    //instrList * instructions;			//TODO
 } tData;
 
 typedef struct hashElem
@@ -34,6 +39,7 @@ typedef struct hTab
 unsigned int hFunct(const char *str, unsigned hTabSize);
 
 hTab * hTabInit (unsigned int size);
+void hashElemInit (hashElem * elem);		//initialises default hashElem values
 
 bool checkOverfill (unsigned int size, unsigned int numStoredElem);
 hTab * expandTab (hTab * table);
