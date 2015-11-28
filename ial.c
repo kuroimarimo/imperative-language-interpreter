@@ -112,6 +112,9 @@ hashElem * addElem (hTab * table, char * key, tData data)
         strcpy(newElem->data.value.string_value, data.value.string_value);
     }
 
+    newElem->data.fParamTypes = malloc((strlen(data.fParamTypes)+1) * sizeof(char));                //TODO      check malloc success
+    strcpy(newElem->data.fParamTypes, data.fParamTypes);
+
     table->table[hFunct(key, table->size)] = newElem;
 
     ++table->numStoredElem;
@@ -146,6 +149,12 @@ void removeElem (hTab * table, char * key)
         if (tmp->data.type == var_string)
             free(tmp->data.value.string_value);
 
+        if (tmp->data.fParamTypes != NULL)
+            free(tmp->data.fParamTypes);
+
+        if (tmp->data.localTable != NULL)
+            hTabFree(tmp->data.localTable);
+
         free(tmp);
         return;
     }
@@ -162,6 +171,12 @@ void removeElem (hTab * table, char * key)
 
         if (removed->data.type == var_string)
             free(removed->data.value.string_value);
+
+        if (removed->data.fParamTypes != NULL)
+            free(removed->data.fParamTypes);
+
+        if (removed->data.localTable != NULL)
+            hTabFree(removed->data.localTable);
 
         free(removed->key);
         free(removed);
@@ -185,6 +200,15 @@ void hTabFree (hTab * table)
             if (elem->data.type == var_string)
                 free(elem->data.value.string_value);
 
+            if (elem->data.type == var_string)
+                free(elem->data.value.string_value);
+
+            if (elem->data.fParamTypes != NULL)
+                free(elem->data.fParamTypes);
+
+            if (elem->data.localTable != NULL)
+                hTabFree(elem->data.localTable);
+
             free(elem->key);
             free(elem);
             elem = tmp;
@@ -192,6 +216,25 @@ void hTabFree (hTab * table)
     }
     free(table->table);
     free(table);
+}
+
+void hashElemInit (hashElem * elem)
+{
+    elem->data.type = -1;
+    elem->data.state = declared;
+    elem->data.value.int_value = 0;
+
+    if (elem->data.fParamTypes != NULL)
+        free(elem->data.fParamTypes); 
+    elem->data.fParamTypes = NULL;
+
+    if (elem->data.localTable != NULL)
+        hTabFree(elem->data.localTable);
+    elem->data.localTable = NULL;
+
+    if (elem->key != NULL)
+        free(elem->key);
+    elem->key = NULL;
 }
 
 int lenght(char *s)
