@@ -12,19 +12,24 @@ int parse(FILE *source)
 {
     srcFile = source;
 
+    hashElem activeElem;
+    activeElem.data.fParamTypes = NULL;
+    activeElem.data.localTable = NULL;
+    activeElem.key = NULL;
+
     globalST = hTabInit(INIT_ST_SIZE);
 
-    int returnValue = rule_funcdef();
-
-    hashElemInit(&activeElem);
+    int returnValue = rule_funcdef(&activeElem);
+    
+    //cleanup?
 
     return returnValue;
 }
 
 // rule:    <prog> -> type id <param-list> <func-defined>   || EOF
-int rule_funcdef()
+int rule_funcdef(hashElem * activeElem)
 {
-    hashElemInit(&activeElem);
+    hashElemInit(activeElem);
 
     scanner(srcFile);
     if (token.type == EOF)
@@ -34,72 +39,69 @@ int rule_funcdef()
         return ERR_SYNTAX;
 
 
-    activeElem.data.type = func;
-    activeElem.data.state = declared;
+    activeElem->data.type = func;
+    activeElem->data.state = declared;
 
-    activeElem.data.fParamTypes = appendChar(activeElem.data.fParamTypes, paramTypeToChar(token.type));    //set function type
+    activeElem->data.fParamTypes = appendChar(activeElem->data.fParamTypes, paramTypeToChar(token.type));    //set function type
     
     scanner(srcFile);
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
 
-    if (NULL == (activeElem.key = malloc((strlen(token.area) + 1) * sizeof(char))))
+    if ((activeElem->key = malloc((strlen(token.area) + 1) * sizeof(char))) == NULL)
         return ERR_AllocFailed;
-    strcpy(activeElem.key, token.area);                                     //save the function name
+    strcpy(activeElem->key, token.area);                                     //save the function name
     
-    int error = rule_paramList();
+    int error = rule_paramList(activeElem);
     if (error != ERR_None)
         return error;
 
-    error = rule_funcDefined();
-    if (error != ERR_None)
-        return error;
-
-    return rule_funcdef();
-}
-
-//rule:     <func-defined> -> { <st-list>        ||      ; 
-int rule_funcDefined()
-{
-    scanner(srcFile);
-
-    if (!strcmp(activeElem.key, "main") && (strcmp(activeElem.data.fParamTypes, "i")))      //main should be of type int and with no parameters
+    if (!strcmp(activeElem->key, "main") && (strcmp(activeElem->data.fParamTypes, "i")))      //main should be of type int and with no parameters
     {
         return ERR_UndefinedFunction;
     }
 
-    hashElem * temp = findElem(globalST, activeElem.key);                           //check whether there already is a function with given name
+    error = rule_funcDefined(activeElem);
+    if (error != ERR_None)
+        return error;
 
-    if (token.type == SEMICOLON)                                                    //the current function has been declared, not defined
-    {
-        if (temp == NULL)                                                           //there's no such function declared in symbol table
-        {
-            if (addElem(globalST, activeElem.key, activeElem.data) == NULL)
+    return rule_funcdef(activeElem);
+}
+
+//rule:     <func-defined> -> { <st-list>        ||      ; 
+int rule_funcDefined(hashElem * activeElem)
+{
+    printf("Funkcia %s parametre: %s\n", activeElem->key, activeElem->data.fParamTypes);
+
+    hashElem * temp = findElem(globalST, activeElem->key);                           //check whether there already is a function with given name
+
+    if (temp != NULL)
+        printf("Najdena funkcia %s parametre: %s\n", temp->key, temp->data.fParamTypes);
+
+    if (temp == NULL)
+    {                                                           //there's no such function declared in symbol table
+            if ((temp = addElem(globalST, activeElem->key, activeElem->data)) == NULL)
                     return ERR_AllocFailed;
-
-            return ERR_None;
-        }
-
-        // the function has already been declared   
-        else if (compareSymbol(temp))
-            return ERR_None;
-
-        else 
-        { 
-            return ERR_AttemptedRedefFunction;
-        }
     }
 
-    if (token.type != L_CURLY_BRACKET)
-        return ERR_SYNTAX;
+    // the function has already been declared   
+    else if (!compareSymbol(temp, activeElem))
+        return ERR_AttemptedRedefFunction;
 
-    activeElem.data.state = defined;
+    scanner(srcFile);
+    if (token.type == SEMICOLON)                                                    //the current function has been declared, not defined
+        return ERR_None;
+
+    else if (token.type != L_CURLY_BRACKET)
+            return ERR_SYNTAX;
+
+    activeElem->data.state = defined;
 
     if ((temp != NULL) && (temp->data.state == defined))
         return ERR_AttemptedRedefFunction;
     
-    else if (temp == NULL)
-        temp = addElem(globalST, activeElem.key, activeElem.data);
+   /* else if (temp == NULL)
+        temp = addElem(globalST, activeElem->key, activeElem->data);*/
 
     temp->data.state = defined;
 
@@ -117,7 +119,7 @@ int rule_funcDefined()
 }
 
 //rule:     <param-list> -> ( <param> <param-next>      |       ()
-int rule_paramList()
+int rule_paramList(hashElem * activeElem)
 {
     scanner(srcFile);
     if (token.type != L_BRACKET)
@@ -127,11 +129,11 @@ int rule_paramList()
     if (token.type == R_BRACKET)
         return ERR_None;
 
-    int error = rule_param();
+    int error = rule_param(activeElem);
     if (error != ERR_None)
         return error;
 
-    error = rule_paramNext();
+    error = rule_paramNext(activeElem);
     if (error != ERR_None)
         return error;
 
@@ -140,12 +142,12 @@ int rule_paramList()
 }
 
 //rule:     <param> -> type id
-int rule_param()    
+int rule_param(hashElem * activeElem)    
 {
     if ((token.type != K_INT) && (token.type != K_DOUBLE) && (token.type != K_STRING))
         return ERR_SYNTAX;
 
-    activeElem.data.fParamTypes = appendChar(activeElem.data.fParamTypes, paramTypeToChar(token.type));    //add param type
+    activeElem->data.fParamTypes = appendChar(activeElem->data.fParamTypes, paramTypeToChar(token.type));    //add param type
 
     scanner(srcFile);
     if (token.type != IDENTIFIER)
@@ -157,7 +159,7 @@ int rule_param()
 }
 
 //rule:     <param-next> -> , <param> <param-next>      |   )
-int rule_paramNext()
+int rule_paramNext(hashElem * activeElem)
 {
     scanner(srcFile);
     
@@ -165,11 +167,11 @@ int rule_paramNext()
     {
 
         scanner(srcFile);
-        int error = rule_param();
+        int error = rule_param(activeElem);
         if (error != ERR_None)
             return error;
 
-        error = rule_paramNext();
+        error = rule_paramNext(activeElem);
         if (error != ERR_None)
             return error;
 
@@ -594,16 +596,18 @@ char * appendChar(char * string, char c)
     return string;
 }
 
-int compareSymbol(hashElem * elem)                          //compares elem with global variable activeElem
+int compareSymbol(hashElem * elem, hashElem * activeElem)                          //compares elem with global variable activeElem
 {
-    if (elem->data.type != activeElem.data.type)
+    if (elem->data.type != activeElem->data.type)
         return 0;
 
-    /*if ((elem->data.fParamTypes == NULL) || (activeElem.data.fParamTypes == NULL))
+    /*if ((elem->data.fParamTypes == NULL) || (activeElem->data.fParamTypes == NULL))
         return 1;*/
 
-    if (strcmp(elem->data.fParamTypes, activeElem.data.fParamTypes) != 0)
+    if (strcmp(elem->data.fParamTypes, activeElem->data.fParamTypes) != 0)
      return 0;
+
+    printf("Su rovnaké: --%s--%s--\n", elem->data.fParamTypes, activeElem->data.fParamTypes);
 
     return 1;
 }
