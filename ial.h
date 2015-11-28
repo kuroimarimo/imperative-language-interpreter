@@ -44,7 +44,7 @@ void hashElemInit (hashElem * elem);		//initialises default hashElem values
 bool checkOverfill (unsigned int size, unsigned int numStoredElem);
 hTab * expandTab (hTab * table);
 
-hashElem * addElem  (hTab * table, char * key, tData data);
+hashElem * addElem  (hTab * table, char * key, tData * data);
 hashElem * findElem (hTab * table, char * key);
 
 void removeElem (hTab * table, char * key);

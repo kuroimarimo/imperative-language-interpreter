@@ -43,6 +43,25 @@ hTab * hTabInit(unsigned int size)
     return hashTable;
 }
 
+void hashElemInit (hashElem * elem)
+{
+    elem->data.type = -1;
+    elem->data.state = declared;
+    elem->data.value.int_value = 0;
+    
+    if (elem->data.fParamTypes != NULL)
+        free(elem->data.fParamTypes);
+    elem->data.fParamTypes = NULL;
+    
+    if (elem->data.localTable != NULL)
+        hTabFree(elem->data.localTable);
+    elem->data.localTable = NULL;
+    
+    if (elem->key != NULL)
+        free(elem->key);
+    elem->key = NULL;
+}
+
 /* doubles the size  of the table */
 hTab * expandTab(hTab * table)
 {
@@ -57,12 +76,12 @@ hTab * expandTab(hTab * table)
         {
             tmp = table->table[i];
 
-            addElem(newTable, tmp->key, tmp->data);
+            addElem(newTable, tmp->key, &tmp->data);
 
             while (tmp->next)           // in case there are synonyms
             {
                 tmp = tmp->next;
-                addElem(newTable, tmp->key, tmp->data);
+                addElem(newTable, tmp->key, &tmp->data);
             }
         }
     }
@@ -71,15 +90,29 @@ hTab * expandTab(hTab * table)
     return newTable;
 }
 
+/* Deep-copies the data from 'srcData' to 'destData' given that both are of type tData.
+   Returns true upon successful completion, otherwise false.*/
+bool tDataCopy (tData * destData, tData * srcData)
+{
+    destData->type = srcData->type;
+    destData->state = srcData->state;
+    destData->value = srcData->value;
+    
+    destData->fParamTypes = strdup(srcData->fParamTypes);
+    destData->localTable = NULL;   // not used if the element is variable; if it's a function, the table is later initialized
+    
+    return destData->fParamTypes;
+}
+
 /* adds new element to a hash table */
-hashElem * addElem (hTab * table, char * key, tData data)
+hashElem * addElem (hTab * table, char * key, tData * data)
 {
     hashElem * newElem;
 
-    //if (checkOverfill(table->size, table->numStoredElem))
-    //{
-    //    table = expandTab(table);
-    //}
+    if (checkOverfill(table->size, table->numStoredElem))
+    {
+        table = expandTab(table);
+    }
 
     newElem = table->table[hFunct (key, table->size)];
 
@@ -87,7 +120,10 @@ hashElem * addElem (hTab * table, char * key, tData data)
     {
         if (!strcmp(key, newElem->key)) // if there's already an element with such key, replace the data it holds
         {
-            newElem->data = data;
+            if (tDataCopy(&newElem->data, data))
+            {
+                return NULL;                    // Malloc failed.
+            }
             return newElem;
         }
 
@@ -101,19 +137,14 @@ hashElem * addElem (hTab * table, char * key, tData data)
 
     newElem->next = table->table[hFunct(key, table->size)];
 
-    newElem->key = malloc((strlen(key) + 1) * sizeof(char));
-    strcpy(newElem->key, key);
+//    newElem->key = malloc((strlen(key) + 1) * sizeof(char));
+//    strcpy(newElem->key, key);
 
-    newElem->data = data;
-
-    if (newElem->data.type == var_string)
+    newElem->key = strdup(key);
+    if (!tDataCopy(&newElem->data, data) || !newElem->key)
     {
-        newElem->data.value.string_value = malloc((strlen(data.value.string_value)+1) * sizeof(char));
-        strcpy(newElem->data.value.string_value, data.value.string_value);
+        return NULL;                    // Malloc failed.
     }
-
-    newElem->data.fParamTypes = malloc((strlen(data.fParamTypes)+1) * sizeof(char));                //TODO      check malloc success
-    strcpy(newElem->data.fParamTypes, data.fParamTypes);
 
     table->table[hFunct(key, table->size)] = newElem;
 
@@ -216,25 +247,6 @@ void hTabFree (hTab * table)
     }
     free(table->table);
     free(table);
-}
-
-void hashElemInit (hashElem * elem)
-{
-    elem->data.type = -1;
-    elem->data.state = declared;
-    elem->data.value.int_value = 0;
-
-    if (elem->data.fParamTypes != NULL)
-        free(elem->data.fParamTypes); 
-    elem->data.fParamTypes = NULL;
-
-    if (elem->data.localTable != NULL)
-        hTabFree(elem->data.localTable);
-    elem->data.localTable = NULL;
-
-    if (elem->key != NULL)
-        free(elem->key);
-    elem->key = NULL;
 }
 
 int lenght(char *s)
