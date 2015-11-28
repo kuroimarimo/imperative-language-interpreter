@@ -5,6 +5,10 @@
 #ifndef ERROR_H
 #define ERROR_H
 
+
+
+#include "header.h"
+
 typedef enum
 {
     ERR_None,

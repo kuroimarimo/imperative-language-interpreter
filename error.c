@@ -2,8 +2,6 @@
 //  error.c
 //
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "error.h"
 
 EErrorReturnValues getReturnValue (EErrorTypes value)
