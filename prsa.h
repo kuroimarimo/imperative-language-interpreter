@@ -14,35 +14,47 @@
 #define NETERMINAL 500
 #define TERMINAL 501
 
-typedef struct {
+typedef union {
+    int int_value;
+    double double_value;
+    char * string_value;
+} tUnionData;
+
+typedef struct
+{
     int terminal;
     int type;
-    void *data;
+    tUnionData * data;
 } tExpr;
+
 // ZASOBNIK
 typedef struct tElem {      // deklarace struktury
     struct tElem *ptr;
-    tExpr* data;
-} *tElemPtr;                   
+    tExpr * data;
+} *tElemPtr;
+
 typedef struct {            // ukazatel prvniho prvku
     tElemPtr First;
 } tList;
-// LINEARNI SEZNAM
-typedef struct {
+
+// INSTRUCTION ARRAY
+
+typedef struct
+{
     int operator;
     int type;
     void *input1;
     void *input2;
     void *output;
 } tInstruction;
-typedef struct instructListElem {
-    struct instructListElem *next;
-    tInstruction *instruction;
-} tInstrListElem;                  
-typedef struct { 
-    tInstrListElem *first;
-    tInstrListElem *last;
+
+typedef struct
+{
+    int lenght;
+    int occupied;
+    tInstruction * array;
 } tInstrList;
+
 
 // PRECEDENCNI TABULKA
 char precedencni_tabulka[14][14] = {
@@ -64,37 +76,14 @@ char precedencni_tabulka[14][14] = {
 };
 
 // OPERACE TABULKY
-char OperatorToIndex (tExpr* op) {
-    switch (op->type) {
-        case MULTIPLY:      return 0;   // *    = 0
-        case DIVIDE:        return 1;   // /    = 1
-        case PLUS:          return 2;   // +    = 2 
-        case MINUS:         return 3;   // -    = 3
-        case GREATER:       return 4;   // >    = 4
-        case GREATER_ROVNO: return 5;   // >=   = 5
-        case LESS:          return 6;   // <    = 6
-        case LESS_ROVNO:    return 7;   // <=   = 7 
-        case EQUAL:         return 8;   // ==   = 8
-        case NEGACE:        return 9;   // !=   = 9
-        case L_BRACKET:     return 10;  // (    = 10
-        case R_BRACKET:     return 11;  // )    = 11
-        case DOUBLE_NUMBER:
-        case INT_NUMBER:
-        case STRING:
-        case IDENTIFIER:    return 12;  // i    = 12 <----- dodelat
-        case SEMICOLON:     return 13;  // ;    = 13
-        default:
-            errorState.state = errcode;
-            errorState.line = token.counter_of_lines;
-            fatalError(errorState);
-    }
-}
+char OperatorToIndex (tExpr* op);
+
+tInstruction * instrListInit(tInstrList *L);
+void addInstruction(tInstruction * instr);
+void expandInstrList(tInstruction * array, int size);
 
 int PrecedencniSA ();
 void Dispose (tList *Z);
-void InitList (tInstrList *L);
 void DisposeList (tInstrList *L);
-void InsertLast (tInstrList *L, tInstruction *data);
-tInstruction* GetFirst (tInstrList *L);
 
 #endif
