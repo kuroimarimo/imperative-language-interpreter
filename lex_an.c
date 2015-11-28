@@ -25,7 +25,7 @@ int tokenCopy (tToken *dst, tToken src)
     {
         if ((dst->area = malloc((strlen(src.area) + 1) * sizeof(char))) == NULL)
             return ERR_AllocFailed;
-        
+
         strcpy(dst->area, src.area);
     }
 
@@ -69,7 +69,7 @@ void initToken () {  // inicializovat token
     token.area = NULL;
     token.counter = 0;
     token.type = TOK_NULL;
-    
+
     static int tmp = 0;
     if(!tmp){
         token.counter_of_lines=1;
@@ -235,13 +235,13 @@ int scanner (FILE *source) {
             }
             else if ((c == '.') || (c == 'E') || (c == 'e') ) {
                 fillToken('0');
-            }   /*
-            else if (isalpha(c)){
+            }
+            else if (isalpha(c) || c == '_')
+            {
                 errorState.state=ERR_LEXICAL;
                 errorState.line=token.counter_of_lines;
                 fatalError (errorState);
-
-            }*/
+            }
             else {
                 test = false;
                 fillToken('0');
@@ -264,13 +264,14 @@ int scanner (FILE *source) {
             else if (c == 'e' || c == 'E') {
                 value = EXP_NUMBER;
                 fillToken(c);
-            }/*
-            else if (isalpha(c)){
+            }
+            else if (isalpha(c) || c == '_')
+            {
                 errorState.state=ERR_LEXICAL;
                 errorState.line=token.counter_of_lines;
                 fatalError (errorState);
 
-            }*/
+            }
             else {
                 token.type = INT_NUMBER;
                 ungetc(c, source);
@@ -300,15 +301,16 @@ int scanner (FILE *source) {
         case DEC_NUMBER_END:
             if (isdigit(c))
                 fillToken(c);
-            else if (c == '.')  /// Lex_an chyba - zadana druha desetinna tecka
-               {
-                        errorState.state=ERR_NumberShape;
-                        errorState.line=token.counter_of_lines;
-                        fatalError (errorState);
-                    }
-            else if ((c == 'e' || c == 'E')) {
+            else if ((c == 'e' || c == 'E'))
+            {
                 fillToken(c);
                 value = EXP_NUMBER;
+            }
+            else if (c == '.' || c == '_' || isalpha(c))  /// Lex_an chyba - zadana druha desetinna tecka
+            {
+                errorState.state=ERR_LEXICAL;
+                errorState.line=token.counter_of_lines;
+                fatalError (errorState);
             }
             else {
                 token.type = DOUBLE_NUMBER;
@@ -329,10 +331,10 @@ int scanner (FILE *source) {
             }
             else                /// za E nejsou cifry
                 {
-                        errorState.state=ERR_NumberShape;
-                        errorState.line=token.counter_of_lines;
-                        fatalError (errorState);
-                    }
+                    errorState.state=ERR_NumberShape;
+                    errorState.line=token.counter_of_lines;
+                    fatalError (errorState);
+                }
 
             break;
 
@@ -343,26 +345,27 @@ int scanner (FILE *source) {
                 }
             else
                {
-                        errorState.state=ERR_NumberShape;
-                        errorState.line=token.counter_of_lines;
-                        fatalError (errorState);
-                    }
+                    errorState.state=ERR_NumberShape;
+                    errorState.line=token.counter_of_lines;
+                    fatalError (errorState);
+                }
 
             break;
 
         case EXP_NUMBER_END:
             if (isdigit(c))
                 fillToken(c);
-            else /*if (c==' '||c== ';'||c== '+'||c== '-'||c== '/'||c== '*'||c== '%'||c== '>'||c== '<'||c == ')'||c == '=') */ {
+            else if (isalpha(c) || c == '_' || c == '.')
+            {
+                errorState.state=ERR_LEXICAL;
+                errorState.line=token.counter_of_lines;
+                fatalError (errorState);
+            }
+            else {
                 token.type = DOUBLE_NUMBER;
                 ungetc(c, source);
                 test = false;
-            }   /*
-            else {
-                        errorState.state=ERR_LEXICAL;
-                        errorState.line=token.counter_of_lines;
-                        fatalError (errorState);
-                    }   */
+            }
             break;
 
         case STRING:
