@@ -1,9 +1,10 @@
 #ifndef PRSA_H
 #define PRSA_H
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <stdbool.h>
 
 #include "ial.h"
 #include "lex_an.h"
