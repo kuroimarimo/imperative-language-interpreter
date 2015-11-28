@@ -19,7 +19,16 @@ const char *built_in_functions [COUNT_OF_BUILT_IN_FUNCTIONS] = {
 
 void tokenCopy (tToken *dst, tToken src)
 {
-    dst->area = src.area;
+    if (dst->area != NULL)
+        free(dst->area);
+    if (src.area != NULL)
+    {
+        if ((dst->area = malloc((strlen(src.area) + 1) * sizeof(char))) == NULL)
+            return ERR_AllocFailed;
+        
+        strcpy(dst->area, src.area);
+    }
+
     dst->int_numb = src.int_numb;
     dst->double_numb = src.double_numb;
     dst->type = src.type;
@@ -35,9 +44,13 @@ void tokenSwap()
 {
     tToken temp;
 
-    tokenCopy(&temp, token);
+    /*tokenCopy(&temp, token);
     tokenCopy(&token, oldToken);
-    tokenCopy(&oldToken, temp);
+    tokenCopy(&oldToken, temp);*/
+
+    temp = token;
+    token = oldToken;
+    oldToken = temp;
 
     return;
 }
@@ -56,7 +69,8 @@ void initToken () {  // inicializovat token
     token.area = NULL;
     token.counter = 0;
     token.type = TOK_NULL;
-     static int tmp = 0;
+    
+    static int tmp = 0;
     if(!tmp){
         token.counter_of_lines=1;
         tmp++;
