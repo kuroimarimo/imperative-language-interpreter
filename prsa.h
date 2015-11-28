@@ -6,40 +6,32 @@
 #include <stdarg.h>
 #include <stdbool.h>
 
+#include "3ak.h"
 #include "ial.h"
 #include "lex_an.h"
 #include "error.h"
 #include "parser.h"
-#include "3ak.h"
 
+#define INITIAL_SIZE 32
 #define NETERMINAL 500
 #define TERMINAL 501
 
-typedef union {
-    int int_value;
-    double double_value;
-    char * string_value;
-} tUnionData;
-
-typedef struct
-{
+typedef struct {
     int terminal;
     int type;
-    tUnionData * data;
+    void *data;
 } tExpr;
 
 // ZASOBNIK
 typedef struct tElem {      // deklarace struktury
     struct tElem *ptr;
-    tExpr * data;
-} *tElemPtr;
-
+    tExpr* data;
+} *tElemPtr;                   
 typedef struct {            // ukazatel prvniho prvku
     tElemPtr First;
 } tList;
 
 // INSTRUCTION ARRAY
-
 typedef struct
 {
     int operator;
@@ -48,14 +40,12 @@ typedef struct
     void *input2;
     void *output;
 } tInstruction;
-
 typedef struct
 {
     int lenght;
     int occupied;
     tInstruction * array;
 } tInstrList;
-
 
 // PRECEDENCNI TABULKA
 char precedencni_tabulka[14][14] = {
@@ -76,18 +66,13 @@ char precedencni_tabulka[14][14] = {
 /* ;  */ {'<','<','<','<','<','<','<','<','<','<','<',' ','<',' '}
 };
 
-// GLOBALNA PREMENNA
 tInstrList instructionList;
 
-// OPERACE TABULKY
-char OperatorToIndex (tExpr* op);
+void PrecedencniSA (hTab *table);
+void Dispose (tList *Z);
 
 bool expandInstrList();
 bool addInstruction(tInstruction * instr);
 bool initInstrList();
-
-int PrecedencniSA ();
-void Dispose (tList *Z);
-void DisposeList (tInstrList *L);
 
 #endif
