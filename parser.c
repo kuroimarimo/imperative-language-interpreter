@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "prsa.h"
 
 int isKeyword(int tokenType)
 {
@@ -638,4 +639,16 @@ hashElem * addVar(char * key, hTab * table, int type)
 	temp.localTable = NULL;
 
 	return addElem(table, key, &temp);
+}
+
+int isDefined(char *key, int type)
+{
+	hashElem * temp;
+	if ((temp = findElem(localST, key)) == NULL)		//the symbol wasn't found
+		return 0;
+
+	if (temp->data.type != type)
+		return 0;
+	else
+		return 1;
 }
