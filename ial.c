@@ -100,13 +100,16 @@ bool tDataCopy (tData * destData, tData * srcData)
     
     destData->localTable = NULL;   // not used if the element is variable; if it's a function, the table is later initialized
     
-	if (srcData->fParamTypes != NULL)			// there's data to copy
-	{
-		destData->fParamTypes = strdup(srcData->fParamTypes);
-		return destData->fParamTypes;
-	}
-	else
-		return true;
+    if (srcData->fParamTypes != NULL)			// there's data to copy
+    {
+	destData->fParamTypes = strdup(srcData->fParamTypes);
+	return destData->fParamTypes;
+    }
+    else
+    {
+	destData->fParamTypes = NULL;
+	return true;
+    }
 }
 
 /* adds new element to a hash table */
