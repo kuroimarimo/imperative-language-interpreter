@@ -8,9 +8,9 @@
 
 #include "error.h"
 
-typedef enum {var_int, var_double, var_string, func} tSymbolType;
+typedef enum {VAR_INT, VAR_DOUBLE, VAR_STRING, FUNC} tSymbolType;
 typedef union {int int_value; double double_value; char * string_value;} tSymbolValue;
-typedef enum  {declared, defined} tState;
+typedef enum  {DECLARED, DEFINED} tState;
 
 typedef struct data
 {
