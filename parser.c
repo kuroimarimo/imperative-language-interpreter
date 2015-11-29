@@ -77,7 +77,7 @@ int rule_funcDefined(hashElem * activeElem)
 
     if (temp == NULL)
     {                                                           //there's no such function declared in symbol table
-            if ((temp = addElem(globalST, activeElem->key, activeElem->data)) == NULL)
+            if ((temp = addElem(globalST, activeElem->key, &activeElem->data)) == NULL)
                     return ERR_AllocFailed;
     }
 
@@ -92,10 +92,9 @@ int rule_funcDefined(hashElem * activeElem)
     else if (token.type != L_CURLY_BRACKET)
             return ERR_SYNTAX;
 
-    activeElem->data.state = defined;
-
-    if ((temp != NULL) && (temp->data.state == defined))
+    if (temp->data.state == defined)
         return ERR_AttemptedRedefFunction;
+	temp->data.state = defined;
     
    /* else if (temp == NULL)
         temp = addElem(globalST, activeElem->key, activeElem->data);*/
@@ -245,15 +244,16 @@ int rule_varDecl()
 
 int rule_expression()
 {
-    scanner(srcFile);
+    /*scanner(srcFile);
     if (strcmp(token.area, "__vyraz__") != 0)
         return ERR_SYNTAX;
 
     scanner(srcFile);
     if (token.type != SEMICOLON)
-        return ERR_SYNTAX;
+        return ERR_SYNTAX;*/
 
-    return ERR_None;
+    PrecedencniSA(localST);
+	return ERR_None;				//TODO	check error state
 }
 
 //rule:     <auto-decl> -> id = <expression>
