@@ -45,6 +45,9 @@ void printErrorDetails (SError errorDetails)
         case ERR_AttemptedRedefVar:
             fprintf(stderr, "Attempted redefinition of variable.\n");
             break;
+		case ERR_UndefinedVariable:
+			fprintf(stderr, "The variable has not been defined.\n");
+			break;
         case ERR_IncompatibleExpr:
             fprintf(stderr, "Incompatible types of expressions.\n");
             break;
