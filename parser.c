@@ -36,8 +36,8 @@ int rule_funcdef(hashElem * activeElem)
         return ERR_SYNTAX;
 
 
-    activeElem->data.type = func;
-    activeElem->data.state = declared;
+    activeElem->data.type = FUNC;
+    activeElem->data.state = DECLARED;
 
     activeElem->data.fParamTypes = appendChar(activeElem->data.fParamTypes, paramTypeToChar(token.type));    //set function type
     
@@ -92,14 +92,14 @@ int rule_funcDefined(hashElem * activeElem)
     else if (token.type != L_CURLY_BRACKET)
             return ERR_SYNTAX;
 
-    if (temp->data.state == defined)
+    if (temp->data.state == DEFINED)
         return ERR_AttemptedRedefFunction;
-	temp->data.state = defined;
+	temp->data.state = DEFINED;
     
    /* else if (temp == NULL)
         temp = addElem(globalST, activeElem->key, activeElem->data);*/
 
-    temp->data.state = defined;
+    temp->data.state = DEFINED;
 
     if ((temp->data.localTable = hTabInit(INIT_ST_SIZE)) == NULL)           //init the functions local symbol table
         return ERR_AllocFailed;
@@ -121,6 +121,9 @@ int rule_paramList(hashElem * activeElem)
     if (token.type != L_BRACKET)
         return ERR_SYNTAX;
 
+	if ((activeElem->data.localTable = hTabInit(INIT_ST_SIZE)) == NULL)		//create local symbol table
+		return ERR_AllocFailed;
+
     scanner(srcFile);
     if (token.type == R_BRACKET)
         return ERR_None;
@@ -140,11 +143,27 @@ int rule_paramList(hashElem * activeElem)
 //rule:     <param> -> type id
 int rule_param(hashElem * activeElem)    
 {
-    if ((token.type != K_INT) && (token.type != K_DOUBLE) && (token.type != K_STRING))
-        return ERR_SYNTAX;
+	int type;
 
-    activeElem->data.fParamTypes = appendChar(activeElem->data.fParamTypes, paramTypeToChar(token.type));    //add param type
+	switch (token.type)
+	{
+	case K_INT:
+		type = VAR_INT;
+		break;
 
+	case K_DOUBLE:
+		type = VAR_DOUBLE;
+		break;
+
+	case K_STRING:
+		type = VAR_STRING;
+		break;
+
+	default:
+		return ERR_SYNTAX;
+	}
+
+	activeElem->data.fParamTypes = appendChar(activeElem->data.fParamTypes, paramTypeToChar(token.type));    //add param type
     scanner(srcFile);
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
@@ -535,13 +554,13 @@ int getType(int tokenType)
     switch (tokenType)
     {
         case K_INT:
-            return var_int;
+            return VAR_INT;
 
         case K_DOUBLE:
-            return var_double;
+            return VAR_DOUBLE;
 
         case K_STRING:
-            return var_string;
+            return VAR_STRING;
 
         default:
             return -1;
@@ -607,4 +626,16 @@ int compareSymbol(hashElem * elem, hashElem * activeElem)                       
     printf("Su rovnaké: --%s--%s--\n", elem->data.fParamTypes, activeElem->data.fParamTypes);
 
     return 1;
+}
+
+hashElem * addVar(char * key, hTab * table, int type)
+{
+	tData temp;
+	temp.type = type;
+	temp.state = DECLARED;
+	temp.value.string_value = NULL;
+	temp.fParamTypes = NULL;
+	temp.localTable = NULL;
+
+	return addElem(table, key, &temp);
 }
