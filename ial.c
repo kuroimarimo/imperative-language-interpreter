@@ -46,7 +46,7 @@ hTab * hTabInit(unsigned int size)
 void hashElemInit (hashElem * elem)
 {
     elem->data.type = -1;
-    elem->data.state = declared;
+    elem->data.state = DECLARED;
     elem->data.value.int_value = 0;
     
     if (elem->data.fParamTypes != NULL)
@@ -177,7 +177,7 @@ void removeElem (hTab * table, char * key)
     {
         table->table[hFunct(key, table->size)] = tmp->next;
 
-        if (tmp->data.type == var_string)
+        if (tmp->data.type == VAR_STRING)
             free(tmp->data.value.string_value);
 
         if (tmp->data.fParamTypes != NULL)
@@ -200,7 +200,7 @@ void removeElem (hTab * table, char * key)
         removed = tmp->next;
         tmp->next = removed->next;              // relinks the linked list, so the element 'removed' can be freed
 
-        if (removed->data.type == var_string)
+        if (removed->data.type == VAR_STRING)
             free(removed->data.value.string_value);
 
         if (removed->data.fParamTypes != NULL)
@@ -228,14 +228,13 @@ void hTabFree (hTab * table)
         {
             tmp = elem->next;
 
-            if (elem->data.type == var_string)
+            if (elem->data.type == VAR_STRING)
                 free(elem->data.value.string_value);
-
-            if (elem->data.type == var_string)
-                free(elem->data.value.string_value);
+			elem->data.value.string_value = NULL;
 
             if (elem->data.fParamTypes != NULL)
                 free(elem->data.fParamTypes);
+			elem->data.fParamTypes = NULL;
 
             if (elem->data.localTable != NULL)
                 hTabFree(elem->data.localTable);
@@ -247,6 +246,7 @@ void hTabFree (hTab * table)
     }
     free(table->table);
     free(table);
+	table = NULL;
 }
 
 int lenght(char *s)
