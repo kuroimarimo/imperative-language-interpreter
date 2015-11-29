@@ -1,3 +1,5 @@
+// TODO: add prec. for BOOLOP, 
+
 #include "prsa.h"
 
 //--------------------------//
@@ -5,10 +7,9 @@
 //--------------------------//
 void Error(int errcode) 
 {
-    // volani ukonceni
-    errorState.state = errcode;
-    errorState.line = token.counter_of_lines;
-    fatalError(errorState);
+    errorState.state = errcode;                     // error code
+    errorState.line = token.counter_of_lines;       // error occured on line
+    fatalError(errorState);                         // exit from error.c
 }
 
 //--------------------------//
@@ -16,54 +17,59 @@ void Error(int errcode)
 //--------------------------//
 tExpr* NextToken() 
 {
-    scanner(srcFile);
+    scanner(srcFile);                               // scans input file
     char* str;
-    tExpr* struktura;
-    static int cond_counter;
+    tExpr* struktura;                               // struct used to store new token
+    static int cond_counter;                        // static counter for condition parse
     if ((struktura = malloc(sizeof(tExpr))) == NULL)
     {
-        Error(ERR_AllocFailed); // chyba
+        Error(ERR_AllocFailed);                     // allocation error
         return NULL;
     }
-    struktura->terminal = TERMINAL;
-    struktura->type = token.type;
+    struktura->terminal = TERMINAL;                 // default
+    struktura->type = token.type;                   // sets type of token
     switch (token.type) {
-        case L_BRACKET: 
-            cond_counter++; 
+        case L_BRACKET:                             // usage in condition
+            //if (errorState.state == ERR_IsFunction) 
+                cond_counter++; 
         break;
-        case R_BRACKET: 
-            cond_counter--; 
-            if (cond_counter > 0) {
-                cond_counter = 0;
-                errorState.state = ERR_NFunction;
-                return NULL;
-            }
+        case R_BRACKET:                             // usage in condition
+            //if (errorState.state == ERR_IsFunction) 
+            //{
+                cond_counter--; 
+                if (cond_counter > 0)                   // if R_BRACKET > L_BRACKET
+                {     
+                    cond_counter = 0;
+                    errorState.state = ERR_NFunction;   // no error, return code of prsa.c
+                    return NULL;
+                }
+            //}
         break;
         case INT_NUMBER: 
             if ((struktura->data = malloc(sizeof(int))) == NULL)
             {
-                Error(ERR_AllocFailed);
+                Error(ERR_AllocFailed);             // allocation failed
                 return NULL;
             }
-            *((int*)struktura->data) = token.int_numb;
+            *((int*)struktura->data) = token.int_numb;      // stores value into data
         break;
         case DOUBLE_NUMBER:
             if ((struktura->data = malloc(sizeof(double))) == NULL)
             {
-                Error(ERR_AllocFailed);
+                Error(ERR_AllocFailed);             // allocation failed
                 return NULL;
             }
-            *((double*)struktura->data) = token.double_numb;
+            *((double*)struktura->data) = token.double_numb;    // stores value into data
         break;
         case STRING:
         case IDENTIFIER:
             if ((str = malloc(strlen(token.area)+1)) == NULL)
             {
-                Error(ERR_AllocFailed); // chyba
+                Error(ERR_AllocFailed);             // allocation failed
                 return NULL;
             }
-            struktura->data = str;
-            strcpy(struktura->data, token.area);
+            struktura->data = str;                  // defines size of data
+            strcpy(struktura->data, token.area);    // stores data from token
         break;
     }
     return struktura;
@@ -72,61 +78,71 @@ tExpr* NextToken()
 //--------------------------//
 //      ZASOBNIK            //
 //--------------------------//
+
+/* initialize stack */
 void Init (tList *Z) 
-{                                                               // inicializace
+{
     Z->First = NULL;
 }
 
+/* dispose whole stack in cycle, init default value */
 void Dispose (tList *Z) 
 {
-    tElemPtr ukazatel = NULL;                                   // deklarace pro predani ukazatele  
+    tElemPtr ukazatel = NULL; 
     while(Z->First != NULL) 
-    {                                                           // cyklus pro free() zasobniku
+    {
         ukazatel = Z->First->ptr;
         free(Z->First);
         Z->First = ukazatel;
     }
-    Init(Z);                                                    // reinicializace zasobniku
+    Init(Z);
 }
 
+/* returns first terminal from stack */
 tExpr* FirstTerminal (tList *Z) 
 {
     tExpr* val = NULL;
     if (Z->First != NULL) 
     {
         val = Z->First->data;
-        while (val->terminal == NETERMINAL)                                      // hledam terminal
+        while (val->terminal == NETERMINAL)
             if (Z->First->ptr != NULL) 
-                val = Z->First->data;                           // aktualni terminal
-            else {Error(ERR_SYNTAX);return NULL;}
+                val = Z->First->data;
+            else 
+            {                                           // in case of no terminal in stack
+                Error(ERR_SYNTAX);
+                return NULL;
+            }
     }
     return val;
 }
 
+/* stores new tExpr in stack */
 void Push (tList *Z, tExpr *val) 
 {
     tElemPtr ukazatel = NULL;
     if(Z->First != NULL) ukazatel = Z->First;
-    tElemPtr struktura = malloc(sizeof(struct tElem));          // alokace struktury
+    tElemPtr struktura = malloc(sizeof(struct tElem));  // allocation of new tElem
     if(struktura != NULL) 
-    {                                                           // kontrola alokace
-        Z->First = struktura;                                   // prirazeni a naplneni
+    {  
+        Z->First = struktura;
         struktura->data = val;
         struktura->ptr = ukazatel;
     }
-    else Error(ERR_AllocFailed);
+    else Error(ERR_AllocFailed);                        // in case of allocation error
 }
 
+/* returns first element from stack*/
 tExpr* Pop (tList *Z) 
 {
     tExpr* val = NULL;
     if (Z->First != NULL) 
     {
-        val = Z->First->data;                                   // pop hodnoty
-        tElemPtr ukazatel = NULL;                               // deklarace pro presun ukazatelu
-        if (Z->First->ptr != NULL) ukazatel = Z->First->ptr;    // uchovani ukazatele
+        val = Z->First->data;
+        tElemPtr ukazatel = NULL;
+        if (Z->First->ptr != NULL) ukazatel = Z->First->ptr;
         free(Z->First);
-        Z->First = ukazatel;                                    // posunuti fronty
+        Z->First = ukazatel;
     }
     return val;
 }
@@ -172,24 +188,24 @@ bool initInstrList()
 //--------------------------//
 //      GRAMATIKA           //
 //--------------------------//
-int PrecG(tExpr *suc1, tExpr *suc2, tExpr *suc3) 
+int PrecG(tExpr *pred3, tExpr *pred2, tExpr *pred1) 
 {
-    switch (suc1->terminal) 
+    switch (pred1->terminal)                                    // what kind of element is in predecessor1
     {
-        case NETERMINAL:
-            if (suc3 == NULL)
+        case NETERMINAL:                                        // in case of NETERMINAL
+            if (pred3 == NULL)                                  // check for predecessor3
             {
-                Error(ERR_SYNTAX);
+                Error(ERR_SYNTAX);                              // in case of empty error
                 return 0;
             }
-            if (suc3->type == NETERMINAL) 
+            if (pred3->type == NETERMINAL)                      // if pred3 is also NETERMINAL
             {
-                if (suc2 == NULL)
+                if (pred2 == NULL)                              // check for predecessor2
                 {
-                    Error(ERR_SYNTAX);
+                    Error(ERR_SYNTAX);                          // in case of empty error
                     return 0;
                 }
-                switch (suc2->type) 
+                switch (pred2->type)                            // what kind of operator is pred2
                 {
                     case PLUS:          return 1;
                     case MINUS:         return 2;
@@ -201,31 +217,31 @@ int PrecG(tExpr *suc1, tExpr *suc2, tExpr *suc3)
                     case LESS_EQUAL:    return 8;
                     case EQUAL:         return 9;
                     case NEGATION:      return 10;
-                    default: Error(ERR_SYNTAX); return 0;
+                    default: Error(ERR_SYNTAX); return 0;       // in case of other operator syntax error
                 }
             }
         break;
-        case TERMINAL:
-            switch (suc1->type) 
+        case TERMINAL:                                          // if predecessor1 is terminal
+            switch (pred1->type)                                // what kind of type is predecessor1
             {
                 case STRING:
                 case IDENTIFIER:
                 case DOUBLE_NUMBER:
                 case INT_NUMBER:
-                    return 11;
-                case L_BRACKET:
-                    if (suc2 == NULL || suc3 == NULL) 
+                    return 11;                                  // in case of string, identifier, double or int returns 11
+                case R_BRACKET:                                 // in case of L_BRACKET checks pred2 and pred1 for data else returns error
+                    if (pred2 == NULL || pred3 == NULL) 
                     {
                         Error(ERR_SYNTAX);
                         return 0;
                     }
-                    if (suc2->terminal == NETERMINAL)
-                        if (suc3->type == R_BRACKET)
+                    if (pred2->terminal == NETERMINAL)          // checks pred2 type (is supposed to by NETERMINAL)
+                        if (pred3->type == L_BRACKET)           // checks pred3 for R_BRACKET
                             return 12;
-                default: Error(ERR_SYNTAX); return 0;
+                default: Error(ERR_SYNTAX); return 0;           // in case of no rule returns error
             }
     }
-    Error(ERR_SYNTAX);
+    Error(ERR_SYNTAX);                                          // in case of other possibility returns error
     return 0;
 }
 
@@ -235,6 +251,7 @@ int PrecG(tExpr *suc1, tExpr *suc2, tExpr *suc3)
 void TrojAdres(int gramatika, tExpr* input1, tExpr* input2, tExpr* output) 
 {
     int operator, type;
+    // checks for operator to be stored in TrojAdres
     switch (gramatika) 
     {
         case 1: operator = OP_SUM; break;
@@ -247,19 +264,21 @@ void TrojAdres(int gramatika, tExpr* input1, tExpr* input2, tExpr* output)
         case 8: operator = OP_LE; break;
         case 9: operator = OP_EQUALS; break;
         case 10: operator = OP_DIFF; break;
-        default: Error(ERR_ParamType); return; // možná jiný druh erroru
+        default: Error(ERR_ParamType); return;          // no grammar
     }
+    // checks for type of first input, decides what kind of type will be used
     switch (input1->type) 
     {
         case INT_NUMBER: type = INT_NUMBER; break;
         case DOUBLE_NUMBER: type = DOUBLE_NUMBER; break;
         case STRING: type = STRING; break;
-        default: Error(ERR_IncompatibleExpr); return; // možná jiný druh
+        default: Error(ERR_IncompatibleExpr); return;   // not id
     }
+    // pushes instruction into array of instructions
     tInstruction* instrBeingAdded;
     if ((instrBeingAdded = malloc(sizeof(tInstruction))) == NULL)
     {
-        Error(ERR_AllocFailed);
+        Error(ERR_AllocFailed);                         // allocation failed
         return;
     }
     instrBeingAdded->operator = operator;
@@ -269,7 +288,7 @@ void TrojAdres(int gramatika, tExpr* input1, tExpr* input2, tExpr* output)
     instrBeingAdded->output = output->data;
     if((addInstruction(instrBeingAdded)) != true)
     {
-        Error(ERR_AllocFailed);
+        Error(ERR_AllocFailed);                         // allocation failed
         return;
     }
 }
@@ -280,24 +299,24 @@ void TrojAdres(int gramatika, tExpr* input1, tExpr* input2, tExpr* output)
 tExpr* SemId(tExpr* identifier, hTab* table) 
 {
     hashElem* element;
-    element = findElem(table, identifier->data);
-    free(identifier->data);
+    element = findElem(table, identifier->data);        // find and store identifier from hash table
+    free(identifier->data);                             // no more need for identifier name, will use pointer
     if (element == NULL) 
     {
-        Error(ERR_UndefinedVariable); // nedefinovana prom
+        Error(ERR_UndefinedVariable);                   // error undefined variable
         return NULL;
     }
-    identifier->data = &element->data.value;
-    identifier->type = element->data.type;
+    identifier->data = &element->data.value;            // stores pointer to data from hash table
+    identifier->type = element->data.type;              // stores type of data from hash table
     return identifier;
 }
 
-tExpr* SemA(tExpr *expr1, tExpr *expr2, tExpr *expr3, int gramatika, hTab *table) 
+tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table) 
 {
     if (expr1->type == IDENTIFIER)
         SemId(expr1, table);
     if (gramatika != 11) 
-    { // BUDE ZMENENO NEEEEEEEEEEEEEEEEEEEEEE!!!!!!!!!!!!!! blbě fujjjj
+    { // TO DO: update after bool types are added
         if (expr2->type == IDENTIFIER)
             SemId(expr2, table);
         if (expr3->type == IDENTIFIER)
@@ -346,7 +365,7 @@ tExpr* SemA(tExpr *expr1, tExpr *expr2, tExpr *expr3, int gramatika, hTab *table
                     return NULL;
                 }
             }
-            TrojAdres(gramatika, expr1->data, expr3->data, struktura->data);
+            TrojAdres(gramatika, expr3->data, expr1->data, struktura->data);
             break;
         case 5:
         case 6:
@@ -384,7 +403,7 @@ tExpr* SemA(tExpr *expr1, tExpr *expr2, tExpr *expr3, int gramatika, hTab *table
                     Error(ERR_AllocFailed); 
                     return NULL;
                 }
-                TrojAdres(gramatika, expr1->data, expr3->data, struktura->data);
+                TrojAdres(gramatika, expr3->data, expr1->data, struktura->data);
             }
             else 
             {
@@ -420,6 +439,7 @@ tExpr* SemA(tExpr *expr1, tExpr *expr2, tExpr *expr3, int gramatika, hTab *table
 //------------------------------//
 //     OPERACE PREC. TABULKY    //
 //------------------------------//
+/* returns index of element to be used in SA */
 int OperatorToIndex (tExpr* op) 
 {
     switch (op->type) 
@@ -450,85 +470,86 @@ int OperatorToIndex (tExpr* op)
 //------------------------------//
 void PrecedencniSA (hTab *table) 
 {
-    int gramatika;             // promenne
-    tExpr* input, *suc1, *suc2, *suc3, *top, *start;
-    tList* Z;                                           // zasobnik
-    if ((Z = malloc(sizeof(tList))) == NULL)
+    int gramatika;                                      // declaration of variables
+    tExpr* input, *pred1, *pred2, *pred3, *top, *start;
+    tList* Z;                                           
+    if ((Z = malloc(sizeof(tList))) == NULL)            // allocation of stack
     {
-        Error(ERR_AllocFailed);
+        Error(ERR_AllocFailed);                         // in case of allocation error
         return;
     }
     Init(Z);
-    if ((start = malloc(sizeof(tExpr))) == NULL)
+    if ((start = malloc(sizeof(tExpr))) == NULL)        // allocation of first element
     {
-        Error(ERR_AllocFailed);
+        Error(ERR_AllocFailed);                         // allocation error
         return;
     }
-    start->type = SEMICOLON;
+    start->type = SEMICOLON;                            // sets default info for first element
     start->terminal = TERMINAL;
-    Push(Z, start);
-    input = NextToken();                                    // input
-    top = FirstTerminal(Z);                             // nacteni pocatku zasobniku
+    Push(Z, start);                                     // stores into stack
+    input = NextToken();                                // pops first token
+    top = FirstTerminal(Z);                             // loads top of stack
     while (top->type != SEMICOLON && input->type != SEMICOLON)  
-    {   // dokud není vstup i zasobnik prazdny
-        top = FirstTerminal(Z);                         // nacti dalsi terminal
-        tExpr* priority = NULL;
+    {                                                   // until nexttoken and stack are empty
+        top = FirstTerminal(Z);                         // loads top of stack
+        tExpr* priority = NULL;                         // priority accoring to precedence table
         switch (precedencni_tabulka[OperatorToIndex(top)][OperatorToIndex(input)]) 
-        {   // najdi pravidlo v prec. tabulce
-            case '=':                                   // pokud se rovnaji
-                Push(Z, input);                         // zapis do zasobniku
-                input = NextToken();                    // nacti dalsi znak na vstupu
+        {
+            case '=':                                   // in case of equal
+                Push(Z, input);                         // push into stack
+                input = NextToken();                    // pop next token
                 if (errorState.state == ERR_NCondition) return;
             break;
-            case '<':                                   // pokud ma zasobnik mensi prioritu nez vstup (dle tabulky)
+            case '<':                                   // if stack has lower priority than nexttoken
                 if ((priority = malloc(sizeof(tExpr))) == NULL)
                 {
-                    Error(ERR_AllocFailed);
+                    Error(ERR_AllocFailed);             // allocation error
                     return;
                 }
-                priority->type = 5948;
-                Push(Z, priority);                           // zapis do zasobniku znak <
-                Push(Z, input);                         // zapis vstup
-                input = NextToken();                    // nacti dalsi vstup
+                priority->type = 5948;                  // sets priority->type as lower priority
+                // ^ possible error
+                Push(Z, priority);
+                Push(Z, input);
+                input = NextToken();
                 if (errorState.state == ERR_NCondition) return;
             break;
-            case '>':                                   // pokud ma zasobnik vetsi prioritu nez vstup (dle tabulky)
+            case '>':                                   // if stack has higher priority than nexttoken
                 do {
-                    suc3 = suc2;                        // zapis 3. predchudce
-                    suc2 = suc1;                        // zapis 2. predchudce
-                    suc1 = top;                         // zapis prvniho predchudce
-                    top = Pop(Z);                       // vytahni prvek na top
-                } while (top->type != 5948);            // dokud v promennych nemam cely retezec, pro ktery hledam pravidlo
-                gramatika = PrecG(suc1, suc2, suc3);
+                    pred3 = pred2;                      // store 3rd predecessor
+                    pred2 = pred1;                      // store 2nd predecessor
+                    pred1 = top;                        // store 1st predecessor
+                    top = Pop(Z);                       // pop element
+                } while (top->type != 5948);            // until lower priority mark is found
+                gramatika = PrecG(pred3, pred2, pred1);
                 if (top->type == 5948 && gramatika != 0) 
-                { 
+                {                                       // if grammar is found
                     free(top);
-                    top = SemA(suc1, suc2, suc3, gramatika, table);
-                    Push(Z, top);   // kontrola na nalezene pravidlo, pokud existuje, prepise na E -> neterminal
+                    top = SemA(pred3, pred2, pred1, gramatika, table);
+                    Push(Z, top);                       // push NETERMINAL with output pointer
                 }
                 else 
                 {
                     Error(ERR_SYNTAX);
                     return;
                 }
-                free(suc1);
-                free(suc2);
-                free(suc3);
-                suc3 = suc2 = suc1 = NULL;
+                free(pred1);
+                free(pred2);
+                free(pred3);
+                pred3 = pred2 = pred1 = NULL;
             break;
-            case ' ':                                   // chyba ve vyrazu
+            case ' ':                                   // possible error
                 top = input;
                 input = NextToken();
                 if (input->type == L_BRACKET && top->type == IDENTIFIER) {
                     Dispose(Z);
-                    errorState.state = ERR_NFunction;
+                    errorState.state = ERR_NFunction;   // not ERROR, found function
                     return;
                 }
-                Error(ERR_SYNTAX);
+                Error(ERR_SYNTAX);                      // is error
                 return;
             default: Error(ERR_SYNTAX); return;
         }
     }
-    Dispose(Z);                                         // uvolneni zasobniku
-    errorState.state = ERR_None; 
+    Dispose(Z);                                         // frees stack
+    errorState.state = ERR_None;                        // no error was found
 }
