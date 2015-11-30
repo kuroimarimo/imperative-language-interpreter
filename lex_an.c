@@ -9,13 +9,6 @@
 #include "error.h"
 #include "lex_an.h"
 
-const char *key_words [COUNT_OF_KEY_WORDS] = {
-    "auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string", "while", "do"
-};
-
-const char *built_in_functions [COUNT_OF_BUILT_IN_FUNCTIONS] = {
-    "length", "substr", "concat", "find", "sort"
-};
 
 int tokenCopy (tToken *dst, tToken src)
 {
@@ -587,6 +580,15 @@ int scanner (FILE *source) {
         break;
         }
     }
+
+
+    const char *key_words [COUNT_OF_KEY_WORDS] = {
+        "auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string", "while", "do"
+    };
+
+    const char *built_in_functions [COUNT_OF_BUILT_IN_FUNCTIONS] = {
+        "length", "substr", "concat", "find", "sort"
+    };
 
 
     if (token.area != NULL)
