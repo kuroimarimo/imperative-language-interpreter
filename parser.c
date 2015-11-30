@@ -1,5 +1,4 @@
 #include "parser.h"
-#include "prsa.h"
 
 int isKeyword(int tokenType)
 {
@@ -19,7 +18,15 @@ int parse(FILE *source)
 
     int returnValue = rule_funcdef(&activeElem);
     
-    //cleanup?
+    if (activeElem.key)
+    {
+        free(activeElem.key);
+    }
+    
+    if (activeElem.data.fParamTypes)
+    {
+        free(activeElem.data.fParamTypes);
+    }
 
     return returnValue;
 }

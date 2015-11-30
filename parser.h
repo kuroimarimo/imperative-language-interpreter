@@ -10,6 +10,7 @@
 #include "lex_an.h"
 #include "error.h"
 #include "ial.h"
+#include "prsa.h"
 
 #define INIT_ST_SIZE	16
 
