@@ -75,7 +75,7 @@ int rule_funcdef(hashElem * activeElem)
     if (error != ERR_None)
         return error;
 
-	tableStackPop(localSTstack);
+	//tableStackPop(localSTstack);
 
     return rule_funcdef(activeElem);
 }
@@ -101,11 +101,24 @@ int rule_funcDefined(hashElem * activeElem)
         return ERR_AttemptedRedefFunction;
 
     scanner(srcFile);
-    if (token.type == SEMICOLON)                                                    //the current function has been declared, not defined
+    /*if (token.type == SEMICOLON)                                                    //the current function has been declared, not defined
         return ERR_None;
 
     else if (token.type != L_CURLY_BRACKET)
-            return ERR_SYNTAX;
+            return ERR_SYNTAX;*/
+
+	switch (token.type)
+	{
+		case SEMICOLON:
+			tableStackPop(localSTstack);
+			return ERR_None;
+
+		case L_CURLY_BRACKET:
+			break;
+
+		default: 
+			return ERR_SYNTAX;
+	}
 
     if (temp->data.state == DEFINED)
         return ERR_AttemptedRedefFunction;
@@ -232,8 +245,11 @@ int rule_stList()
     int error;
     
 
-    if (token.type == R_CURLY_BRACKET)
-        return ERR_None;
+	if (token.type == R_CURLY_BRACKET)
+	{
+		tableStackPop(localSTstack);
+		return ERR_None;
+	}
     
     error = rule_statement();
         if (error != ERR_None)
@@ -241,8 +257,8 @@ int rule_stList()
 
     scanner(srcFile);
     error = rule_stList();
-        if (error != ERR_None)
-            return error;
+    if (error != ERR_None)
+		return error;
 
     return ERR_None;
 }
@@ -252,7 +268,7 @@ int rule_statement()
 {
     if (token.type == IDENTIFIER)
     {
-		if (!isDeclared(token.area))			//TODO skontrolovať, či to nie je ID funkcie
+		if (isDeclaredOnTheSameLevel(token.area) == NULL)
 			return ERR_UndefinedVariable;
 
         scanner(srcFile);
@@ -267,6 +283,13 @@ int rule_statement()
 
     else if (token.type == L_CURLY_BRACKET)
     {
+		hTab * temp = hTabInit(INIT_ST_SIZE);
+		if (temp == NULL)
+			return ERR_AllocFailed;
+
+		if ((tableStackPush(localSTstack, temp)) == NULL)
+			return ERR_AllocFailed;
+
         scanner(srcFile);
         return rule_stList();
     }
@@ -309,7 +332,7 @@ int rule_auto()
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
 
-	if (isDeclared(token.area))
+	if (isDeclaredOnTheSameLevel(token.area) != NULL)
 		return ERR_AttemptedRedefVar;
 
     scanner(srcFile);
@@ -498,7 +521,10 @@ int rule_keyword()
 			if (token.type != IDENTIFIER)
 				return ERR_SYNTAX;
 			
-			if (isDeclared(token.area))
+			if (isDeclaredOnTheSameLevel(token.area) != NULL)
+				return ERR_AttemptedRedefVar;
+
+			if (findElem(globalST, token.area) != NULL)
 				return ERR_AttemptedRedefVar;
 
 			if (addVar(token.area, tableStackTop(localSTstack), type) == NULL)
@@ -696,7 +722,7 @@ hashElem * addVar(char * key, hTab * table, int type)
 	return addElem(table, key, &temp);
 }
 
-hashElem * isDeclared(char *key)						//TODO hľadať vo všetkých nadradených rámcoch and stuff >_<
+hashElem * isDeclared(char *key)									//TODO lepsie meno
 {
 	hashElem * temp;
 	/*if ((temp = findElem(localST, key)) == NULL)		// the symbol wasn't found
@@ -706,5 +732,10 @@ hashElem * isDeclared(char *key)						//TODO hľadať vo všetkých nadradených
 		if ((temp = findElem(getTableStackElem(localSTstack, i), key)) != NULL)
 			return temp;
 	
-	return NULL;										// the symbol was found
+	return NULL;										// the symbol wasn't found
+}
+
+hashElem * isDeclaredOnTheSameLevel(char *key)						//TODO lepsie meno >_<
+{
+	return findElem(tableStackTop(localSTstack), key);
 }

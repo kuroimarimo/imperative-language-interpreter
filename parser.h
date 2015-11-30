@@ -65,5 +65,6 @@ int paramTypeToInt(char c);
 int compareSymbol(hashElem * elem, hashElem * activeElem);			// compares elem with global variable activeElem
 hashElem * addVar(char * key, hTab * table, int type);
 hashElem * isDeclared(char *key);											// checks whether the symbol with given key exists
+hashElem * isDeclaredOnTheSameLevel(char *key);
 
 #endif
