@@ -126,120 +126,90 @@ int scanner (FILE *source) {
 
     while (test && ( c = fgetc(source)) != EOF)
     {
+
         switch (value) {
         case START:
                 /* Rozpoznani characteru */
-
-            if (isalpha(c)){
+            if (isalpha(c))
                 value = LETTER;
-                break;
-                }
             else if (c == '0') {
                 value = NUMBER_START_ZERO;
                 break;
                 }
-            else if (isdigit(c)){
+            else if (isdigit(c))
                 value = NUMBER;
+            else if (c == '_')
+                value = UNDERSCORE;
+            else if (c == ' ')          // preskocim character mezery
                 break;
-            }
-
-            switch (c){
-            case '_':
-                 value = UNDERSCORE;
-                 break;
-            case ' ':          // preskocim character mezery
-                 break;
-
-            case '\t':
+            else if (c == '\t')
                 break;                  // preskocim character tabulatoru
-            case '\n':
+            else if (c == '\n') {
                 token.counter_of_lines++;
                 break;                  // preskocim character konce radku
-                break;
-            case '/':
+                }
+            else if (c == '/') {
                 value = DIVIDE;
                 break;
-                break;
-            case '\\':
+                }
+            else if (c == '\\') {
                 value = BACKSLASH;
                 break;
-                break;
-            case '!':
+            }
+            else if (c == '!')
                 value = EXCLAMATION_MARK;  //vykřičník
-                break;
-            case '?':
+            else if (c == '?')
                 value = QUESTION_MARK;
- 	 	 	 	break;
-            case '"':
+            else if (c == '"')
                 value = STRING;
-                break;
-            case '<':
+            else if (c == '<')
                 value = LESS;
- 	              break;
-            case '>':
+            else if (c == '>')
                 value = GREATER;
- 	 	 	    break;
-            case '=':
+            else if (c == '=')
                 value = ASSIGNMENT;
- 	 	 	 	break;
-            case '+':
-                value = PLUS;
- 	 	 	 	break;
-            case '-':
-                value = MINUS;
-                break;
-            default:
-                          /// jednoznakove tokeny
-               test = false;
+            else if (c == '+')
+                    value = PLUS;
+            else if (c == '-')
+                    value = MINUS;
+            else {              /// jednoznakove tokeny
+                test = false;
 
-                switch (c){
-                case ';':
+                if (c == ';')
                     token.type = SEMICOLON;
-                    break;
-                 case ',':
-                    token.type = COMMA ;
- 	 	 	 	    break;
-                case  '(':
+                else if (c == ',')
+                    token.type = COMMA;
+                else if (c == '(')
                     token.type = L_BRACKET;
- 	 	 	 	    break;
-                case  ')':
+                else if (c == ')')
                     token.type = R_BRACKET;
- 	 	 	 	     break;
-                case  ']':
+                else if (c == ']')
                     token.type = L_SQUARE_BRACKET;
- 	 	 	 	    break;
-                case  '[':
+                else if (c == '[')
                     token.type = R_SQUARE_BRACKET;
- 	 	 	 	    break;
-                case  '{':
+                else if (c == '{')
                     token.type = L_CURLY_BRACKET;
- 	 	 	 	     break;
-                case  '}':
+                else if (c == '}')
                     token.type = R_CURLY_BRACKET;
- 	 	 	 	    break;
-                case  '*':
+                else if (c == '*')
                     token.type = MULTIPLY;
- 	 	 	 	     break;
-                case  '%':
+                else if (c == '%')
                     token.type = MODULO;
- 	 	 	      	 break;
-                default:
-
+                else
+                    {
                         errorState.state=ERR_UnknownChar;
                         errorState.line=token.counter_of_lines;
                         fatalError (errorState);
-
-                }
+                    }
 
             }
-
-
 
 
 
             if (value != STRING) /// neukladam uvozovky na zacatku retezce
                 fillToken(c);
             break;
+
 
 
        case LETTER:       /// identifikator, zacina pismenem nebo '_' ; dalsi charactery mohou byt cisla
