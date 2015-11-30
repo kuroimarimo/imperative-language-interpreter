@@ -314,6 +314,9 @@ int rule_cin()
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
 
+	if (!isDeclared(token.area))
+		return ERR_UndefinedVariable;
+
     return ERR_None;
 }
 
@@ -341,8 +344,24 @@ int rule_cout()
         return ERR_SYNTAX;
 
     scanner(srcFile);
-    if ((token.type != IDENTIFIER) && (token.type != STRING) && (token.type != INT_NUMBER) && (token.type != DOUBLE_NUMBER))
-        return ERR_SYNTAX;
+    /*if ((token.type != IDENTIFIER) && (token.type != STRING) && (token.type != INT_NUMBER) && (token.type != DOUBLE_NUMBER))
+        return ERR_SYNTAX;*/
+
+	switch (token.type)
+	{
+		case STRING:
+		case INT_NUMBER:
+		case DOUBLE_NUMBER:
+			break;
+
+		case IDENTIFIER:
+			if (!isDeclared(token.area))
+				return ERR_UndefinedVariable;
+			break;
+
+		default:
+			return ERR_SYNTAX;
+	}
 
     return ERR_None;
 }
