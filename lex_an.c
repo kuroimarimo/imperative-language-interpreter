@@ -9,13 +9,6 @@
 #include "error.h"
 #include "lex_an.h"
 
-const char *key_words [COUNT_OF_KEY_WORDS] = {
-    "auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string", "while", "do"
-};
-
-const char *built_in_functions [COUNT_OF_BUILT_IN_FUNCTIONS] = {
-    "length", "substr", "concat", "find", "sort"
-};
 
 int tokenCopy (tToken *dst, tToken src)
 {
@@ -126,12 +119,14 @@ int scanner (FILE *source) {
     initToken();
 
     int c = 0;
+    int counter = 0;
     char array_x [3];
     int value = START;
     bool test = true;
 
     while (test && ( c = fgetc(source)) != EOF)
     {
+
         switch (value) {
         case START:
                 /* Rozpoznani characteru */
@@ -157,15 +152,16 @@ int scanner (FILE *source) {
                 value = DIVIDE;
                 break;
                 }
+            else if (c == '\\') {
+                value = BACKSLASH;
+                break;
+            }
             else if (c == '!')
                 value = EXCLAMATION_MARK;  //vykřičník
             else if (c == '?')
                 value = QUESTION_MARK;
             else if (c == '"')
                 value = STRING;
-            /*else if (c == '.')
-                return -1;          ///value = TECKA;    /// Error - cislo nemuze zacinat teckou
-            */
             else if (c == '<')
                 value = LESS;
             else if (c == '>')
@@ -205,8 +201,7 @@ int scanner (FILE *source) {
                         errorState.line=token.counter_of_lines;
                         fatalError (errorState);
                     }
-                  //token.type = ANOTHER_CHAR;  má smysl?       V: Život? Vaše komentáre? ... ^__^
-                /// break;                                      Ani jedno ...
+
             }
 
 
@@ -214,6 +209,7 @@ int scanner (FILE *source) {
             if (value != STRING) /// neukladam uvozovky na zacatku retezce
                 fillToken(c);
             break;
+
 
 
        case LETTER:       /// identifikator, zacina pismenem nebo '_' ; dalsi charactery mohou byt cisla
@@ -502,6 +498,46 @@ int scanner (FILE *source) {
 
         break;
 
+    case BACKSLASH:
+        if (c == 'b')
+            value = BINARY;
+        else if (c == '0')
+            value = OCTAL;
+        else if (c == 'x')
+            value = HEXADECIMAL;
+        else {
+            errorState.state = ERR_NumberShape;
+            errorState.line = token.counter_of_lines;
+            fatalError (errorState);
+        }
+
+        break;
+
+    case BINARY:
+        if (counter == 8 && ((c >= '0' && c <= '9') || isalpha(c))) {
+            errorState.state = ERR_NumberShape;
+            errorState.line = token.counter_of_lines;
+            fatalError (errorState);
+        }
+        else {
+            test = false;
+            token.type = BINARY;
+            ungetc(c,source);
+            break;
+        }
+
+        if (c >= '0' && c <= '1') {
+            fillToken(c);
+            counter++;
+        }
+        else {
+            test = false;
+            token.type = BINARY;
+            ungetc(c,source);
+        }
+
+        break;
+
     case LINE_COMMENT:
         if (c == '\n'){
            value = START;
@@ -589,6 +625,15 @@ int scanner (FILE *source) {
     }
 
 
+    const char *key_words [COUNT_OF_KEY_WORDS] = {
+        "auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string", "while", "do"
+    };
+
+    const char *built_in_functions [COUNT_OF_BUILT_IN_FUNCTIONS] = {
+        "length", "substr", "concat", "find", "sort"
+    };
+
+
     if (token.area != NULL)
     {
         if (token.type == IDENTIFIER)
@@ -614,10 +659,10 @@ int scanner (FILE *source) {
             }
         }
 
+    long integer;
 
         if (token.type == INT_NUMBER)
         {
-            long integer;
             errno = 0;
 
             integer = strtol(token.area, NULL, 10);
@@ -641,6 +686,14 @@ int scanner (FILE *source) {
 
             real_number = strtod(token.area, &ptr);
             token.double_numb = real_number;
+        }
+
+        if (token.type == BINARY) {
+            integer = strtol(token.area, NULL, 2);
+            token.int_numb = (int) integer;
+
+            printf("Cislo binarne: %s", token.area);
+            printf("Cislo: %ld\n", integer);
         }
     }
 
