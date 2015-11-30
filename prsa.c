@@ -474,7 +474,7 @@ void PrecedencniSA (hTab *table)
 {
     int gramatika;                                      // declaration of variables
     tExpr* input, *pred1, *pred2, *pred3, *top, *start;
-	//pred1 = pred2 = pred3 = NULL;
+	pred1 = pred2 = pred3 = NULL;
     tList* Z;                                           
     if ((Z = malloc(sizeof(tList))) == NULL)            // allocation of stack
     {

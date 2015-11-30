@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 1
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -7,8 +9,6 @@
 #include "lex_an.h"
 #include "error.h"
 #include "parser.h"
-
-
 
 int main(int argc, char** argv)
 {

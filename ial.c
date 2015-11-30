@@ -21,6 +21,7 @@ bool checkOverfill (unsigned int size, unsigned int numStoredElem)
     return (numStoredElem >= 0.6 * size);
 }
 
+
 /* creates a new hash table of size 'size' */
 hTab * hTabInit(unsigned int size)
 {
@@ -53,8 +54,8 @@ void hashElemInit (hashElem * elem)
         free(elem->data.fParamTypes);
     elem->data.fParamTypes = NULL;
     
-    if (elem->data.localTable != NULL)
-        hTabFree(elem->data.localTable);
+    //if (elem->data.localTable != NULL)
+    //    hTabFree(elem->data.localTable);
     elem->data.localTable = NULL;
     
     if (elem->key != NULL)
@@ -98,17 +99,17 @@ bool tDataCopy (tData * destData, tData * srcData)
     destData->state = srcData->state;
     destData->value = srcData->value;
     
-    destData->localTable = NULL;   // not used if the element is variable; if it's a function, the table is later initialized
+    destData->localTable = srcData->localTable;   // not used if the element is variable; if it's a function, the table is later initialized
     
     if (srcData->fParamTypes != NULL)			// there's data to copy
     {
-	destData->fParamTypes = strdup(srcData->fParamTypes);
-	return destData->fParamTypes;
+        destData->fParamTypes = strdup(srcData->fParamTypes);
+        return destData->fParamTypes;
     }
     else
     {
-	destData->fParamTypes = NULL;
-	return true;
+        destData->fParamTypes = NULL;
+        return true;
     }
 }
 

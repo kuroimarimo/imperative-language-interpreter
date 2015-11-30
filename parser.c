@@ -77,7 +77,7 @@ int rule_funcDefined(hashElem * activeElem)
         printf("Najdena funkcia %s parametre: %s\n", temp->key, temp->data.fParamTypes);
 
     if (temp == NULL)
-    {                                                           //there's no such function declared in symbol table
+    {																				//there's no such function declared in symbol table, create it then
             if ((temp = addElem(globalST, activeElem->key, &activeElem->data)) == NULL)
                     return ERR_AllocFailed;
     }
@@ -102,9 +102,9 @@ int rule_funcDefined(hashElem * activeElem)
 
     temp->data.state = DEFINED;
 
-    if ((temp->data.localTable = hTabInit(INIT_ST_SIZE)) == NULL)           //init the functions local symbol table
+    /*if ((temp->data.localTable = hTabInit(INIT_ST_SIZE)) == NULL)           //init the functions local symbol table
         return ERR_AllocFailed;
-    localST = temp->data.localTable;
+    localST = temp->data.localTable;*/
 
 
     scanner(srcFile);
@@ -124,6 +124,8 @@ int rule_paramList(hashElem * activeElem)
 
 	if ((activeElem->data.localTable = hTabInit(INIT_ST_SIZE)) == NULL)		//create local symbol table
 		return ERR_AllocFailed;
+
+	localST = activeElem->data.localTable;
 
     scanner(srcFile);
     if (token.type == R_BRACKET)
@@ -146,7 +148,7 @@ int rule_param(hashElem * activeElem)
 {
 	int type;
 
-	switch (token.type)
+	switch (token.type)					// get the parameter type
 	{
 	case K_INT:
 		type = VAR_INT;
@@ -169,7 +171,13 @@ int rule_param(hashElem * activeElem)
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
 
+	if (isDeclared(token.area))							// there already is a symbol with that name
+		return ERR_AttemptedRedefVar;
+
     //pridanie ID premennej do tabulky
+
+	if (addVar(token.area, localST, type) == NULL)
+		return ERR_AllocFailed;
 
     return ERR_None;
 }
@@ -229,6 +237,9 @@ int rule_statement()
 {
     if (token.type == IDENTIFIER)
     {
+		if (!isDeclared(token.area))			//TODO skontrolovať, či to nie je ID funkcie
+			return ERR_UndefinedVariable;
+
         scanner(srcFile);
         if (token.type == ASSIGNMENT)
             return rule_expression();
@@ -282,6 +293,9 @@ int rule_auto()
     scanner(srcFile);
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
+
+	if (isDeclared(token.area))
+		return ERR_AttemptedRedefVar;
 
     scanner(srcFile);
     if (token.type != ASSIGNMENT)
@@ -444,12 +458,19 @@ int rule_keyword()
         case K_DOUBLE:
         case K_STRING:
         {
-                scanner(srcFile);
-        
-                if (token.type != IDENTIFIER)
-                    return ERR_SYNTAX;
-        
-                return rule_varDecl();
+			int type = getType(token.type);
+			scanner(srcFile);
+			
+			if (token.type != IDENTIFIER)
+				return ERR_SYNTAX;
+			
+			if (isDeclared(token.area))
+				return ERR_AttemptedRedefVar;
+
+			if (addVar(token.area, localST, type) == NULL)
+				return ERR_AllocFailed;
+			
+			return rule_varDecl();
         }
 
         case K_CIN:
@@ -641,14 +662,12 @@ hashElem * addVar(char * key, hTab * table, int type)
 	return addElem(table, key, &temp);
 }
 
-int isDefined(char *key, int type)
+int isDeclared(char *key)						//TODO hľadať vo všetkých nadradených rámcoch and stuff >_<
 {
 	hashElem * temp;
-	if ((temp = findElem(localST, key)) == NULL)		//the symbol wasn't found
+	if ((temp = findElem(localST, key)) == NULL)		// the symbol wasn't found
 		return 0;
 
-	if (temp->data.type != type)
-		return 0;
 	else
-		return 1;
+		return 1;										// the symbol was found
 }
