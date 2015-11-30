@@ -59,12 +59,14 @@ int rule_expression();
 
 int getType(int tokenType);
 char * appendChar(char * string, char c);
-char paramTypeToChar(int type);
+//char paramTypeToChar(int type);
+int getFuncType(int tokenType);
 int paramTypeToInt(char c);
 
 int compareSymbol(hashElem * elem, hashElem * activeElem);			// compares elem with global variable activeElem
 hashElem * addVar(char * key, hTab * table, int type);
 hashElem * isDeclared(char *key);											// checks whether the symbol with given key exists
 hashElem * isDeclaredOnTheSameLevel(char *key);
+tParam * addParam(hashElem * elem, char * key, tSymbolType type);
 
 #endif

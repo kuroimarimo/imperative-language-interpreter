@@ -66,15 +66,17 @@ void hashElemInit (hashElem * elem)
 {
     elem->data.type = -1;
     elem->data.state = DECLARED;
-    elem->data.value.int_value = 0;
+    elem->data.numberOfParams = 0;
+	elem->data.value.int_value = 0;
+	elem->data.params = NULL;
     
-    if (elem->data.fParamTypes != NULL)
-        free(elem->data.fParamTypes);
-    elem->data.fParamTypes = NULL;
+    //if (elem->data.fParamTypes != NULL)
+   /*     free(elem->data.fParamTypes);
+    elem->data.fParamTypes = NULL;*/
     
     //if (elem->data.localTable != NULL)
     //    hTabFree(elem->data.localTable);
-    elem->data.localTable = NULL;
+    //elem->data.localTable = NULL;
     
     if (elem->key != NULL)
         free(elem->key);
@@ -110,17 +112,18 @@ hTab * expandTab(hTab * table)
 }
 
 /* Deep-copies the data from 'srcData' to 'destData' given that both are of type tData.
-    (Except localTable, 'cause reasons. (╯°□°）╯︵ ┻━┻ )
+    (Except params, 'cause reasons. (╯°□°）╯︵ ┻━┻ )
    Returns true upon successful completion, otherwise false.*/
 bool tDataCopy (tData * destData, tData * srcData)
 {
     destData->type = srcData->type;
     destData->state = srcData->state;
     destData->value = srcData->value;
+	destData->numberOfParams = srcData->numberOfParams;
     
-    destData->localTable = srcData->localTable;   // not used if the element is variable; if it's a function, the table is later initialized
+    //destData->localTable = srcData->localTable;   // not used if the element is variable; if it's a function, the table is later initialized
     
-    if (srcData->fParamTypes != NULL)			// there's data to copy
+    /*if (srcData->fParamTypes != NULL)			// there's data to copy
     //    return (strDuplicate(&destData->fParamTypes, &srcData->fParamTypes));
     {
         destData->fParamTypes = malloc((strlen(srcData->fParamTypes)+1) * sizeof(char));
@@ -133,7 +136,9 @@ bool tDataCopy (tData * destData, tData * srcData)
     {
         destData->fParamTypes = NULL;
         return true;
-    }
+    }*/
+	destData->params = srcData->params;
+	return true;
     
 }
 
@@ -212,14 +217,17 @@ void removeElem (hTab * table, char * key)
     {
         table->table[hFunct(key, table->size)] = tmp->next;
 
-        if (tmp->data.type == VAR_STRING)
-            free(tmp->data.value.string_value);
+        /*if (tmp->data.type == VAR_STRING)
+            free(tmp->data.value.string_value);*/
 
-        if (tmp->data.fParamTypes != NULL)
+        /*if (tmp->data.fParamTypes != NULL)
             free(tmp->data.fParamTypes);
 
         if (tmp->data.localTable != NULL)
-            hTabFree(tmp->data.localTable);
+            hTabFree(tmp->data.localTable);*/
+		
+		if (tmp->data.params != NULL)
+			free(tmp->data.params);
 
         free(tmp);
         return;
@@ -235,14 +243,16 @@ void removeElem (hTab * table, char * key)
         removed = tmp->next;
         tmp->next = removed->next;              // relinks the linked list, so the element 'removed' can be freed
 
-        if (removed->data.type == VAR_STRING)
-            free(removed->data.value.string_value);
+        /*if (removed->data.type == VAR_STRING)
+            free(removed->data.value.string_value);*/
 
-        if (removed->data.fParamTypes != NULL)
+        /*if (removed->data.fParamTypes != NULL)
             free(removed->data.fParamTypes);
 
         if (removed->data.localTable != NULL)
-            hTabFree(removed->data.localTable);
+            hTabFree(removed->data.localTable);*/
+		if (removed->data.params != NULL)
+			free(tmp->data.params);
 
         free(removed->key);
         free(removed);
@@ -263,16 +273,19 @@ void hTabFree (hTab * table)
         {
             tmp = elem->next;
 
-            if (elem->data.type == VAR_STRING)
+            /*if (elem->data.type == VAR_STRING)
                 free(elem->data.value.string_value);
-			elem->data.value.string_value = NULL;
+			elem->data.value.string_value = NULL;*/
 
-            if (elem->data.fParamTypes != NULL)
+           /* if (elem->data.fParamTypes != NULL)
                 free(elem->data.fParamTypes);
 			elem->data.fParamTypes = NULL;
 
             if (elem->data.localTable != NULL)
-                hTabFree(elem->data.localTable);
+                hTabFree(elem->data.localTable);*/
+
+			if (elem->data.params != NULL)
+				free(elem->data.params);
 
             free(elem->key);
             free(elem);
