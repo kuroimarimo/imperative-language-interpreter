@@ -67,6 +67,7 @@ void tableStackDispose(tableStack * stack)
 		hTabFree(stack->elems[i]);
 
 	free(stack->elems);
+	free(stack);
 }
 
 hTab * getTableStackElem(tableStack * stack, int index)
