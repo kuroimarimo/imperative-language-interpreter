@@ -22,6 +22,24 @@ bool checkOverfill (unsigned int size, unsigned int numStoredElem)
 }
 
 
+/* Autamatically allocates memory and copies string from 'src' to 'dest'.
+ Return value depend on whether the allocation has succeeded or not. */
+bool strDuplicate(char ** dest, char ** src)                                // UNFINISHED!
+{
+    size_t srcLength;
+    //char * tmp = * dest;
+    
+    srcLength = strlen(*src) + 1;                // + 1 takes into account the end of string character
+    
+    if (!(*dest = malloc(srcLength * sizeof(char))))
+        return false;
+    
+    *dest = strcpy(*dest, *src);
+    
+    return true;
+}
+
+
 /* creates a new hash table of size 'size' */
 hTab * hTabInit(unsigned int size)
 {
@@ -92,6 +110,7 @@ hTab * expandTab(hTab * table)
 }
 
 /* Deep-copies the data from 'srcData' to 'destData' given that both are of type tData.
+    (Except localTable, 'cause reasons. (╯°□°）╯︵ ┻━┻ )
    Returns true upon successful completion, otherwise false.*/
 bool tDataCopy (tData * destData, tData * srcData)
 {
@@ -102,15 +121,20 @@ bool tDataCopy (tData * destData, tData * srcData)
     destData->localTable = srcData->localTable;   // not used if the element is variable; if it's a function, the table is later initialized
     
     if (srcData->fParamTypes != NULL)			// there's data to copy
+    //    return (strDuplicate(&destData->fParamTypes, &srcData->fParamTypes));
     {
-        destData->fParamTypes = strdup(srcData->fParamTypes);
+        destData->fParamTypes = malloc((strlen(srcData->fParamTypes)+1) * sizeof(char));
+        strcpy(destData->fParamTypes, srcData->fParamTypes);
+
         return destData->fParamTypes;
     }
+
     else
     {
         destData->fParamTypes = NULL;
         return true;
     }
+    
 }
 
 /* adds new element to a hash table */
@@ -146,15 +170,17 @@ hashElem * addElem (hTab * table, char * key, tData * data)
 
     newElem->next = table->table[hFunct(key, table->size)];
 
-//    newElem->key = malloc((strlen(key) + 1) * sizeof(char));
-//    strcpy(newElem->key, key);
+    newElem->key = malloc((strlen(key) + 1) * sizeof(char));
+    strcpy(newElem->key, key);
 
-    newElem->key = strdup(key);
+//    if (!strDuplicate(&newElem->key, &key))
+//        return NULL;                    // Malloc failed.
+    
     if (!tDataCopy(&newElem->data, data) || !newElem->key)
     {
         return NULL;                    // Malloc failed.
     }
-
+    
     table->table[hFunct(key, table->size)] = newElem;
 
     ++table->numStoredElem;

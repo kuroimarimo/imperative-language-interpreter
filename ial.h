@@ -38,6 +38,9 @@ typedef struct hTab
 
 unsigned int hFunct(const char *str, unsigned hTabSize);
 
+bool strDuplicate(char ** dest, char ** src);
+bool tDataCopy (tData * destData, tData * srcData);
+
 hTab * hTabInit (unsigned int size);
 void hashElemInit (hashElem * elem);		//initialises default hashElem values
 
