@@ -11,12 +11,13 @@
 #include "error.h"
 #include "ial.h"
 #include "prsa.h"
+#include "table_stack.h"
 
-#define INIT_ST_SIZE	16
+#define INIT_ST_SIZE	16			//initial table stack and symnbol table size
 
 FILE* srcFile;
 hTab * globalST;									// global symbol table
-hTab * localST;										// local symbol table for the currently parsed function
+tableStack *localSTstack;							// stack of local symbol tables
 //hashElem activeElem;								// symbol table element being modified
 //tData STdata;										// tData being created
 
@@ -63,6 +64,6 @@ int paramTypeToInt(char c);
 
 int compareSymbol(hashElem * elem, hashElem * activeElem);			// compares elem with global variable activeElem
 hashElem * addVar(char * key, hTab * table, int type);
-int isDeclared(char *key);											// checks whether the symbol with given key exists
+hashElem * isDeclared(char *key);											// checks whether the symbol with given key exists
 
 #endif

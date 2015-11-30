@@ -15,6 +15,9 @@ int parse(FILE *source)
     activeElem.key = NULL;
 
     globalST = hTabInit(INIT_ST_SIZE);
+	if ((localSTstack = tableStackInit(INIT_ST_SIZE)) == NULL)
+		return ERR_AllocFailed;
+
 
     int returnValue = rule_funcdef(&activeElem);
     
@@ -27,6 +30,8 @@ int parse(FILE *source)
     {
         free(activeElem.data.fParamTypes);
     }
+
+	tableStackDispose(localSTstack);
 
     return returnValue;
 }
@@ -69,6 +74,8 @@ int rule_funcdef(hashElem * activeElem)
     error = rule_funcDefined(activeElem);
     if (error != ERR_None)
         return error;
+
+	tableStackPop(localSTstack);
 
     return rule_funcdef(activeElem);
 }
@@ -132,7 +139,8 @@ int rule_paramList(hashElem * activeElem)
 	if ((activeElem->data.localTable = hTabInit(INIT_ST_SIZE)) == NULL)		//create local symbol table
 		return ERR_AllocFailed;
 
-	localST = activeElem->data.localTable;
+	if (tableStackPush(localSTstack, activeElem->data.localTable) == NULL)
+		return ERR_AllocFailed;
 
     scanner(srcFile);
     if (token.type == R_BRACKET)
@@ -183,7 +191,7 @@ int rule_param(hashElem * activeElem)
 
     //pridanie ID premennej do tabulky
 
-	if (addVar(token.area, localST, type) == NULL)
+	if (addVar(token.area, tableStackTop(localSTstack), type) == NULL)
 		return ERR_AllocFailed;
 
     return ERR_None;
@@ -290,7 +298,7 @@ int rule_expression()
     if (token.type != SEMICOLON)
         return ERR_SYNTAX;*/
 
-    PrecedencniSA(localST);
+    PrecedencniSA(tableStackTop(localSTstack));			//TODO prsa.c sa musi naucit pouzivat tableStack
 	return ERR_None;				//TODO	check error state
 }
 
@@ -493,7 +501,7 @@ int rule_keyword()
 			if (isDeclared(token.area))
 				return ERR_AttemptedRedefVar;
 
-			if (addVar(token.area, localST, type) == NULL)
+			if (addVar(token.area, tableStackTop(localSTstack), type) == NULL)
 				return ERR_AllocFailed;
 			
 			return rule_varDecl();
@@ -688,12 +696,15 @@ hashElem * addVar(char * key, hTab * table, int type)
 	return addElem(table, key, &temp);
 }
 
-int isDeclared(char *key)						//TODO hľadať vo všetkých nadradených rámcoch and stuff >_<
+hashElem * isDeclared(char *key)						//TODO hľadať vo všetkých nadradených rámcoch and stuff >_<
 {
 	hashElem * temp;
-	if ((temp = findElem(localST, key)) == NULL)		// the symbol wasn't found
-		return 0;
+	/*if ((temp = findElem(localST, key)) == NULL)		// the symbol wasn't found
+		return 0;*/
 
-	else
-		return 1;										// the symbol was found
+	for (int i = localSTstack->top; i >= 0; i--)
+		if ((temp = findElem(getTableStackElem(localSTstack, i), key)) != NULL)
+			return temp;
+	
+	return NULL;										// the symbol was found
 }
