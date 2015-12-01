@@ -105,7 +105,7 @@ void fillToken (char character) {  // naplnit token
     return ;
 }
 
-int scanner (FILE *source) {
+int scanner () {
 
     if (ungotToken)             //ungetToken was called
     {
@@ -119,7 +119,6 @@ int scanner (FILE *source) {
     initToken();
 
     int c = 0;
-    int counter = 0;
     char array_x [3];
     int value = START;
     bool test = true;
@@ -152,10 +151,6 @@ int scanner (FILE *source) {
                 value = DIVIDE;
                 break;
                 }
-            else if (c == '\\') {
-                value = BACKSLASH;
-                break;
-            }
             else if (c == '!')
                 value = EXCLAMATION_MARK;  //vykřičník
             else if (c == '?')
@@ -201,7 +196,7 @@ int scanner (FILE *source) {
                         errorState.line=token.counter_of_lines;
                         fatalError (errorState);
                     }
-
+                  
             }
 
 
@@ -498,46 +493,6 @@ int scanner (FILE *source) {
 
         break;
 
-    case BACKSLASH:
-        if (c == 'b')
-            value = BINARY;
-        else if (c == '0')
-            value = OCTAL;
-        else if (c == 'x')
-            value = HEXADECIMAL;
-        else {
-            errorState.state = ERR_NumberShape;
-            errorState.line = token.counter_of_lines;
-            fatalError (errorState);
-        }
-
-        break;
-
-    case BINARY:
-        if (counter == 8 && ((c >= '0' && c <= '9') || isalpha(c))) {
-            errorState.state = ERR_NumberShape;
-            errorState.line = token.counter_of_lines;
-            fatalError (errorState);
-        }
-        else {
-            test = false;
-            token.type = BINARY;
-            ungetc(c,source);
-            break;
-        }
-
-        if (c >= '0' && c <= '1') {
-            fillToken(c);
-            counter++;
-        }
-        else {
-            test = false;
-            token.type = BINARY;
-            ungetc(c,source);
-        }
-
-        break;
-
     case LINE_COMMENT:
         if (c == '\n'){
            value = START;
@@ -659,10 +614,10 @@ int scanner (FILE *source) {
             }
         }
 
-    long integer;
 
         if (token.type == INT_NUMBER)
         {
+            long integer;
             errno = 0;
 
             integer = strtol(token.area, NULL, 10);
@@ -686,14 +641,6 @@ int scanner (FILE *source) {
 
             real_number = strtod(token.area, &ptr);
             token.double_numb = real_number;
-        }
-
-        if (token.type == BINARY) {
-            integer = strtol(token.area, NULL, 2);
-            token.int_numb = (int) integer;
-
-            printf("Cislo binarne: %s", token.area);
-            printf("Cislo: %ld\n", integer);
         }
     }
 

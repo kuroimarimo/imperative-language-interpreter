@@ -11,7 +11,7 @@
 int main(int argc, char** argv)
 {
 
-    FILE *source;
+    //FILE *source;
     
     if (argc != 2)
     {
@@ -36,7 +36,7 @@ int main(int argc, char** argv)
     }
 */
     
-    errorState.state = parse(source);               // parse the code
+    errorState.state = parse();               // parse the code
     errorState.line = token.counter_of_lines;
 
     if (errorState.state != ERR_None)
