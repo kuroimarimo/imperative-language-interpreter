@@ -105,7 +105,7 @@ void fillToken (char character) {  // naplnit token
     return ;
 }
 
-int scanner (FILE *source) {
+int scanner () {
 
     if (ungotToken)             //ungetToken was called
     {

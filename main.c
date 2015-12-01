@@ -11,7 +11,7 @@
 int main(int argc, char** argv)
 {
 
-    FILE *source;
+    //FILE *source;
     
     if (argc != 2)
     {
