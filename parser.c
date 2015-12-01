@@ -5,10 +5,8 @@ int isKeyword(int tokenType)
     return (tokenType >= K_AUTO) && (tokenType <= K_DO);
 }
 
-int parse(FILE *source)
+int parse()
 {
-    srcFile = source;
-
     hashElem activeElem;
     //activeElem.data.fParamTypes = NULL;
     //activeElem.data.localTable = NULL;
@@ -41,7 +39,7 @@ int rule_funcdef(hashElem * activeElem)
 {
     hashElemInit(activeElem);
 
-    scanner(srcFile);
+    scanner();
     if (token.type == EOF)
         return ERR_None;
 
@@ -54,7 +52,7 @@ int rule_funcdef(hashElem * activeElem)
 
     /*activeElem->data.fParamTypes = appendChar(activeElem->data.fParamTypes, paramTypeToChar(token.type));    //set function type*/
 
-    scanner(srcFile);
+    scanner();
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
 
@@ -102,7 +100,7 @@ int rule_funcDefined(hashElem * activeElem)
     else if (!compareSymbol(temp, activeElem))
         return ERR_AttemptedRedefFunction;
 
-    scanner(srcFile);
+    scanner();
     /*if (token.type == SEMICOLON)                                                    //the current function has been declared, not defined
         return ERR_None;
 
@@ -136,7 +134,7 @@ int rule_funcDefined(hashElem * activeElem)
     localST = temp->data.localTable;*/
 
 
-    scanner(srcFile);
+    scanner();
     int error = rule_stList();
     if (error != ERR_None)
         return error;
@@ -147,7 +145,7 @@ int rule_funcDefined(hashElem * activeElem)
 //rule:     <param-list> -> ( <param> <param-next>      |       ()
 int rule_paramList(hashElem * activeElem)
 {
-    scanner(srcFile);
+    scanner();
     if (token.type != L_BRACKET)
         return ERR_SYNTAX;
 
@@ -161,7 +159,7 @@ int rule_paramList(hashElem * activeElem)
 		return ERR_AllocFailed;
 	}
 
-    scanner(srcFile);
+    scanner();
     if (token.type == R_BRACKET)
         return ERR_None;
 
@@ -201,7 +199,7 @@ int rule_param(hashElem * activeElem)
 	}
 
 	//activeElem->data.fParamTypes = appendChar(activeElem->data.fParamTypes, paramTypeToChar(token.type));    //add param type
-    scanner(srcFile);
+    scanner();
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
 
@@ -222,12 +220,12 @@ int rule_param(hashElem * activeElem)
 //rule:     <param-next> -> , <param> <param-next>      |   )
 int rule_paramNext(hashElem * activeElem)
 {
-    scanner(srcFile);
+    scanner();
     
     if (token.type == COMMA)
     {
 
-        scanner(srcFile);
+        scanner();
         int error = rule_param(activeElem);
         if (error != ERR_None)
             return error;
@@ -264,7 +262,7 @@ int rule_stList()
         if (error != ERR_None)
             return error;
 
-    scanner(srcFile);
+    scanner();
     error = rule_stList();
     if (error != ERR_None)
 		return error;
@@ -272,7 +270,7 @@ int rule_stList()
     return ERR_None;
 }
 
-//rule:     <statement> -> type id <var-decl> ;   ||      id <assignment> ;      ||        id (<param-list> ;       ||      <keyword>   || { <st-list>
+//rule:     <statement> -> type id <var-decl> ;   ||      id <assignment> ;		||      <keyword>   || { <st-list>
 int rule_statement()
 {
     if (token.type == IDENTIFIER)
@@ -280,7 +278,7 @@ int rule_statement()
 		if (isDeclaredOnTheSameLevel(token.area) == NULL)
 			return ERR_UndefinedVariable;
 
-        scanner(srcFile);
+        scanner();
         if (token.type == ASSIGNMENT)
             return rule_expression();
     }
@@ -302,7 +300,7 @@ int rule_statement()
 			return ERR_AllocFailed;
 		}
 
-        scanner(srcFile);
+        scanner();
         return rule_stList();
     }
 
@@ -312,7 +310,7 @@ int rule_statement()
 //rule:     <var-decl> -> ;    |   = <expression> ;
 int rule_varDecl()
 {
-    scanner(srcFile);
+    scanner();
 
     if (token.type == SEMICOLON)
         return ERR_None;
@@ -325,13 +323,48 @@ int rule_varDecl()
 
 int rule_expression()
 {
-    /*scanner(srcFile);
-    if (strcmp(token.area, "__vyraz__") != 0)
-        return ERR_SYNTAX;
+	/*scanner();
+	if (strcmp(token.area, "__vyraz__") != 0)
+		return ERR_SYNTAX;
 
-    scanner(srcFile);
-    if (token.type != SEMICOLON)
-        return ERR_SYNTAX;*/
+	scanner();
+	if (token.type != SEMICOLON)
+		return ERR_SYNTAX;*/
+
+	scanner();
+	switch (token.type)
+	{
+		case IDENTIFIER:
+			if (isFunct(token.area))
+				return rule_funcCall();
+			else
+			{
+				ungetToken();
+				PrecedencniSA(tableStackTop(localSTstack));		//TODO pouzivat cely stack, treba na to vytvorit funkciu
+				return ERR_None;
+			}
+			break;
+
+		case B_LENGTH:
+			return rule_BLength();
+
+		case B_SUBSTR:
+			return rule_BSubstr();
+
+		case B_CONCAT:
+			return rule_BConcat();
+
+		case B_FIND:
+			return rule_BFind();
+
+		case B_SORT:
+			return rule_BSort();
+
+		default:
+			ungetToken();
+			PrecedencniSA(tableStackTop(localSTstack));		//TODO pouzivat cely stack, treba na to vytvorit funkciu
+			return ERR_None;
+	}
 
     PrecedencniSA(tableStackTop(localSTstack));			//TODO prsa.c sa musi naucit pouzivat tableStack
 	return ERR_None;				//TODO	check error state
@@ -340,14 +373,14 @@ int rule_expression()
 //rule:     <auto-decl> -> id = <expression>
 int rule_auto()
 {
-    scanner(srcFile);
+    scanner();
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
 
 	if (isDeclaredOnTheSameLevel(token.area) != NULL)
 		return ERR_AttemptedRedefVar;
 
-    scanner(srcFile);
+    scanner();
     if (token.type != ASSIGNMENT)
         return ERR_SYNTAX;
 
@@ -360,7 +393,7 @@ int rule_cin()
     if (token.type != C_IN)
         return ERR_SYNTAX;
 
-    scanner(srcFile);
+    scanner();
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
 
@@ -373,7 +406,7 @@ int rule_cin()
 // <cin-list> -> <cin> <cin-list>   ||  ;
 int rule_cinList()
 {
-    scanner(srcFile);
+    scanner();
 
     if (token.type == SEMICOLON)
         return ERR_None;
@@ -393,7 +426,7 @@ int rule_cout()
     if (token.type != C_OUT)
         return ERR_SYNTAX;
 
-    scanner(srcFile);
+    scanner();
     /*if ((token.type != IDENTIFIER) && (token.type != STRING) && (token.type != INT_NUMBER) && (token.type != DOUBLE_NUMBER))
         return ERR_SYNTAX;*/
 
@@ -419,7 +452,7 @@ int rule_cout()
 // <cout-list> -> <cout> <cout-list>   ||  ;
 int rule_coutList()
 {
-    scanner(srcFile);
+    scanner();
 
     if (token.type == SEMICOLON)
         return ERR_None;
@@ -436,7 +469,7 @@ int rule_coutList()
 //rule:     <if-decl> -> ( <expression> ) <st-list> else <st-list>
 int rule_if()
 {
-    scanner(srcFile);
+    scanner();
     if (token.type != L_BRACKET)
         return ERR_SYNTAX;
 
@@ -444,22 +477,22 @@ int rule_if()
     if (error != ERR_None)
         return error;
 
-    scanner(srcFile);
+    scanner();
     if (token.type != R_BRACKET)
         return ERR_SYNTAX;
 
-    scanner(srcFile);
+    scanner();
     if ((error = rule_statement()) != ERR_None)
         return error;
 
-    scanner(srcFile);
+    scanner();
     if (token.type != K_ELSE)
     {
         ungetToken();
         return ERR_None;
     }
     
-    scanner(srcFile);
+    scanner();
     if ((error = rule_statement()) != ERR_None)
         return error;
 
@@ -475,15 +508,15 @@ int rule_return()
 //rule:     <for-decl> -> ( id <var-decl> <expression> id = <expression> ) { <st-list>
 int rule_for()
 {
-    scanner(srcFile);
+    scanner();
     if (token.type != L_BRACKET)
         return ERR_SYNTAX;
 
-    scanner(srcFile);
+    scanner();
     if ((token.type != K_INT) && (token.type != K_DOUBLE) && (token.type != K_STRING))
         return ERR_SYNTAX;
 
-    scanner(srcFile);
+    scanner();
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
 
@@ -495,22 +528,22 @@ int rule_for()
     if ((error = rule_expression()) != ERR_None)
         return error;
 
-    scanner(srcFile);
+    scanner();
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
 
-    scanner(srcFile);
+    scanner();
     if (token.type != ASSIGNMENT)
         return ERR_SYNTAX;
 
     if ((error = rule_expression()) != ERR_None)
         return error;
 
-    scanner(srcFile);
+    scanner();
     if (token.type != R_BRACKET)
         return ERR_SYNTAX;
 
-    scanner(srcFile);
+    scanner();
     return rule_statement();
 }
 
@@ -528,7 +561,7 @@ int rule_keyword()
         case K_STRING:
         {
 			int type = getType(token.type);
-			scanner(srcFile);
+			scanner();
 			
 			if (token.type != IDENTIFIER)
 				return ERR_SYNTAX;
@@ -547,7 +580,7 @@ int rule_keyword()
 
         case K_CIN:
         {
-            scanner(srcFile);
+            scanner();
             if ((error = rule_cin()) != ERR_None)
                 return error;
             else 
@@ -556,7 +589,7 @@ int rule_keyword()
 
         case K_COUT:
         {
-            scanner(srcFile);
+            scanner();
     
             if ((error = rule_cout()) != ERR_None)
                 return error;
@@ -590,7 +623,7 @@ int rule_keyword()
 //rule:      <while-loop> -> ( <expression> ) <statement>
 int rule_while()
 {
-    scanner(srcFile);
+    scanner();
     if (token.type != L_BRACKET)
         return ERR_SYNTAX;
 
@@ -598,11 +631,11 @@ int rule_while()
     if ((error = rule_expression()) != ERR_None)
         return error;
 
-    scanner(srcFile);
+    scanner();
     if (token.type != R_BRACKET)
         return ERR_SYNTAX;
 
-    scanner(srcFile);
+    scanner();
     if ((error = rule_statement()) != ERR_None)
         return error;
 
@@ -617,26 +650,26 @@ int rule_do()
     int error;
     
     
-    scanner(srcFile);
+    scanner();
     if ((error = rule_statement()) != ERR_None)
         return error;
 
-    scanner(srcFile);
+    scanner();
     if (token.type != K_WHILE)
         return ERR_SYNTAX;
 
-    scanner(srcFile);
+    scanner();
     if (token.type != L_BRACKET)
         return ERR_SYNTAX;
 
     if ((error = rule_expression()) != ERR_None)
         return error;
 
-    scanner(srcFile);
+    scanner();
     if (token.type != R_BRACKET)
         return ERR_SYNTAX;
 
-    scanner(srcFile);
+    scanner();
     if (token.type != SEMICOLON)
         return ERR_SYNTAX;
 
@@ -711,16 +744,7 @@ int compareSymbol(hashElem * elem, hashElem * activeElem)                       
     if (elem->data.type != activeElem->data.type)
         return 0;
 
-	if (elem->data.numberOfParams != activeElem->data.numberOfParams)
-		return 0;
-
-	for (int i = 0; i < elem->data.numberOfParams; i++)
-	{
-		if (elem->data.params[i].type != activeElem->data.params[i].type)
-			return 0;
-		if (strcmp(elem->data.params[i].key, activeElem->data.params[i].key) != 0)
-			return 0;
-	}
+	return compareParams(elem, activeElem);
 
     /*if ((elem->data.fParamTypes == NULL) || (activeElem->data.fParamTypes == NULL))
         return 1;*/
@@ -731,6 +755,34 @@ int compareSymbol(hashElem * elem, hashElem * activeElem)                       
     //printf("Su rovnaké: --%s--%s--\n", elem->data.fParamTypes, activeElem->data.fParamTypes);
 
     return 1;
+}
+
+int compareParams(hashElem * elem1, hashElem * elem2)
+{
+	if (elem1->data.numberOfParams != elem2->data.numberOfParams)
+		return 0;
+
+	for (int i = 0; i < elem1->data.numberOfParams; i++)
+	{
+		if (elem1->data.params[i].type != elem2->data.params[i].type)
+			return 0;
+		if (strcmp(elem1->data.params[i].key, elem2->data.params[i].key) != 0)
+			return 0;
+	}
+
+	return 1;
+}
+
+int compareParamTypes(hashElem * elem1, hashElem * elem2)
+{
+	if (elem1->data.numberOfParams != elem2->data.numberOfParams)
+		return 0;
+
+	for (int i = 0; i < elem1->data.numberOfParams; i++)
+		if (elem1->data.params[i].type != elem2->data.params[i].type)
+			return 0;
+
+	return 1;
 }
 
 hashElem * addVar(char * key, hTab * table, int type)
@@ -778,4 +830,203 @@ tParam * addParam(hashElem * elem, char * key, tSymbolType type)
 
 	++elem->data.numberOfParams;
 	return temp;
+}
+
+hashElem * isFunct(char * key)
+{
+	return findElem(globalST, key);
+}
+
+int rule_funcCall()	//id (<call_list>;
+{
+	hashElem funcCall;
+	funcCall.key = NULL;
+	hashElemInit(&funcCall);
+
+	funcCall.key = strdup(token.area);
+	if (funcCall.key == NULL)
+		return ERR_AllocFailed;
+
+	scanner();
+	if (token.type != L_BRACKET)
+		return ERR_SYNTAX;
+
+	int error = rule_callParam(&funcCall);
+
+	if (error != ERR_None)
+		return error;
+
+	if (!compareParamTypes(&funcCall, findElem(globalST, funcCall.key)))
+		return ERR_ParamType;
+	
+	scanner();
+	if (token.type != SEMICOLON)
+		return ERR_SYNTAX;
+
+	return ERR_None;
+}
+
+int rule_callParam(hashElem * funcCall)
+{
+	scanner();
+
+	hashElem * temp;	
+	switch (token.type)
+	{
+		case R_BRACKET:
+			return ERR_None;
+
+		case IDENTIFIER:
+			if ((temp = isDeclared(token.area)) == NULL)
+				return ERR_UndefinedVariable;
+
+			if (addParam(funcCall, "", temp->data.type) == NULL)
+				return ERR_AllocFailed;
+			return rule_callParamList(funcCall);
+
+		case INT_NUMBER:
+			if (addParam(funcCall, "", VAR_INT) == NULL)
+				return ERR_AllocFailed;
+			return rule_callParamList(funcCall);
+
+		case DOUBLE_NUMBER:
+			if (addParam(funcCall, "", VAR_DOUBLE) == NULL)
+				return ERR_AllocFailed;
+			return rule_callParamList(funcCall);
+
+		case STRING:
+			if (addParam(funcCall, "", VAR_STRING) == NULL)
+				return ERR_AllocFailed;
+			return rule_callParamList(funcCall);
+
+		default:
+			return ERR_SYNTAX;
+	}
+}
+
+int rule_callParamList(hashElem * funcCall)
+{
+	scanner();
+	switch (token.type)
+	{
+		case COMMA:
+			break;
+
+		case R_BRACKET:
+			return ERR_None;
+
+		default:
+			return ERR_SYNTAX;
+	}
+
+	hashElem * temp;
+	scanner();
+	switch (token.type)
+	{
+		case IDENTIFIER:
+			if ((temp = isDeclared(token.area)) == NULL)
+				return ERR_UndefinedVariable;
+
+			if (addParam(funcCall, "", temp->data.type) == NULL)
+				return ERR_AllocFailed;
+			return rule_callParamList(funcCall);
+
+		case INT_NUMBER:
+			if (addParam(funcCall, "", VAR_INT) == NULL)
+				return ERR_AllocFailed;
+			return rule_callParamList(funcCall);
+
+		case DOUBLE_NUMBER:
+			if (addParam(funcCall, "", VAR_DOUBLE) == NULL)
+				return ERR_AllocFailed;
+			return rule_callParamList(funcCall);
+
+		case STRING:
+			if (addParam(funcCall, "", VAR_STRING) == NULL)
+				return ERR_AllocFailed;
+			return rule_callParamList(funcCall);
+
+		default:
+			return ERR_SYNTAX;
+	}	
+}
+
+int rule_BLength()
+{
+	scanner();
+	if (token.type != L_BRACKET)
+		return ERR_SYNTAX;				//Či?
+
+	scanner();
+
+	switch (token.type)
+	{
+		case STRING:
+			break;
+		
+		case IDENTIFIER:
+			if (isDeclared(token.area)->data.type == VAR_STRING)
+				break;
+			else
+				return ERR_ParamType;
+		
+		case R_BRACKET:
+			return ERR_ParamNumber;
+		
+		default:
+			return ERR_SYNTAX;
+	}
+
+	scanner();
+	switch (token.type)
+	{
+		case R_BRACKET:
+			break;
+
+		case COMMA:
+			scanner();
+			switch (token.type)
+			{
+				case IDENTIFIER:
+				case INT_NUMBER:
+				case DOUBLE_NUMBER:
+				case STRING:
+					return ERR_ParamNumber;
+				default:
+					return ERR_SYNTAX;
+			}
+
+		default:
+			return ERR_SYNTAX;
+	}
+
+	scanner();
+	switch (token.type)
+	{
+		case SEMICOLON:
+			return ERR_None;
+
+		default:
+			return ERR_SYNTAX;
+	}
+}
+
+int rule_BSubstr()
+{
+	return ERR_None;
+}
+
+int rule_BConcat()
+{
+	return ERR_None;
+}
+
+int rule_BFind()
+{
+	return ERR_None;
+}
+
+int rule_BSort()
+{
+	return ERR_None;
 }

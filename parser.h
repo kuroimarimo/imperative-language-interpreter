@@ -23,7 +23,7 @@ tableStack *localSTstack;							// stack of local symbol tables
 
                                                     /*Function definitions*/
 
-int parse(FILE *source);							// parse the code
+int parse();							// parse the code
 int isKeyword(int tokenType);
 
 
@@ -68,5 +68,16 @@ hashElem * addVar(char * key, hTab * table, int type);
 hashElem * isDeclared(char *key);											// checks whether the symbol with given key exists
 hashElem * isDeclaredOnTheSameLevel(char *key);
 tParam * addParam(hashElem * elem, char * key, tSymbolType type);
+int compareParams(hashElem * elem1, hashElem * elem2);
+hashElem * isFunct(char * key);
+int rule_funcCall();
+int rule_callParam(hashElem * funcCall);
+int rule_callParamList(hashElem * funcCall);
+
+int rule_BLength();
+int rule_BSubstr();
+int rule_BConcat();
+int rule_BFind();
+int rule_BSort();
 
 #endif
