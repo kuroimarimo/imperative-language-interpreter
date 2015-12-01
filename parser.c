@@ -21,6 +21,7 @@ int parse()
 	//cleanup
     if (activeElem.key)
     {
+        free(activeElem.data.params);
         free(activeElem.key);
     }
 	tableStackDispose(localSTstack);
@@ -862,12 +863,19 @@ int rule_funcCall()	//id (<call_list>;
 
 	scanner();
 	if (token.type != L_BRACKET)
+    {
+        free(funcCall.key);
 		return ERR_SYNTAX;
-
+    }
+    
 	int error = rule_callParam(&funcCall);
 
 	if (error != ERR_None)
+    {
+        free(funcCall.key);
+        free(funcCall.data.params);
 		return error;
+    }
 
 	if (!compareParamTypes(&funcCall, findElem(globalST, funcCall.key)))
 		return ERR_ParamType;
