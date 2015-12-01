@@ -32,7 +32,7 @@ int isKeyword(int tokenType);
 int rule_stList();									// <st-list> -> <statement> <st-list>     |   } 
 
 int rule_statement();								// <statement> -> type id <var-def> ;   ||      id = <expression> ;      ||        id (<param-list>) ;      ||      <keyword>	|| { <st-list>
-int rule_varDecl();									// <var-decl> -> ;    |   = <expression> ;
+int rule_varDecl(hashElem * assignee);									// <var-decl> -> ;    |   = <expression> ;
 
 int rule_funcdef(hashElem * activeElem);            // <prog> -> type id <param-list> <func-defined> 
 int rule_funcDefined(hashElem * activeElem);        // <func-defined> -> { <st-list> <prog>     ||      ; <prog>
@@ -55,7 +55,7 @@ int rule_while();									// <while-loop> -> ( <expression> ) <statement>
 int rule_do();										// <do-loop> -> <statement> while ( <expression> )               
 
 
-int rule_expression();
+int rule_expression(hashElem * assignee);
 
 int getType(int tokenType);
 char * appendChar(char * string, char c);
@@ -65,7 +65,7 @@ int paramTypeToInt(char c);
 
 int compareSymbol(hashElem * elem, hashElem * activeElem);			// compares elem with global variable activeElem
 hashElem * addVar(char * key, hTab * table, int type);
-hashElem * isDeclared(char *key);											// checks whether the symbol with given key exists
+hashElem * findVar(char *key);											// checks whether the symbol with given key exists
 hashElem * isDeclaredOnTheSameLevel(char *key);
 tParam * addParam(hashElem * elem, char * key, tSymbolType type);
 int compareParams(hashElem * elem1, hashElem * elem2);
@@ -79,5 +79,6 @@ int rule_BSubstr();
 int rule_BConcat();
 int rule_BFind();
 int rule_BSort();
+int convertType(tSymbolType inType, tSymbolType outType);
 
 #endif

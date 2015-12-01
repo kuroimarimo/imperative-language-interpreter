@@ -11,6 +11,7 @@ int parse()
     //activeElem.data.fParamTypes = NULL;
     //activeElem.data.localTable = NULL;
     activeElem.key = NULL;
+	//activeElem.data.params = NULL;
 
     globalST = hTabInit(INIT_ST_SIZE);
 	if ((localSTstack = tableStackInit(INIT_ST_SIZE)) == NULL)
@@ -206,7 +207,7 @@ int rule_param(hashElem * activeElem)
 	if (addParam(activeElem, token.area, type) == NULL)
 		return ERR_AllocFailed;
 
-	if (isDeclared(token.area))							// there already is a symbol with that name
+	if (findVar(token.area))							// there already is a symbol with that name
 		return ERR_AttemptedRedefVar;
 
     //pridanie ID premennej do tabulky
@@ -275,12 +276,13 @@ int rule_statement()
 {
     if (token.type == IDENTIFIER)
     {
-		if (isDeclaredOnTheSameLevel(token.area) == NULL)
+		hashElem * assignee;
+		if ((assignee = findVar(token.area)) == NULL)
 			return ERR_UndefinedVariable;
 
         scanner();
         if (token.type == ASSIGNMENT)
-            return rule_expression();
+            return rule_expression(assignee);
     }
 
     else if (isKeyword(token.type))
@@ -308,7 +310,7 @@ int rule_statement()
 }
 
 //rule:     <var-decl> -> ;    |   = <expression> ;
-int rule_varDecl()
+int rule_varDecl(hashElem * assignee)
 {
     scanner();
 
@@ -316,12 +318,12 @@ int rule_varDecl()
         return ERR_None;
 
     if (token.type == ASSIGNMENT)
-        return (rule_expression());
+        return (rule_expression(assignee));
 
     return ERR_SYNTAX;
 }
 
-int rule_expression()
+int rule_expression(hashElem * assignee)
 {
 	/*scanner();
 	if (strcmp(token.area, "__vyraz__") != 0)
@@ -377,14 +379,15 @@ int rule_auto()
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
 
-	if (isDeclaredOnTheSameLevel(token.area) != NULL)
+	hashElem * assignee;
+	if ((assignee = isDeclaredOnTheSameLevel(token.area)) != NULL)
 		return ERR_AttemptedRedefVar;
 
     scanner();
     if (token.type != ASSIGNMENT)
         return ERR_SYNTAX;
 
-    return rule_expression();
+    return rule_expression(assignee);
 } 
 
 //rule:     <cin> -> >> id
@@ -397,7 +400,7 @@ int rule_cin()
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
 
-	if (!isDeclared(token.area))
+	if (!findVar(token.area))
 		return ERR_UndefinedVariable;
 
     return ERR_None;
@@ -438,7 +441,7 @@ int rule_cout()
 			break;
 
 		case IDENTIFIER:
-			if (!isDeclared(token.area))
+			if (!findVar(token.area))
 				return ERR_UndefinedVariable;
 			break;
 
@@ -473,7 +476,7 @@ int rule_if()
     if (token.type != L_BRACKET)
         return ERR_SYNTAX;
 
-    int error = rule_expression();
+    int error = rule_expression(NULL);					//TODO
     if (error != ERR_None)
         return error;
 
@@ -502,7 +505,7 @@ int rule_if()
 //rule:     <return> -> expression
 int rule_return()
 {
-    return rule_expression();
+    return rule_expression(NULL);				//TODO
 }
 
 //rule:     <for-decl> -> ( id <var-decl> <expression> id = <expression> ) { <st-list>
@@ -511,6 +514,16 @@ int rule_for()
     scanner();
     if (token.type != L_BRACKET)
         return ERR_SYNTAX;
+
+	/*hTab * temp;
+	if ((temp = hTabInit(INIT_ST_SIZE)) == NULL)
+		return ERR_AllocFailed;
+
+	if (tableStackPush(localSTstack, temp) == NULL)
+	{
+		hTabFree(temp);
+		return ERR_AllocFailed;
+	}*/    // NOT YET ; _ ;
 
     scanner();
     if ((token.type != K_INT) && (token.type != K_DOUBLE) && (token.type != K_STRING))
@@ -522,10 +535,10 @@ int rule_for()
 
     int error;
 
-    if ((error = rule_varDecl()) != ERR_None)
+    if ((error = rule_varDecl(NULL)) != ERR_None)
         return error;
 
-    if ((error = rule_expression()) != ERR_None)
+    if ((error = rule_expression(NULL)) != ERR_None)
         return error;
 
     scanner();
@@ -536,7 +549,7 @@ int rule_for()
     if (token.type != ASSIGNMENT)
         return ERR_SYNTAX;
 
-    if ((error = rule_expression()) != ERR_None)
+    if ((error = rule_expression(NULL)) != ERR_None)			//rovno prsa namiesto expression?
         return error;
 
     scanner();
@@ -572,10 +585,11 @@ int rule_keyword()
 			if (findElem(globalST, token.area) != NULL)
 				return ERR_AttemptedRedefVar;
 
-			if (addVar(token.area, tableStackTop(localSTstack), type) == NULL)
+			hashElem * temp;
+			if ((temp = addVar(token.area, tableStackTop(localSTstack), type)) == NULL)
 				return ERR_AllocFailed;
 			
-			return rule_varDecl();
+			return rule_varDecl(temp);
         }
 
         case K_CIN:
@@ -628,7 +642,7 @@ int rule_while()
         return ERR_SYNTAX;
 
     int error;
-    if ((error = rule_expression()) != ERR_None)
+    if ((error = rule_expression(NULL)) != ERR_None)
         return error;
 
     scanner();
@@ -662,7 +676,7 @@ int rule_do()
     if (token.type != L_BRACKET)
         return ERR_SYNTAX;
 
-    if ((error = rule_expression()) != ERR_None)
+    if ((error = rule_expression(NULL)) != ERR_None)
         return error;
 
     scanner();
@@ -779,7 +793,7 @@ int compareParamTypes(hashElem * elem1, hashElem * elem2)
 		return 0;
 
 	for (int i = 0; i < elem1->data.numberOfParams; i++)
-		if (elem1->data.params[i].type != elem2->data.params[i].type)
+		if (!convertType(elem1->data.params[i].type, elem2->data.params[i].type))//(elem1->data.params[i].type != elem2->data.params[i].type)
 			return 0;
 
 	return 1;
@@ -798,7 +812,7 @@ hashElem * addVar(char * key, hTab * table, int type)
 	return addElem(table, key, &temp);
 }
 
-hashElem * isDeclared(char *key)									//TODO lepsie meno
+hashElem * findVar(char *key)									//TODO lepsie meno
 {
 	hashElem * temp;
 	/*if ((temp = findElem(localST, key)) == NULL)		// the symbol wasn't found
@@ -841,6 +855,7 @@ int rule_funcCall()	//id (<call_list>;
 {
 	hashElem funcCall;
 	funcCall.key = NULL;
+	funcCall.data.params = NULL;
 	hashElemInit(&funcCall);
 
 	funcCall.key = strdup(token.area);
@@ -863,6 +878,7 @@ int rule_funcCall()	//id (<call_list>;
 	if (token.type != SEMICOLON)
 		return ERR_SYNTAX;
 
+	hashElemInit(&funcCall);
 	return ERR_None;
 }
 
@@ -877,7 +893,7 @@ int rule_callParam(hashElem * funcCall)
 			return ERR_None;
 
 		case IDENTIFIER:
-			if ((temp = isDeclared(token.area)) == NULL)
+			if ((temp = findVar(token.area)) == NULL)
 				return ERR_UndefinedVariable;
 
 			if (addParam(funcCall, "", temp->data.type) == NULL)
@@ -924,7 +940,7 @@ int rule_callParamList(hashElem * funcCall)
 	switch (token.type)
 	{
 		case IDENTIFIER:
-			if ((temp = isDeclared(token.area)) == NULL)
+			if ((temp = findVar(token.area)) == NULL)
 				return ERR_UndefinedVariable;
 
 			if (addParam(funcCall, "", temp->data.type) == NULL)
@@ -955,7 +971,7 @@ int rule_BLength()
 {
 	scanner();
 	if (token.type != L_BRACKET)
-		return ERR_SYNTAX;				//Či?
+		return ERR_SYNTAX;
 
 	scanner();
 
@@ -965,7 +981,7 @@ int rule_BLength()
 			break;
 		
 		case IDENTIFIER:
-			if (isDeclared(token.area)->data.type == VAR_STRING)
+			if (findVar(token.area)->data.type == VAR_STRING)
 				break;
 			else
 				return ERR_ParamType;
@@ -1013,6 +1029,63 @@ int rule_BLength()
 
 int rule_BSubstr()
 {
+	/*scanner();
+	if (token.type != L_BRACKET)
+		return ERR_SYNTAX;
+
+	scanner();
+
+	switch (token.type)
+	{
+	case STRING:
+		break;
+
+	case IDENTIFIER:
+		if (findVar(token.area)->data.type == VAR_STRING)
+			break;
+		else
+			return ERR_ParamType;
+
+	case R_BRACKET:
+		return ERR_ParamNumber;
+
+	default:
+		return ERR_SYNTAX;
+	}
+
+	scanner();
+	switch (token.type)
+	{
+	case R_BRACKET:
+		break;
+
+	case COMMA:
+		scanner();
+		switch (token.type)
+		{
+		case IDENTIFIER:
+		case INT_NUMBER:
+		case DOUBLE_NUMBER:
+		case STRING:
+			return ERR_ParamNumber;
+		default:
+			return ERR_SYNTAX;
+		}
+
+	default:
+		return ERR_SYNTAX;
+	}
+
+	scanner();
+	switch (token.type)
+	{
+	case SEMICOLON:
+		return ERR_None;
+
+	default:
+		return ERR_SYNTAX;
+	}*/
+
 	return ERR_None;
 }
 
@@ -1028,5 +1101,115 @@ int rule_BFind()
 
 int rule_BSort()
 {
-	return ERR_None;
+	scanner();
+	if (token.type != L_BRACKET)
+		return ERR_SYNTAX;				//Či?
+
+	scanner();
+
+	switch (token.type)
+	{
+	case STRING:
+		break;
+
+	case IDENTIFIER:
+		if (findVar(token.area)->data.type == VAR_STRING)
+			break;
+		else
+			return ERR_ParamType;
+
+	case R_BRACKET:
+		return ERR_ParamNumber;
+
+	default:
+		return ERR_SYNTAX;
+	}
+
+	scanner();
+	switch (token.type)
+	{
+	case R_BRACKET:
+		break;
+
+	case COMMA:
+		scanner();
+		switch (token.type)
+		{
+		case IDENTIFIER:
+		case INT_NUMBER:
+		case DOUBLE_NUMBER:
+		case STRING:
+			return ERR_ParamNumber;
+		default:
+			return ERR_SYNTAX;
+		}
+
+	default:
+		return ERR_SYNTAX;
+	}
+
+	scanner();
+	switch (token.type)
+	{
+	case SEMICOLON:
+		return ERR_None;
+
+	default:
+		return ERR_SYNTAX;
+	}
+}
+
+int convertType(tSymbolType inType, tSymbolType outType)			//converts inType to outType
+{
+	switch (inType)
+	{
+		case VAR_INT:
+			switch (outType)
+			{
+				case VAR_INT:
+				case FUNC_INT:
+					return 1;			//no conversion needed
+
+				case VAR_DOUBLE:
+				case FUNC_DOUBLE:
+					//generovanie inštrukcie na konverziu
+					return 1;
+
+				default: 
+					return 0;
+			}
+			break;
+
+		case VAR_DOUBLE:
+			switch (outType)
+			{
+				case VAR_DOUBLE:
+				case FUNC_DOUBLE:
+					return 1;			//no conversion needed
+
+				case VAR_INT:
+				case FUNC_INT:
+					//generovanie inštrukcie na konverziu
+					return 1;
+
+				default:
+					return 0;
+			}
+			break;
+
+		case VAR_STRING:
+			switch (outType)
+			{
+				case VAR_STRING:
+				case FUNC_STRING:
+					return 1;			//no conversion needed
+
+				default:
+					return 0;			//string can't be converted to other types
+			}
+
+		default:
+			return 0;
+
+	}
 }
