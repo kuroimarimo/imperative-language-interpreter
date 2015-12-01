@@ -9,7 +9,7 @@ tableStack * tableStackInit(int size)
 
 	stack->top = -1;
 	stack->size = size;
-	if ((stack->elems = malloc(size * sizeof(hTab *))) == NULL)
+	if ((stack->elems = malloc(size * sizeof(hTab*))) == NULL)
     {
         free(stack);
         return NULL;

@@ -7,30 +7,28 @@ int isKeyword(int tokenType)
 
 int parse()
 {
-    hashElem activeElem;
-    //activeElem.data.fParamTypes = NULL;
-    //activeElem.data.localTable = NULL;
+    hashElem activeElem;			//informations about curently parsed function
     activeElem.key = NULL;
-	//activeElem.data.params = NULL;
 
     globalST = hTabInit(INIT_ST_SIZE);
 	if ((localSTstack = tableStackInit(INIT_ST_SIZE)) == NULL)
 		return ERR_AllocFailed;
 
 
-    int returnValue = rule_funcdef(&activeElem);
+    int returnValue = rule_funcdef(&activeElem);		//process function definition/declaration
     
+
+	//cleanup
     if (activeElem.key)
     {
         free(activeElem.key);
     }
-    
-    /*if (activeElem.data.fParamTypes)
-    {
-        free(activeElem.data.fParamTypes);
-    }*/
-
 	tableStackDispose(localSTstack);
+
+	if (!isFunct("main"))					//there's no main
+		return ERR_UndefinedFunction;
+
+	//call interpreter
 
     return returnValue;
 }
@@ -41,7 +39,7 @@ int rule_funcdef(hashElem * activeElem)
     hashElemInit(activeElem);
 
     scanner();
-    if (token.type == EOF)
+    if (token.type == EOF)				//the whole file has been processed
         return ERR_None;
 
     if ((token.type != K_INT) && (token.type != K_DOUBLE) && (token.type != K_STRING))
