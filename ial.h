@@ -8,17 +8,24 @@
 
 #include "error.h"
 
-typedef enum {VAR_INT, VAR_DOUBLE, VAR_STRING, FUNC} tSymbolType;
+typedef enum {VAR_INT, VAR_DOUBLE, VAR_STRING, FUNC_INT, FUNC_DOUBLE, FUNC_STRING} tSymbolType;
 typedef union {int int_value; double double_value; char * string_value;} tSymbolValue;
 typedef enum  {DECLARED, DEFINED} tState;
+
+typedef struct
+{
+	tSymbolType type;
+	char * key;
+} tParam;
 
 typedef struct data
 {
     tSymbolType type;
     tState state;
-    tSymbolValue value;
-    char * fParamTypes;
-    struct hTab * localTable;
+    tSymbolValue value;					
+    tParam * params;					// function parameters
+	int numberOfParams;					// number of function parameters
+    //struct hTab * localTable;
     //instrList * instructions;			//TODO
 } tData;
 

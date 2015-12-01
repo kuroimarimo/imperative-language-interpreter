@@ -10,8 +10,8 @@ int parse(FILE *source)
     srcFile = source;
 
     hashElem activeElem;
-    activeElem.data.fParamTypes = NULL;
-    activeElem.data.localTable = NULL;
+    //activeElem.data.fParamTypes = NULL;
+    //activeElem.data.localTable = NULL;
     activeElem.key = NULL;
 
     globalST = hTabInit(INIT_ST_SIZE);
@@ -26,10 +26,10 @@ int parse(FILE *source)
         free(activeElem.key);
     }
     
-    if (activeElem.data.fParamTypes)
+    /*if (activeElem.data.fParamTypes)
     {
         free(activeElem.data.fParamTypes);
-    }
+    }*/
 
 	tableStackDispose(localSTstack);
 
@@ -49,11 +49,11 @@ int rule_funcdef(hashElem * activeElem)
         return ERR_SYNTAX;
 
 
-    activeElem->data.type = FUNC;
+    activeElem->data.type = getFuncType(token.type);
     activeElem->data.state = DECLARED;
 
-    activeElem->data.fParamTypes = appendChar(activeElem->data.fParamTypes, paramTypeToChar(token.type));    //set function type
-    
+    /*activeElem->data.fParamTypes = appendChar(activeElem->data.fParamTypes, paramTypeToChar(token.type));    //set function type*/
+
     scanner(srcFile);
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
@@ -66,7 +66,9 @@ int rule_funcdef(hashElem * activeElem)
     if (error != ERR_None)
         return error;
 
-    if (!strcmp(activeElem->key, "main") && (strcmp(activeElem->data.fParamTypes, "i")))      //main should be of type int and with no parameters
+	printf("Funkcia %s pocet parametrov: %d\n", activeElem->key, activeElem->data.numberOfParams);
+
+    if (!strcmp(activeElem->key, "main") && (activeElem->data.numberOfParams != 0))      //main should be of type int and with no parameters
     {
         return ERR_UndefinedFunction;
     }
@@ -83,12 +85,12 @@ int rule_funcdef(hashElem * activeElem)
 //rule:     <func-defined> -> { <st-list>        ||      ; 
 int rule_funcDefined(hashElem * activeElem)
 {
-    printf("Funkcia %s parametre: %s\n", activeElem->key, activeElem->data.fParamTypes);
+    //printf("Funkcia %s parametre: %s\n", activeElem->key, activeElem->data.fParamTypes);
 
     hashElem * temp = findElem(globalST, activeElem->key);                           //check whether there already is a function with given name
 
-    if (temp != NULL)
-        printf("Najdena funkcia %s parametre: %s\n", temp->key, temp->data.fParamTypes);
+    /*if (temp != NULL)
+        printf("Najdena funkcia %s parametre: %s\n", temp->key, temp->data.fParamTypes);*/
 
     if (temp == NULL)
     {																				//there's no such function declared in symbol table, create it then
@@ -127,7 +129,7 @@ int rule_funcDefined(hashElem * activeElem)
    /* else if (temp == NULL)
         temp = addElem(globalST, activeElem->key, activeElem->data);*/
 
-    temp->data.state = DEFINED;
+    //temp->data.state = DEFINED;
 
     /*if ((temp->data.localTable = hTabInit(INIT_ST_SIZE)) == NULL)           //init the functions local symbol table
         return ERR_AllocFailed;
@@ -149,11 +151,15 @@ int rule_paramList(hashElem * activeElem)
     if (token.type != L_BRACKET)
         return ERR_SYNTAX;
 
-	if ((activeElem->data.localTable = hTabInit(INIT_ST_SIZE)) == NULL)		//create local symbol table
+	hTab * temp;
+	if ((temp = hTabInit(INIT_ST_SIZE)) == NULL)		//create local symbol table
 		return ERR_AllocFailed;
 
-	if (tableStackPush(localSTstack, activeElem->data.localTable) == NULL)
+	if (tableStackPush(localSTstack, temp) == NULL)
+	{
+		hTabFree(temp);
 		return ERR_AllocFailed;
+	}
 
     scanner(srcFile);
     if (token.type == R_BRACKET)
@@ -194,10 +200,13 @@ int rule_param(hashElem * activeElem)
 		return ERR_SYNTAX;
 	}
 
-	activeElem->data.fParamTypes = appendChar(activeElem->data.fParamTypes, paramTypeToChar(token.type));    //add param type
+	//activeElem->data.fParamTypes = appendChar(activeElem->data.fParamTypes, paramTypeToChar(token.type));    //add param type
     scanner(srcFile);
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
+
+	if (addParam(activeElem, token.area, type) == NULL)
+		return ERR_AllocFailed;
 
 	if (isDeclared(token.area))							// there already is a symbol with that name
 		return ERR_AttemptedRedefVar;
@@ -288,7 +297,10 @@ int rule_statement()
 			return ERR_AllocFailed;
 
 		if ((tableStackPush(localSTstack, temp)) == NULL)
+		{
+			free(temp);
 			return ERR_AllocFailed;
+		}
 
         scanner(srcFile);
         return rule_stList();
@@ -649,25 +661,25 @@ int getType(int tokenType)
     }
 }
 
-char paramTypeToChar(int type)
+int getFuncType(int tokenType)
 {
-    switch (type)
+    switch (tokenType)
     {
         case K_INT:
-            return 'i';
+            return FUNC_INT;
 
         case K_DOUBLE:
-            return 'd';
+            return FUNC_DOUBLE;
 
         case K_STRING:
-            return 's';
+            return FUNC_STRING;
 
         default:
             return -1;
     }
 }
 
-char * appendChar(char * string, char c)
+/*char * appendChar(char * string, char c)
 {
     if (string == NULL)
     {
@@ -692,20 +704,31 @@ char * appendChar(char * string, char c)
     }
 
     return string;
-}
+}*/
 
 int compareSymbol(hashElem * elem, hashElem * activeElem)                          //compares elem with global variable activeElem
 {
     if (elem->data.type != activeElem->data.type)
         return 0;
 
+	if (elem->data.numberOfParams != activeElem->data.numberOfParams)
+		return 0;
+
+	for (int i = 0; i < elem->data.numberOfParams; i++)
+	{
+		if (elem->data.params[i].type != activeElem->data.params[i].type)
+			return 0;
+		if (strcmp(elem->data.params[i].key, activeElem->data.params[i].key) != 0)
+			return 0;
+	}
+
     /*if ((elem->data.fParamTypes == NULL) || (activeElem->data.fParamTypes == NULL))
         return 1;*/
 
-    if (strcmp(elem->data.fParamTypes, activeElem->data.fParamTypes) != 0)
-     return 0;
+    /*if (strcmp(elem->data.fParamTypes, activeElem->data.fParamTypes) != 0)
+     return 0;*/
 
-    printf("Su rovnaké: --%s--%s--\n", elem->data.fParamTypes, activeElem->data.fParamTypes);
+    //printf("Su rovnaké: --%s--%s--\n", elem->data.fParamTypes, activeElem->data.fParamTypes);
 
     return 1;
 }
@@ -715,9 +738,10 @@ hashElem * addVar(char * key, hTab * table, int type)
 	tData temp;
 	temp.type = type;
 	temp.state = DECLARED;
-	temp.value.string_value = NULL;
-	temp.fParamTypes = NULL;
-	temp.localTable = NULL;
+	temp.numberOfParams = 0;
+	temp.params = NULL;
+	//temp.fParamTypes = NULL;
+	//temp.localTable = NULL;
 
 	return addElem(table, key, &temp);
 }
@@ -738,4 +762,20 @@ hashElem * isDeclared(char *key)									//TODO lepsie meno
 hashElem * isDeclaredOnTheSameLevel(char *key)						//TODO lepsie meno >_<
 {
 	return findElem(tableStackTop(localSTstack), key);
+}
+
+tParam * addParam(hashElem * elem, char * key, tSymbolType type)
+{
+	tParam * temp = realloc(elem->data.params, (elem->data.numberOfParams + 1) * sizeof(tParam));
+	if (temp == NULL)
+		return NULL;
+
+	elem->data.params = temp;
+	elem->data.params[elem->data.numberOfParams].type = type;
+
+	if ((elem->data.params[elem->data.numberOfParams].key = strdup(key)) == NULL)
+		return NULL;
+
+	++elem->data.numberOfParams;
+	return temp;
 }
