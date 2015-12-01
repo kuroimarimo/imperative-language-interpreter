@@ -14,78 +14,83 @@ enum {
     EXP_NUMBER_SIGN,    /// 7       znamenkovy (+/-) 15E+8
     EXP_NUMBER_END,     /// 8
 
-    SEMICOLON,          /// 9       ;
-    UNDERSCORE,         /// 10      _
+    SEMICOLON = 10,     ///         ;
+    UNDERSCORE,         ///         _
 
-    L_BRACKET,          /// 11      (
-    R_BRACKET,          /// 12      )
-    L_SQUARE_BRACKET,   /// 13      [
-    R_SQUARE_BRACKET,   /// 14      ]
-    L_CURLY_BRACKET,    /// 15      {
-    R_CURLY_BRACKET,    /// 16      }
+    L_BRACKET,          ///         (
+    R_BRACKET,          ///         )
+    L_SQUARE_BRACKET,   ///         [
+    R_SQUARE_BRACKET,   ///         ]
+    L_CURLY_BRACKET,    ///         {
+    R_CURLY_BRACKET,    ///         }
 
-    PLUS,               /// 17      +
-    MINUS,              /// 18      -
-    INCREMENT,          /// 19      ++
-    DECREMENT,          /// 20      --
-    MULTIPLY,           /// 21      *
-    DIVIDE,             /// 22      /
-    MODULO,             /// 23      %
+    PLUS,               ///         +
+    MINUS,              ///         -
+    INCREMENT,          ///         ++
+    DECREMENT,          ///         --
+    MULTIPLY,           ///         *
+    DIVIDE,             ///         /
+    BACKSLASH,          ///
+    MODULO,             ///         %
 
-    EXCLAMATION_MARK,   /// 24      !
-    NEGATION,           /// 25      !=
-    QUESTION_MARK,      /// 26      ?
-    STRING,             /// 27      ".."
-    STRING_ESCAPE,      /// 28
-    STRING_ESCAPE_x1,   /// 29
-    STRING_ESCAPE_x2,   /// 30
-    COMMA,              /// 31      ,
+    EXCLAMATION_MARK,   ///         !
+    NEGATION,           ///         !=
+    QUESTION_MARK,      ///         ?
+    STRING,             ///         ".."
+    STRING_ESCAPE,      ///
+    STRING_ESCAPE_x1,   ///
+    STRING_ESCAPE_x2,   ///
+    COMMA,              ///         ,
 
-    LESS,               /// 32      <
-    GREATER,            /// 33      >
-    C_IN,               /// 34      >>
-    C_OUT,              /// 35      <<
-    ASSIGNMENT,         /// 36      =
-    EQUAL,              /// 37      ==
-    LESS_EQUAL,         /// 38      <=
-    GREATER_EQUAL,      /// 39      >=
+    LESS,               ///         <
+    GREATER,            ///         >
+    C_IN,               ///         >>
+    C_OUT,              ///         <<
+    ASSIGNMENT,         ///         =
+    EQUAL,              ///         ==
+    LESS_EQUAL,         ///         <=
+    GREATER_EQUAL,      ///         >=
 
-    LINE_COMMENT,       /// 40      // ...
-    COMMENT,            /// 41      /* ...
-    COMMENT_END,        /// 42      ... */
+    LINE_COMMENT,       ///         // ...
+    COMMENT,            ///         /* ...
+    COMMENT_END,        ///         ... */
 
-    ANOTHER_CHAR,       /// 43      ostatni znaky
+    ANOTHER_CHAR,       ///         ostatni znaky
 
 
-    TOK_NULL,           /// 44      prazdny/neinicializovany token  */
+    TOK_NULL,           ///         prazdny/neinicializovany token  */
+
+    BINARY,             ///         dvojkove cislo
+    OCTAL,              ///         osmickove cislo
+    HEXADECIMAL,        ///         hexadecimalni cislo
 
         /// typy tokenu
-    IDENTIFIER,         /// 45
-    KEY_WORD,           /// 46
-    BUILT_IN_FUNCTION,  /// 47
-    INT_NUMBER,         /// 48
-    DOUBLE_NUMBER,      /// 49
+    IDENTIFIER = 60,    ///
+    KEY_WORD,           ///
+    BUILT_IN_FUNCTION,  ///
+    INT_NUMBER,         ///
+    DOUBLE_NUMBER,      ///
 
         /// klicova slova
-    K_AUTO,             /// 50
-    K_CIN,              ///
+    K_CIN = 70,         ///
     K_COUT,             ///
+    K_AUTO,             ///
+    K_INT,              ///
     K_DOUBLE,           ///
+    K_STRING,           ///
+    K_IF,               ///
     K_ELSE,             ///
     K_FOR,              ///
-    K_IF,               ///
-    K_INT,              ///
     K_RETURN,           ///
-    K_STRING,           ///
     K_WHILE,            ///
-    K_DO,               /// 61
+    K_DO,               ///
 
         /// vestavene funkce
-    B_LENGTH,           /// 62
+    B_LENGTH = 85,      ///
     B_SUBSTR,           ///
     B_CONCAT,           ///
     B_FIND,             ///
-    B_SORT,             /// 66
+    B_SORT,             ///
 
     MAX_OF_ENUM         ///
 
@@ -125,8 +130,8 @@ void ungetToken();               //ungets the latest token, can be used only onc
 void tokenSwap();
 int tokenCopy (tToken *dst, tToken src);   //"copies" the contents of src token to the dst token
 void initToken (); // function for inicialization Token .. it's called when you need delete old variables
-void fillToken (char character); // comes some character and function saves it to variable 
-int scanner (FILE *source);  // its scanner, heart of lex_an ... it's automata 
+void fillToken (char character); // comes some character and function saves it to variable
+int scanner (FILE *source);  // its scanner, heart of lex_an ... it's automata
 
 
 int ungotToken;                 //TODO: inicializovať na 0 >_<
