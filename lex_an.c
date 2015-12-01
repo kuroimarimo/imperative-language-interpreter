@@ -118,7 +118,7 @@ int scanner () {
 
     initToken();
 
-    int c = 0;
+   int c = 0;
     char array_x [3];
     int value = START;
     bool test = true;
@@ -128,7 +128,7 @@ int scanner () {
 
         switch (value) {
         case START:
-                /* Rozpoznani characteru */
+                /* Rozpoznani characteru  */
             if (isalpha(c))
                 value = LETTER;
             else if (c == '0') {
@@ -170,34 +170,44 @@ int scanner () {
             else {              /// jednoznakove tokeny
                 test = false;
 
-                if (c == ';')
+                switch (c){
+                case ';':
                     token.type = SEMICOLON;
-                else if (c == ',')
-                    token.type = COMMA;
-                else if (c == '(')
+                    break;
+                 case ',':
+                    token.type = COMMA ;
+ 	 	 	 	    break;
+                case  '(':
                     token.type = L_BRACKET;
-                else if (c == ')')
+ 	 	 	 	    break;
+                case  ')':
                     token.type = R_BRACKET;
-                else if (c == ']')
+ 	 	 	 	     break;
+                case  ']':
                     token.type = L_SQUARE_BRACKET;
-                else if (c == '[')
+ 	 	 	 	    break;
+                case  '[':
                     token.type = R_SQUARE_BRACKET;
-                else if (c == '{')
+ 	 	 	 	    break;
+                case  '{':
                     token.type = L_CURLY_BRACKET;
-                else if (c == '}')
+ 	 	 	 	     break;
+                case  '}':
                     token.type = R_CURLY_BRACKET;
-                else if (c == '*')
+ 	 	 	 	    break;
+                case  '*':
                     token.type = MULTIPLY;
-                else if (c == '%')
+ 	 	 	 	     break;
+                case  '%':
                     token.type = MODULO;
-                else
-                    {
+ 	 	 	      	 break;
+                default:
                         errorState.state=ERR_UnknownChar;
                         errorState.line=token.counter_of_lines;
                         fatalError (errorState);
-                    }
-                  
-            }
+
+                }   // end switch
+            }   // end if
 
 
 
@@ -576,8 +586,9 @@ int scanner () {
         test = false;
 
         break;
-        }
-    }
+
+        }   // end main switch
+    }   // end while
 
 
     const char *key_words [COUNT_OF_KEY_WORDS] = {
