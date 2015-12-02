@@ -7,11 +7,12 @@
 #include "lex_an.h"
 #include "error.h"
 #include "parser.h"
+#include "garbageCollector.h"
 
 int main(int argc, char** argv)
 {
 
-    //FILE *source;
+	garbageListInit(&garbageList);
     
     if (argc != 2)
     {
@@ -47,10 +48,7 @@ int main(int argc, char** argv)
     fclose(source);
 
     // cleanup
-    initToken();
-    hTabFree(globalST);
-    if (oldToken.area != NULL)
-        free(oldToken.area);
+	garbageCleanup(&garbageList);
 
     return getReturnValue(errorState.state);
 }
