@@ -11,7 +11,7 @@
 
 int tokenCopy (tToken *dst, tToken src)
 {
- 
+
     if (src.area != NULL)
     {
         if ((dst->area = customMalloc((strlen(src.area) + 1) * sizeof(char))) == NULL)
@@ -55,7 +55,7 @@ void ungetToken()
 }
 
 void initToken () {  // inicializovat token
-   
+
     token.area = NULL;
     token.counter = 0;
     token.type = TOK_NULL;
