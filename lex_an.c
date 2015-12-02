@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <limits.h>
-#include <errno.h>
 
 #include "error.h"
 #include "lex_an.h"
@@ -72,6 +70,42 @@ void initToken () {  // inicializovat token
 
 }
 
+void cmpKeyWords ()
+{
+    const char *key_words [COUNT_OF_KEY_WORDS] = {
+        "cin", "cout", "auto", "int", "double", "string", "if", "else", "for", "return", "while", "do"
+    };
+
+    const char *built_in_functions [COUNT_OF_BUILT_IN_FUNCTIONS] = {
+        "length", "substr", "concat", "find", "sort"
+    };
+
+    for (int i = 0; i < COUNT_OF_KEY_WORDS; i++)
+    {
+        if (strcmp(token.area, key_words[i]) == 0)
+        {
+            token.type = K_CIN + i;
+            return ;
+        }
+    }
+
+
+    for (int i = 0; i < COUNT_OF_BUILT_IN_FUNCTIONS; i++)
+    {
+        if (strcmp(token.area, built_in_functions[i]) == 0)
+        {
+            token.type = B_LENGTH + i;
+            return ;
+        }
+    }
+
+}
+
+void numberConverter(int base)
+{
+    token.int_numb = (int) strtol(token.area, NULL, base);
+}
+
 void fillToken (char character) {  // naplnit token
     // int extension_tok = 0;
 
@@ -118,8 +152,11 @@ int scanner () {
 
     initToken();
 
-   int c = 0;
+    int c = 0;
+    int cx;
     char array_x [3];
+    int counter = 0;
+    int base = 0;
     int value = START;
     bool test = true;
 
@@ -129,89 +166,117 @@ int scanner () {
         switch (value) {
         case START:
                 /* Rozpoznani characteru  */
-            if (isalpha(c))
+            if (isalpha(c)) {
                 value = LETTER;
+                cx = SWTICH_END;
+                }
             else if (c == '0') {
                 value = NUMBER_START_ZERO;
                 break;
                 }
-            else if (isdigit(c))
+            else if (isdigit(c)) {
                 value = NUMBER;
-            else if (c == '_')
+                cx = SWTICH_END;
+                }
+            else
+                cx = c;
+
+
+            switch (cx)
+            {
+            case SWTICH_END:
+                break;
+            case '_':
                 value = UNDERSCORE;
-            else if (c == ' ')          // preskocim character mezery
                 break;
-            else if (c == '\t')
+            case ' ':          // preskocim character mezery
+                cx = BREAK;
+                break;
+            case '\t':
+                cx = BREAK;
                 break;                  // preskocim character tabulatoru
-            else if (c == '\n') {
+            case '\n':
                 token.counter_of_lines++;
+                cx = BREAK;
                 break;                  // preskocim character konce radku
-                }
-            else if (c == '/') {
+            case '/':
                 value = DIVIDE;
+                cx = BREAK;
                 break;
-                }
-            else if (c == '!')
+            case '\\':
+                value = BACKSLASH;
+                cx = BREAK;
+                break;
+            case '!':
                 value = EXCLAMATION_MARK;  //vykřičník
-            else if (c == '?')
+                break;
+            case '?':
                 value = QUESTION_MARK;
-            else if (c == '"')
+ 	 	 	 	break;
+            case '"':
                 value = STRING;
-            else if (c == '<')
+                cx = BREAK;
+                break;
+            case '<':
                 value = LESS;
-            else if (c == '>')
+                break;
+            case '>':
                 value = GREATER;
-            else if (c == '=')
+ 	 	 	    break;
+            case '=':
                 value = ASSIGNMENT;
-            else if (c == '+')
-                    value = PLUS;
-            else if (c == '-')
-                    value = MINUS;
-            else {              /// jednoznakove tokeny
-                test = false;
+ 	 	 	 	break;
+            case '+':
+                value = PLUS;
+ 	 	 	 	break;
+            case '-':
+                value = MINUS;
+                break;
+            default:
+                    test = false;
 
-                switch (c){
-                case ';':
-                    token.type = SEMICOLON;
-                    break;
-                 case ',':
-                    token.type = COMMA ;
- 	 	 	 	    break;
-                case  '(':
-                    token.type = L_BRACKET;
- 	 	 	 	    break;
-                case  ')':
-                    token.type = R_BRACKET;
- 	 	 	 	     break;
-                case  ']':
-                    token.type = L_SQUARE_BRACKET;
- 	 	 	 	    break;
-                case  '[':
-                    token.type = R_SQUARE_BRACKET;
- 	 	 	 	    break;
-                case  '{':
-                    token.type = L_CURLY_BRACKET;
- 	 	 	 	     break;
-                case  '}':
-                    token.type = R_CURLY_BRACKET;
- 	 	 	 	    break;
-                case  '*':
-                    token.type = MULTIPLY;
- 	 	 	 	     break;
-                case  '%':
-                    token.type = MODULO;
- 	 	 	      	 break;
-                default:
-                        errorState.state=ERR_UnknownChar;
-                        errorState.line=token.counter_of_lines;
-                        fatalError (errorState);
+                    switch (c)
+                    {
+                    case ';':
+                        token.type = SEMICOLON;
+                        break;
+                    case ',':
+                        token.type = COMMA;
+                        break;
 
-                }   // end switch
-            }   // end if
+                    case  '(':
+                        token.type = L_BRACKET;
+                        break;
+                    case  ')':
+                        token.type = R_BRACKET;
+                        break;
+                    case  ']':
+                        token.type = L_SQUARE_BRACKET;
+                        break;
+                    case  '[':
+                        token.type = R_SQUARE_BRACKET;
+                        break;
+                    case  '{':
+                        token.type = L_CURLY_BRACKET;
+                        break;
+                    case  '}':
+                        token.type = R_CURLY_BRACKET;
+                        break;
+                    case  '*':
+                        token.type = MULTIPLY;
+                        break;
+                    case  '%':
+                        token.type = MODULO;
+                        break;
+                    default:
+                            errorState.state=ERR_UnknownChar;
+                            errorState.line=token.counter_of_lines;
+                            fatalError (errorState);
 
+                    }
+            }
 
-
-            if (value != STRING) /// neukladam uvozovky na zacatku retezce
+            if (cx != BREAK)
                 fillToken(c);
             break;
 
@@ -503,6 +568,43 @@ int scanner () {
 
         break;
 
+        case BACKSLASH:
+        counter = 0;
+
+        if (c == 'b')
+            value = BINARY;
+        else if (c == '0')
+            value = OCTAL;
+        else if (c == 'x')
+            value = HEXADECIMAL;
+        else {
+            errorState.state = ERR_NumberShape;
+            errorState.line = token.counter_of_lines;
+            fatalError (errorState);
+        }
+
+        break;
+
+    case BINARY:
+        if (counter == 8 && ((c >= '0' && c <= '1') /*|| isalpha(c)*/ )) {
+            errorState.state = ERR_NumberShape;
+            errorState.line = token.counter_of_lines;
+            fatalError (errorState);
+        }
+
+        if (c >= '0' && c <= '1') {
+            fillToken(c);
+            counter++;
+        }
+        else {
+            test = false;
+            token.type = BINARY;
+            base = 2;
+            ungetc(c,source);
+        }
+
+        break;
+
     case LINE_COMMENT:
         if (c == '\n'){
            value = START;
@@ -591,60 +693,27 @@ int scanner () {
     }   // end while
 
 
-    const char *key_words [COUNT_OF_KEY_WORDS] = {
-        "cin", "cout", "auto", "int", "double", "string", "if", "else", "for", "return", "while", "do"
-    };
 
-    const char *built_in_functions [COUNT_OF_BUILT_IN_FUNCTIONS] = {
-        "length", "substr", "concat", "find", "sort"
-    };
 
 
     if (token.area != NULL)
     {
         if (token.type == IDENTIFIER)
-        {
-            for (int i = 0; i < COUNT_OF_KEY_WORDS; i++) {
-                int test_for;
-                test_for = strcmp(token.area, key_words[i]);
-
-                if (test_for == 0) {
-                    token.type = K_CIN + i;
-                    break;     /// ukončím for smyčku
-                }
-            }
-        }
-        if (token.type == IDENTIFIER)
-        {
-            for (int i = 0; i < COUNT_OF_BUILT_IN_FUNCTIONS; i++) {
-                int test_for;
-                test_for = strcmp(token.area, built_in_functions[i]);
-
-                if (test_for == 0) {
-                    token.type = B_LENGTH + i;
-                    break;    /// ukončím for smyčku
-                }
-            }
-        }
-
+            cmpKeyWords();
 
         if (token.type == INT_NUMBER)
-        {
-            long integer;
-            errno = 0;
+            numberConverter(10);
 
-            integer = strtol(token.area, NULL, 10);
-            /*
-            if ((errno == ERANGE && (integer == LONG_MAX)) || (errno != 0 && integer == 0))
+        if (token.type == BINARY || token.type == OCTAL || token.type == HEXADECIMAL)
+        {
+            numberConverter(base);
+
+            if (token.int_numb <= 0 || token.int_numb > 255)
             {
-                //printf("Warning: Nevejde se do integeru.\n");
+                errorState.state=ERR_LEXICAL;
+                errorState.line=token.counter_of_lines;
+                fatalError (errorState);
             }
-            else if (integer > INT_MAX)
-            {
-                //printf("Warning: Nevejde se do integeru.\n");
-            }
-            */
-            token.int_numb = (int) integer;
         }
 
         if (token.type == DOUBLE_NUMBER)
