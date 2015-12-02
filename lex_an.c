@@ -592,7 +592,7 @@ int scanner () {
 
 
     const char *key_words [COUNT_OF_KEY_WORDS] = {
-        "auto", "cin", "cout", "double", "else", "for", "if", "int", "return", "string", "while", "do"
+        "cin", "cout", "auto", "int", "double", "string", "if", "else", "for", "return", "while", "do"
     };
 
     const char *built_in_functions [COUNT_OF_BUILT_IN_FUNCTIONS] = {
@@ -609,18 +609,20 @@ int scanner () {
                 test_for = strcmp(token.area, key_words[i]);
 
                 if (test_for == 0) {
-                    token.type = K_AUTO + i;
-                    i = COUNT_OF_KEY_WORDS;     /// ukončím for smyčku
+                    token.type = K_CIN + i;
+                    break;     /// ukončím for smyčku
                 }
             }
-
+        }
+        if (token.type == IDENTIFIER)
+        {
             for (int i = 0; i < COUNT_OF_BUILT_IN_FUNCTIONS; i++) {
                 int test_for;
                 test_for = strcmp(token.area, built_in_functions[i]);
 
                 if (test_for == 0) {
                     token.type = B_LENGTH + i;
-                    i = COUNT_OF_BUILT_IN_FUNCTIONS;    /// ukončím for smyčku
+                    break;    /// ukončím for smyčku
                 }
             }
         }
