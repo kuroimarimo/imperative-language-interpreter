@@ -95,5 +95,6 @@ void printErrorDetails (SError errorDetails)
 void fatalError (SError error)
 {
     printErrorDetails (error);
+	garbageCleanup(&garbageList);
     exit (getReturnValue(error.state));
 }

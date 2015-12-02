@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "garbageCollector.h"
+
 typedef enum
 {
     ERR_None,
