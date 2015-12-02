@@ -6,17 +6,17 @@
 #include <limits.h>
 #include <errno.h>
 
+
 #include "error.h"
 #include "lex_an.h"
 
 
 int tokenCopy (tToken *dst, tToken src)
 {
-    if (dst->area != NULL)
-        free(dst->area);
+ 
     if (src.area != NULL)
     {
-        if ((dst->area = malloc((strlen(src.area) + 1) * sizeof(char))) == NULL)
+        if ((dst->area = customMalloc((strlen(src.area) + 1) * sizeof(char))) == NULL)
             return ERR_AllocFailed;
 
         strcpy(dst->area, src.area);
@@ -57,8 +57,7 @@ void ungetToken()
 }
 
 void initToken () {  // inicializovat token
-    if (token.area != NULL)
-        free(token.area);
+   
     token.area = NULL;
     token.counter = 0;
     token.type = TOK_NULL;
@@ -77,7 +76,7 @@ void fillToken (char character) {  // naplnit token
 
         /// prvni inicializace
     if (token.counter == 0) {
-        token.area = (char *) malloc(3);   /// 2 charactery + \O
+        token.area = (char *) customMalloc(3);   /// 2 charactery + \O
         token.sizeof_area = 2;
         if (token.area == NULL){
             errorState.state= ERR_AllocFailed;
@@ -89,7 +88,7 @@ void fillToken (char character) {  // naplnit token
     else if (token.counter == token.sizeof_area) {      /// navyseni kapacity o dvojnasobek
         token.sizeof_area = token.sizeof_area * 2;
 
-        token.area = (char *) realloc(token.area, (token.sizeof_area + 1));
+        token.area = (char *) customRealloc(token.area, (token.sizeof_area + 1));
         if (token.area == NULL){
             errorState.state= ERR_AllocFailed;
             errorState.line=token.counter_of_lines;
