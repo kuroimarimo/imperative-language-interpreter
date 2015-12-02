@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-
 #include "ial.h"
-#include "error.h"
 
 /* hashes string 'str' for hash table of size 'hTabSize' */
 unsigned int hFunct(const char *str, unsigned hTabSize)

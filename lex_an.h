@@ -1,7 +1,14 @@
 #ifndef LEX_AN_H
 #define LEX_AN_H
 
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
+#include "error.h"
+#include "garbage_collector.h"
 
 /** jednotlivé stavy */
 enum {

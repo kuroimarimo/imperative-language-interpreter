@@ -12,8 +12,10 @@
 #include "ial.h"
 #include "prsa.h"
 #include "table_stack.h"
+#include "garbage_collector.h"
 
 #define INIT_ST_SIZE	16							//initial table stack and symnbol table size
+#define F_MAIN			"main"
 
 FILE* srcFile;
 hTab * globalST;									// global symbol table

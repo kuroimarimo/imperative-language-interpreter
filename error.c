@@ -96,5 +96,5 @@ void fatalError (SError error)
 {
     printErrorDetails (error);
 	garbageCleanup(&garbageList);
-    exit (getReturnValue(error.state));
+    exit(getReturnValue(error.state));
 }

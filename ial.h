@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+
+#include "garbage_collector.h"
 #include "error.h"
 
 typedef enum {VAR_INT, VAR_DOUBLE, VAR_STRING, FUNC_INT, FUNC_DOUBLE, FUNC_STRING} tSymbolType;

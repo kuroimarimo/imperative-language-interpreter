@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "garbageCollector.h"
+#include "garbage_collector.h"
 
 typedef enum
 {
