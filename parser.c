@@ -2,7 +2,7 @@
 
 int isKeyword(int tokenType)
 {
-    return (tokenType >= K_AUTO) && (tokenType <= K_DO);
+    return (tokenType >= K_CIN) && (tokenType <= K_DO);
 }
 
 int parse()
