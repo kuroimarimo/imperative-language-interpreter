@@ -578,7 +578,7 @@ int scanner () {
 
     case BINARY:
         if (counter == 8 && ((c >= '0' && c <= '1') /*|| isalpha(c)*/ )) {
-            errorState.state = ERR_NumberShape;
+            errorState.state = ERR_NumberEscape;
             errorState.line = token.counter_of_lines;
             fatalError (errorState);
         }
@@ -595,6 +595,47 @@ int scanner () {
         }
 
         break;
+
+    case OCTAL:
+        if (counter == 3 && c >= '0' && c <= '7') {
+            errorState.state = ERR_NumberEscape;
+            errorState.line = token.counter_of_lines;
+            fatalError (errorState);
+        }
+
+        if (c >= '0' && c <= '7') {
+            fillToken(c);
+            counter++;
+        }
+        else {
+            test = false;
+            token.type = OCTAL;
+            base = 8;
+            ungetc(c,source);
+        }
+
+        break;
+
+    case HEXADECIMAL:
+        if (counter == 2 && (isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) {
+            errorState.state = ERR_NumberEscape;
+            errorState.line = token.counter_of_lines;
+            fatalError (errorState);
+        }
+
+        if (isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
+            fillToken(c);
+            counter++;
+        }
+        else {
+            test = false;
+            token.type = HEXADECIMAL;
+            base = 16;
+            ungetc(c,source);
+        }
+
+        break;
+
 
     case LINE_COMMENT:
         if (c == '\n'){
@@ -692,10 +733,10 @@ int scanner () {
         if (token.type == IDENTIFIER)
             cmpKeyWords();
 
-        if (token.type == INT_NUMBER)
+        else if (token.type == INT_NUMBER)
             numberConverter(10);
 
-        if (token.type == BINARY || token.type == OCTAL || token.type == HEXADECIMAL)
+        else if (token.type == BINARY || token.type == OCTAL || token.type == HEXADECIMAL)
         {
             numberConverter(base);
 
@@ -706,8 +747,7 @@ int scanner () {
                 fatalError (errorState);
             }
         }
-
-        if (token.type == DOUBLE_NUMBER)
+        else if (token.type == DOUBLE_NUMBER)
         {
             double real_number;
             char *ptr;
