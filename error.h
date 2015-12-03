@@ -18,6 +18,7 @@ typedef enum
     ERR_LEXICAL             = 100,          // TODO prepisat ked budeme mat konkretne chybove stavy
     ERR_NumberShape,
     ERR_StringEscape,
+    ERR_NumberEscape,
     ERR_UnknownChar,
 
     //// SYNTAX

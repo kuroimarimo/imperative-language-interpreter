@@ -27,6 +27,9 @@ void printErrorDetails (SError errorDetails)
         case ERR_NumberShape:
             fprintf(stderr, "Number is in wrong shape.\n");
             break;
+        case ERR_NumberEscape:
+            fprintf(stderr, "Number escape have too much characters.\n");
+            break;
         case ERR_StringEscape:
             fprintf(stderr, "Error escaping string.\n");
             break;
