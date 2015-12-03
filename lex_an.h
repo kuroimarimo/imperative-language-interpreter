@@ -5,16 +5,18 @@
 
 /** jednotlivé stavy */
 enum {
-    START,              /// 0       Určení znaku
+    START,              ///         Určení znaku
+    SWTICH_END,
+    BREAK,
 
-    NUMBER,             /// 1       0..9
-    LETTER,             /// 2       a..z, A..Z
+    NUMBER,             ///         0..9
+    LETTER,             ///         a..z, A..Z
     NUMBER_START_ZERO,
-    DEC_NUMBER,         /// 4       1.234
-    DEC_NUMBER_END,     /// 5       *.123
-    EXP_NUMBER,         /// 6       1e+4 15E8
-    EXP_NUMBER_SIGN,    /// 7       znamenkovy (+/-) 15E+8
-    EXP_NUMBER_END,     /// 8
+    DEC_NUMBER,         ///         1.234
+    DEC_NUMBER_END,     ///         *.123
+    EXP_NUMBER,         ///         1e+4 15E8
+    EXP_NUMBER_SIGN,    ///         znamenkovy (+/-) 15E+8
+    EXP_NUMBER_END,     ///
 
     SEMICOLON = 10,     ///         ;
     UNDERSCORE,         ///         _
