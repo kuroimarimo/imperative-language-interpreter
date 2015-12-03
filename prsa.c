@@ -1,7 +1,7 @@
 // TODO: add prec. for BOOLOP, 
 
 #include "prsa.h"
-#include "precedenceTable.h"
+#include "precedence_table.h"
 #include "parser.h"
 
 //--------------------------//
