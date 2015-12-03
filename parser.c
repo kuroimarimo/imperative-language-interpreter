@@ -320,7 +320,7 @@ int rule_expression(hashElem * assignee)
 			else
 			{
 				ungetToken();
-				PrecedencniSA(tableStackTop(localSTstack));		//TODO pouzivat cely stack, treba na to vytvorit funkciu
+				PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION);		//TODO pouzivat cely stack, treba na to vytvorit funkciu
 				return ERR_None;
 			}
 			break;
@@ -342,11 +342,11 @@ int rule_expression(hashElem * assignee)
 
 		default:
 			ungetToken();
-			PrecedencniSA(tableStackTop(localSTstack));		//TODO pouzivat cely stack, treba na to vytvorit funkciu
+			PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION);		//TODO pouzivat cely stack, treba na to vytvorit funkciu
 			return ERR_None;
 	}
 
-    PrecedencniSA(tableStackTop(localSTstack));			//TODO prsa.c sa musi naucit pouzivat tableStack
+    PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION);			//TODO prsa.c sa musi naucit pouzivat tableStack
 	return ERR_None;				//TODO	check error state
 }
 
