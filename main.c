@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 {
 
 	garbageListInit(&garbageList);
-    
+    	initInstrList();
     if (argc != 2)
     {
         printf("I can't find any file! \n");
