@@ -13,6 +13,13 @@ int main(int argc, char** argv)
 {
 
 	garbageListInit(&garbageList);
+	/*void * a;
+	customMalloc(58);
+	customMalloc(92);
+	a = customMalloc(598);
+	a = customRealloc(a, 15536);
+	garbageCleanup(&garbageList);
+	return 0;*/
     	initInstrList();
     if (argc != 2)
     {

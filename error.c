@@ -99,5 +99,6 @@ void fatalError (SError error)
 {
     printErrorDetails (error);
 	garbageCleanup(&garbageList);
+	fclose(source);
     exit(getReturnValue(error.state));
 }

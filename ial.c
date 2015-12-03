@@ -19,33 +19,34 @@ bool checkOverfill (unsigned int size, unsigned int numStoredElem)
 
 /* Autamatically allocates memory and copies string from 'src' to 'dest'.
  Return value depend on whether the allocation has succeeded or not. */
-bool strDuplicate(char ** dest, char ** src)                                // UNFINISHED!
+char * strDuplicate(char * src)                                // UNFINISHED!
 {
     size_t srcLength;
+	char * dest;
     //char * tmp = * dest;
     
-    srcLength = strlen(*src) + 1;                // + 1 takes into account the end of string character
+    srcLength = strlen(src) + 1;                // + 1 takes into account the end of string character
     
-    if (!(*dest = malloc(srcLength * sizeof(char))))
-        return false;
+	dest = customMalloc(srcLength * sizeof(char));
     
-    *dest = strcpy(*dest, *src);
+    if ((dest = strcpy(dest, src)) == NULL)
+		return NULL;							//zavolat error.h
     
-    return true;
+    return dest;
 }
 
 
 /* creates a new hash table of size 'size' */
 hTab * hTabInit(unsigned int size)
 {
-    hTab * hashTable = malloc(sizeof(hTab));
+    hTab * hashTable = customMalloc(sizeof(hTab));
     if (!hashTable)
 
-        return NULL;            // malloc failed ERROR!
+        return NULL;            // customMalloc failed ERROR!
 
-    if ((hashTable->table = malloc(size * sizeof(hashElem *))) == NULL)
+    if ((hashTable->table = customMalloc(size * sizeof(hashElem *))) == NULL)
     {
-        free(hashTable);
+        //free(hashTable);
         return NULL;            // malloc failed ERROR!
     }
 
@@ -73,8 +74,8 @@ void hashElemInit (hashElem * elem)
     //    hTabFree(elem->data.localTable);
     //elem->data.localTable = NULL;
     
-    if (elem->key != NULL)
-        free(elem->key);
+    //if (elem->key != NULL)
+        //free(elem->key);
     elem->key = NULL;
 }
 
@@ -165,12 +166,12 @@ hashElem * addElem (hTab * table, char * key, tData * data)
 
     // no element with such key
 
-    if ((newElem = malloc(sizeof(hashElem))) == NULL)
+    if ((newElem = customMalloc(sizeof(hashElem))) == NULL)
         return NULL;        // malloc failed ERROR!
 
     newElem->next = table->table[hFunct(key, table->size)];
 
-    newElem->key = malloc((strlen(key) + 1) * sizeof(char));
+    newElem->key = customMalloc((strlen(key) + 1) * sizeof(char));
     strcpy(newElem->key, key);
 
 //    if (!strDuplicate(&newElem->key, &key))
@@ -221,10 +222,10 @@ void removeElem (hTab * table, char * key)
         if (tmp->data.localTable != NULL)
             hTabFree(tmp->data.localTable);*/
 		
-		if (tmp->data.params != NULL)
+		/*if (tmp->data.params != NULL)
 			free(tmp->data.params);
 
-        free(tmp);
+        free(tmp);*/
         return;
     }
 
@@ -246,11 +247,11 @@ void removeElem (hTab * table, char * key)
 
         if (removed->data.localTable != NULL)
             hTabFree(removed->data.localTable);*/
-		if (removed->data.params != NULL)
+		/*if (removed->data.params != NULL)
 			free(tmp->data.params);
 
         free(removed->key);
-        free(removed);
+        free(removed);*/
     }
 }
 
@@ -279,16 +280,16 @@ void hTabFree (hTab * table)
             if (elem->data.localTable != NULL)
                 hTabFree(elem->data.localTable);*/
 
-			if (elem->data.params != NULL)
+			/*if (elem->data.params != NULL)
 				free(elem->data.params);
 
             free(elem->key);
-            free(elem);
+            free(elem);*/
             elem = tmp;
         }
     }
-    free(table->table);
-    free(table);
+    /*free(table->table);
+    free(table);*/
 	table = NULL;
 }
 
@@ -322,7 +323,7 @@ char *substr (char *s, int i, int n) {
 
     int len = (int) strlen(s);    /// length of string
     char * subs = NULL;
-    subs = malloc((len + 1)*sizeof(char));
+    subs = customMalloc((len + 1)*sizeof(char));
 
     if (subs == NULL) {
         /// chyba 10;

@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 #include "garbage_collector.h"
+#include "lex_an.h"
 
 typedef enum
 {

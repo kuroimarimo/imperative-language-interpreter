@@ -320,7 +320,7 @@ tExpr* SemId(tExpr* identifier, hTab* table)
 {
     hashElem* element;
     element = findElem(table, identifier->data);        // find and store identifier from hash table
-    free(identifier->data);                             // no more need for identifier name, will use pointer
+    //free(identifier->data);                             // no more need for identifier name, will use pointer
     if (element == NULL) 
     {
         Error(ERR_UndefinedVariable);                   // error undefined variable

@@ -47,7 +47,7 @@ typedef struct hTab
 
 unsigned int hFunct(const char *str, unsigned hTabSize);
 
-bool strDuplicate(char ** dest, char ** src);
+char * strDuplicate(char * src);
 bool tDataCopy (tData * destData, tData * srcData);
 
 hTab * hTabInit (unsigned int size);

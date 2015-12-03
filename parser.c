@@ -21,8 +21,8 @@ int parse()
 	//cleanup
     if (activeElem.key)
     {
-        free(activeElem.data.params);
-        free(activeElem.key);
+        //free(activeElem.data.params);
+        //free(activeElem.key);
     }
 	tableStackDispose(localSTstack);
 
@@ -57,7 +57,7 @@ int rule_funcdef(hashElem * activeElem)
     if (token.type != IDENTIFIER)
         return ERR_SYNTAX;
 
-    if ((activeElem->key = malloc((strlen(token.area) + 1) * sizeof(char))) == NULL)
+    if ((activeElem->key = customMalloc((strlen(token.area) + 1) * sizeof(char))) == NULL)
         return ERR_AllocFailed;
     strcpy(activeElem->key, token.area);                            //save the function name
     
@@ -276,7 +276,7 @@ int rule_statement()
 
 		if ((tableStackPush(localSTstack, temp)) == NULL)
 		{
-			free(temp);
+			//free(temp);
 			return ERR_AllocFailed;
 		}
 
@@ -802,15 +802,14 @@ hashElem * isDeclaredOnTheSameLevel(char *key)						//TODO lepsie meno >_<
 
 tParam * addParam(hashElem * elem, char * key, tSymbolType type)
 {
-	tParam * temp = realloc(elem->data.params, (elem->data.numberOfParams + 1) * sizeof(tParam));
+	tParam * temp = customRealloc(elem->data.params, (elem->data.numberOfParams + 1) * sizeof(tParam));
 	if (temp == NULL)
 		return NULL;
 
 	elem->data.params = temp;
 	elem->data.params[elem->data.numberOfParams].type = type;
 
-	if ((elem->data.params[elem->data.numberOfParams].key = strdup(key)) == NULL)
-		return NULL;
+	elem->data.params[elem->data.numberOfParams].key = strDuplicate(key);
 
 	++elem->data.numberOfParams;
 	return temp;
@@ -828,14 +827,14 @@ int rule_funcCall()	//id (<call_list>;
 	funcCall.data.params = NULL;
 	hashElemInit(&funcCall);
 
-	funcCall.key = strdup(token.area);
+	funcCall.key = strDuplicate(token.area);
 	if (funcCall.key == NULL)
 		return ERR_AllocFailed;
 
 	scanner();
 	if (token.type != L_BRACKET)
     {
-        free(funcCall.key);
+        //free(funcCall.key);
 		return ERR_SYNTAX;
     }
     
@@ -843,8 +842,8 @@ int rule_funcCall()	//id (<call_list>;
 
 	if (error != ERR_None)
     {
-        free(funcCall.key);
-        free(funcCall.data.params);
+        //free(funcCall.key);
+        //free(funcCall.data.params);
 		return error;
     }
 
