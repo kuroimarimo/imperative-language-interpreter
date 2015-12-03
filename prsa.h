@@ -10,6 +10,7 @@
 #include "ial.h"
 #include "lex_an.h"
 #include "error.h"
+#include "garbage_collector.h"
 
 #define INITIAL_SIZE 32
 #define NETERMINAL 500

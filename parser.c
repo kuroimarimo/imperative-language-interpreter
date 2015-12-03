@@ -26,7 +26,10 @@ int parse()
     }
 	tableStackDispose(localSTstack);
 
-	if (!isFunct("main"))					//there's no main
+	if (returnValue != ERR_None)
+		return returnValue;
+
+	if (!isFunct(F_MAIN))					//there's no main
 		return ERR_UndefinedFunction;
 
 	//call interpreter
@@ -47,10 +50,8 @@ int rule_funcdef(hashElem * activeElem)
         return ERR_SYNTAX;
 
 
-    activeElem->data.type = getFuncType(token.type);
+    activeElem->data.type = getFuncType(token.type);				//get function type
     activeElem->data.state = DECLARED;
-
-    /*activeElem->data.fParamTypes = appendChar(activeElem->data.fParamTypes, paramTypeToChar(token.type));    //set function type*/
 
     scanner();
     if (token.type != IDENTIFIER)
@@ -58,24 +59,21 @@ int rule_funcdef(hashElem * activeElem)
 
     if ((activeElem->key = malloc((strlen(token.area) + 1) * sizeof(char))) == NULL)
         return ERR_AllocFailed;
-    strcpy(activeElem->key, token.area);                                     //save the function name
+    strcpy(activeElem->key, token.area);                            //save the function name
     
-    int error = rule_paramList(activeElem);
+    int error = rule_paramList(activeElem);							//process parameters
     if (error != ERR_None)
         return error;
 
-	printf("Funkcia %s pocet parametrov: %d\n", activeElem->key, activeElem->data.numberOfParams);
-
-    if (!strcmp(activeElem->key, "main") && (activeElem->data.numberOfParams != 0))      //main should be of type int and with no parameters
+	//main should be of type int and with no parameters
+    if (!strcmp(activeElem->key, F_MAIN) && ((activeElem->data.numberOfParams != 0) || (activeElem->data.type != FUNC_INT)))
     {
         return ERR_UndefinedFunction;
     }
 
-    error = rule_funcDefined(activeElem);
+    error = rule_funcDefined(activeElem);		//process the rest of definition/declaration
     if (error != ERR_None)
         return error;
-
-	//tableStackPop(localSTstack);
 
     return rule_funcdef(activeElem);
 }
@@ -83,15 +81,11 @@ int rule_funcdef(hashElem * activeElem)
 //rule:     <func-defined> -> { <st-list>        ||      ; 
 int rule_funcDefined(hashElem * activeElem)
 {
-    //printf("Funkcia %s parametre: %s\n", activeElem->key, activeElem->data.fParamTypes);
+    hashElem * temp = findElem(globalST, activeElem->key);
 
-    hashElem * temp = findElem(globalST, activeElem->key);                           //check whether there already is a function with given name
-
-    /*if (temp != NULL)
-        printf("Najdena funkcia %s parametre: %s\n", temp->key, temp->data.fParamTypes);*/
-
-    if (temp == NULL)
-    {																				//there's no such function declared in symbol table, create it then
+    if (temp == NULL)																
+    {		
+			//there's no such function declared in symbol table, create it then
             if ((temp = addElem(globalST, activeElem->key, &activeElem->data)) == NULL)
                     return ERR_AllocFailed;
     }
@@ -101,41 +95,26 @@ int rule_funcDefined(hashElem * activeElem)
         return ERR_AttemptedRedefFunction;
 
     scanner();
-    /*if (token.type == SEMICOLON)                                                    //the current function has been declared, not defined
-        return ERR_None;
-
-    else if (token.type != L_CURLY_BRACKET)
-            return ERR_SYNTAX;*/
-
 	switch (token.type)
 	{
-		case SEMICOLON:
+		case SEMICOLON:						//only a declaration, nothing more to be done here
 			tableStackPop(localSTstack);
 			return ERR_None;
 
-		case L_CURLY_BRACKET:
+		case L_CURLY_BRACKET:				//function definition
 			break;
 
 		default: 
 			return ERR_SYNTAX;
 	}
 
-    if (temp->data.state == DEFINED)
-        return ERR_AttemptedRedefFunction;
+    if (temp->data.state == DEFINED)		
+        return ERR_AttemptedRedefFunction;	//function is already defined
+
 	temp->data.state = DEFINED;
-    
-   /* else if (temp == NULL)
-        temp = addElem(globalST, activeElem->key, activeElem->data);*/
-
-    //temp->data.state = DEFINED;
-
-    /*if ((temp->data.localTable = hTabInit(INIT_ST_SIZE)) == NULL)           //init the functions local symbol table
-        return ERR_AllocFailed;
-    localST = temp->data.localTable;*/
-
 
     scanner();
-    int error = rule_stList();
+    int error = rule_stList();				//process function body
     if (error != ERR_None)
         return error;
 
@@ -153,14 +132,14 @@ int rule_paramList(hashElem * activeElem)
 	if ((temp = hTabInit(INIT_ST_SIZE)) == NULL)		//create local symbol table
 		return ERR_AllocFailed;
 
-	if (tableStackPush(localSTstack, temp) == NULL)
+	if (tableStackPush(localSTstack, temp) == NULL)		//push it to the table stack
 	{
 		hTabFree(temp);
 		return ERR_AllocFailed;
 	}
 
     scanner();
-    if (token.type == R_BRACKET)
+    if (token.type == R_BRACKET)						//no parameters
         return ERR_None;
 
     int error = rule_param(activeElem);
@@ -556,7 +535,9 @@ int rule_for()
         return ERR_SYNTAX;
 
     scanner();
-    return rule_statement();
+    error = rule_statement();
+
+	return error;
 }
 
 
@@ -758,16 +739,6 @@ int compareSymbol(hashElem * elem, hashElem * activeElem)                       
         return 0;
 
 	return compareParams(elem, activeElem);
-
-    /*if ((elem->data.fParamTypes == NULL) || (activeElem->data.fParamTypes == NULL))
-        return 1;*/
-
-    /*if (strcmp(elem->data.fParamTypes, activeElem->data.fParamTypes) != 0)
-     return 0;*/
-
-    //printf("Su rovnaké: --%s--%s--\n", elem->data.fParamTypes, activeElem->data.fParamTypes);
-
-    return 1;
 }
 
 int compareParams(hashElem * elem1, hashElem * elem2)

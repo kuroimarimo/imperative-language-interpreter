@@ -1,4 +1,4 @@
-#include "garbageCollector.h"
+#include "garbage_collector.h"
 
 void garbageListInit(tGarbageList * list)
 {

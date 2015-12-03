@@ -7,7 +7,7 @@
 #include "lex_an.h"
 #include "error.h"
 #include "parser.h"
-#include "garbageCollector.h"
+#include "garbage_collector.h"
 
 int main(int argc, char** argv)
 {
