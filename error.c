@@ -13,14 +13,14 @@ EErrorReturnValues getReturnValue (EErrorTypes value)
     return returnValue;
 }
 
-void printErrorDetails (SError errorDetails)
+void printErrorDetails (EErrorTypes state)
 /*
  * Prints information about the occurred error - line number and appropriate message.
  */
 {
-    fprintf(stderr, "Error on line number %d. \n", errorDetails.line);
+    fprintf(stderr, "Error on line number %d. \n", token.counter_of_lines);
 
-    switch (errorDetails.state) {
+    switch (state) {
         case ERR_LEXICAL:
             fprintf(stderr, "Lexical error\n");
             break;
@@ -95,10 +95,10 @@ void printErrorDetails (SError errorDetails)
     }
 }
 
-void fatalError (SError error)
+void fatalError (EErrorTypes state)
 {
-    printErrorDetails (error);
+    printErrorDetails (state);
 	garbageCleanup(&garbageList);
 	fclose(source);
-    exit(getReturnValue(error.state));
+    exit(getReturnValue(state));
 }

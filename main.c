@@ -11,6 +11,20 @@
 
 int main(int argc, char** argv)
 {
+	if (argc != 2)
+    {
+		printErrorDetails(ERR_InvalidCommndLineArgs);
+		return getReturnValue(ERR_InvalidCommndLineArgs);
+        /*printf("I can't find any file! \n");
+        return 1;*/
+    }
+    if ((source = fopen(argv[1], "r")) == NULL)
+    {
+		printErrorDetails(ERR_CannotOpenFile);
+        return getReturnValue(ERR_CannotOpenFile);
+		/*printf("I coudn't open the file! \n");
+        return 1;*/
+    }
 
 	garbageListInit(&garbageList);
 	/*void * a;
@@ -20,17 +34,7 @@ int main(int argc, char** argv)
 	a = customRealloc(a, 15536);
 	garbageCleanup(&garbageList);
 	return 0;*/
-    	initInstrList();
-    if (argc != 2)
-    {
-        printf("I can't find any file! \n");
-        return 1;
-    }
-    if ((source = fopen(argv[1], "r")) == NULL)
-    {
-        printf("I coudn't open the file! \n");
-        return 1;
-    }
+    initInstrList();
     
 /*
     bool test = true;
@@ -43,19 +47,19 @@ int main(int argc, char** argv)
             printf("Tok: %s %d\n", token.unie.area, token.type);
     }
 */
-    
-    errorState.state = parse();               // parse the code
-    errorState.line = token.counter_of_lines;
+ 
+    /*errorState.line = token.counter_of_lines;
 
     if (errorState.state != ERR_None)
         printErrorDetails(errorState);
     else
-        printf("Syntax OK.\n");
+        printf("Syntax OK.\n");*/
 
-    fclose(source);
-
+	parse();               // parse the code
+	
     // cleanup
+	fclose(source);
 	garbageCleanup(&garbageList);
 
-    return getReturnValue(errorState.state);
+    return 0;
 }

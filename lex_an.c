@@ -104,23 +104,11 @@ void fillToken (char character) {  // naplnit token
     if (token.counter == 0) {
         token.area = (char *) customMalloc(3);   /// 2 charactery + \O
         token.sizeof_area = 2;
-        if (token.area == NULL){
-            errorState.state= ERR_AllocFailed;
-            errorState.line=token.counter_of_lines;
-            fatalError (errorState);
-            }
-
     }
     else if (token.counter == token.sizeof_area) {      /// navyseni kapacity o dvojnasobek
         token.sizeof_area = token.sizeof_area * 2;
 
         token.area = (char *) customRealloc(token.area, (token.sizeof_area + 1));
-        if (token.area == NULL){
-            errorState.state= ERR_AllocFailed;
-            errorState.line=token.counter_of_lines;
-            fatalError (errorState);
-            }
-            /// chyba realloc
     }
 
     token.area [token.counter] = character;
@@ -260,9 +248,7 @@ int scanner () {
                         token.type = MODULO;
                         break;
                     default:
-                            errorState.state=ERR_UnknownChar;
-                            errorState.line=token.counter_of_lines;
-                            fatalError (errorState);
+                            fatalError (ERR_UnknownChar);
 
                     }
             }
@@ -295,9 +281,7 @@ int scanner () {
             }
             else if (isalpha(c) || c == '_')
             {
-                errorState.state=ERR_LEXICAL;
-                errorState.line=token.counter_of_lines;
-                fatalError (errorState);
+                fatalError (ERR_LEXICAL);
             }
             else {
                 test = false;
@@ -324,10 +308,7 @@ int scanner () {
             }
             else if (isalpha(c) || c == '_')
             {
-                errorState.state=ERR_LEXICAL;
-                errorState.line=token.counter_of_lines;
-                fatalError (errorState);
-
+                fatalError (ERR_LEXICAL);
             }
             else {
                 token.type = INT_NUMBER;
@@ -344,9 +325,7 @@ int scanner () {
             }
             else /* if (c == '.')   || (c == 'e' || c == 'E'))    */
                 {
-                        errorState.state=ERR_NumberShape;
-                        errorState.line=token.counter_of_lines;
-                        fatalError (errorState);
+                        fatalError (ERR_NumberShape);
                     }       /// Lex_an chyba - zadana druha desetinna tecka
             /*else {
                 token.type = DOUBLE_NUMBER;
@@ -365,9 +344,7 @@ int scanner () {
             }
             else if (c == '.' || c == '_' || isalpha(c))  /// Lex_an chyba - zadana druha desetinna tecka
             {
-                errorState.state=ERR_LEXICAL;
-                errorState.line=token.counter_of_lines;
-                fatalError (errorState);
+                fatalError (ERR_LEXICAL);
             }
             else {
                 token.type = DOUBLE_NUMBER;
@@ -388,9 +365,7 @@ int scanner () {
             }
             else                /// za E nejsou cifry
                 {
-                    errorState.state=ERR_NumberShape;
-                    errorState.line=token.counter_of_lines;
-                    fatalError (errorState);
+                    fatalError (ERR_NumberShape);
                 }
 
             break;
@@ -402,9 +377,7 @@ int scanner () {
                 }
             else
                {
-                    errorState.state=ERR_NumberShape;
-                    errorState.line=token.counter_of_lines;
-                    fatalError (errorState);
+                    fatalError (ERR_NumberShape);
                 }
 
             break;
@@ -414,9 +387,7 @@ int scanner () {
                 fillToken(c);
             else if (isalpha(c) || c == '_' || c == '.')
             {
-                errorState.state=ERR_LEXICAL;
-                errorState.line=token.counter_of_lines;
-                fatalError (errorState);
+                fatalError (ERR_LEXICAL);
             }
             else {
                 token.type = DOUBLE_NUMBER;
@@ -452,9 +423,7 @@ int scanner () {
             else if (c == 'x')
                 value = STRING_ESCAPE_x1;
             else {
-                errorState.state=ERR_StringEscape;
-                errorState.line=token.counter_of_lines;
-                fatalError (errorState);
+                fatalError (ERR_StringEscape);
             }
 
             break;
@@ -468,9 +437,7 @@ int scanner () {
             }
             else
                 {
-                        errorState.state=ERR_StringEscape;
-                        errorState.line=token.counter_of_lines;
-                        fatalError (errorState);
+                        fatalError (ERR_StringEscape);
                     }
 
             break;
@@ -487,18 +454,14 @@ int scanner () {
                     fillToken(number + '\0');
                 else
                    {
-                        errorState.state=ERR_StringEscape;
-                        errorState.line=token.counter_of_lines;
-                        fatalError (errorState);
+                        fatalError (ERR_StringEscape);
                     }
 
                 value = STRING;
             }
             else
                {
-                        errorState.state=ERR_StringEscape;
-                        errorState.line=token.counter_of_lines;
-                        fatalError (errorState);
+                        fatalError (ERR_StringEscape);
                     }
 
             break;
@@ -569,18 +532,14 @@ int scanner () {
         else if (c == 'x')
             value = HEXADECIMAL;
         else {
-            errorState.state = ERR_NumberShape;
-            errorState.line = token.counter_of_lines;
-            fatalError (errorState);
+            fatalError (ERR_NumberShape);
         }
 
         break;
 
     case BINARY:
         if (counter == 8 && ((c >= '0' && c <= '1') /*|| isalpha(c)*/ )) {
-            errorState.state = ERR_NumberEscape;
-            errorState.line = token.counter_of_lines;
-            fatalError (errorState);
+            fatalError (ERR_NumberEscape);
         }
 
         if (c >= '0' && c <= '1') {
@@ -598,9 +557,7 @@ int scanner () {
 
     case OCTAL:
         if (counter == 3 && c >= '0' && c <= '7') {
-            errorState.state = ERR_NumberEscape;
-            errorState.line = token.counter_of_lines;
-            fatalError (errorState);
+            fatalError (ERR_NumberEscape);
         }
 
         if (c >= '0' && c <= '7') {
@@ -618,9 +575,7 @@ int scanner () {
 
     case HEXADECIMAL:
         if (counter == 2 && (isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) {
-            errorState.state = ERR_NumberEscape;
-            errorState.line = token.counter_of_lines;
-            fatalError (errorState);
+            fatalError (ERR_NumberEscape);
         }
 
         if (isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
@@ -742,9 +697,7 @@ int scanner () {
 
             if (token.int_numb <= 0 || token.int_numb > 255)
             {
-                errorState.state=ERR_LEXICAL;
-                errorState.line=token.counter_of_lines;
-                fatalError (errorState);
+                fatalError (ERR_LEXICAL);
             }
         }
         else if (token.type == DOUBLE_NUMBER)

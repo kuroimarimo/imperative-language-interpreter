@@ -2,6 +2,7 @@
 #define GARBAGE_COLLECTOR_H
 
 #include <stdlib.h>
+#include "error.h"
 
 typedef struct garbage
 {

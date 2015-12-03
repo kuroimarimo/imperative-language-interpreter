@@ -74,10 +74,10 @@ void * customMalloc(int size)
 	if (appendGarbage(&garbageList, temp) == NULL)
 	{
 		free(temp);				//clean malloc-ed data that hasn't been saved to garbageList
-		return NULL;			//error.h
+		fatalError(ERR_AllocFailed);
 	}
-	else
-		return temp;
+	
+	return temp;
 }
 
 void * customRealloc(void * data, int size)
@@ -87,8 +87,9 @@ void * customRealloc(void * data, int size)
 		return customMalloc(size); 
 
 	void * temp = realloc(data, size);
+	
 	if (temp == NULL)
-		return NULL;			//error.h
+		fatalError(ERR_AllocFailed);
 
 	if (temp != data)
 		deleteGarbageItem(&garbageList, data);
@@ -96,10 +97,10 @@ void * customRealloc(void * data, int size)
 	if (appendGarbage(&garbageList, temp) == NULL)
 	{
 		free(temp);
-		return NULL;					//error.h
+		fatalError(ERR_AllocFailed);
 	}
-	else
-		return temp;
+	
+	return temp;
 }
 
 void garbageCleanup(tGarbageList * list)

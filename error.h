@@ -80,12 +80,12 @@ typedef struct
     unsigned line;              // on what line of code
 } SError;
 
-SError errorState;
+//SError errorState;
 
 EErrorReturnValues getReturnValue (EErrorTypes value);
 
-void printErrorDetails (SError errorDetails);
+void printErrorDetails (EErrorTypes state);
 
-void fatalError (SError error);
+void fatalError (EErrorTypes state);
 
 #endif

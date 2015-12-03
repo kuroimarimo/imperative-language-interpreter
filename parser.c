@@ -17,13 +17,6 @@ int parse()
 
     int returnValue = rule_funcdef(&activeElem);		//process function definition/declaration
     
-
-	//cleanup
-    if (activeElem.key)
-    {
-        //free(activeElem.data.params);
-        //free(activeElem.key);
-    }
 	tableStackDispose(localSTstack);
 
 	if (returnValue != ERR_None)
