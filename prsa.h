@@ -15,6 +15,8 @@
 #define INITIAL_SIZE 32
 #define NETERMINAL 500
 #define TERMINAL 501
+#define CALL_EXPRESSION 0
+#define CALL_CONDITION 1
 
 typedef struct {
     int terminal;
@@ -49,11 +51,12 @@ typedef struct
 
 tInstrList instructionList;
 
-void PrecedencniSA (hTab *table);
+void PrecedencniSA (hTab *table, int PrecType);
 void Dispose (tList *Z);
 
 bool expandInstrList();
 bool addInstruction(tInstruction * instr);
 bool initInstrList();
+void debugInstrList();
 
 #endif
