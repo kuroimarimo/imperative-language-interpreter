@@ -5,57 +5,27 @@
 #include "parser.h"
 
 //--------------------------//
-//          ERROR           //
-//--------------------------//
-/*void Error(int errcode) 
-{
-    errorState.state = errcode;                     // error code
-    errorState.line = token.counter_of_lines;       // error occured on line
-    fatalError(errorState);                         // exit from error.c
-}*/
-
-//--------------------------//
 //        NEXT TOKEN        //
 //--------------------------//
 tExpr* NextToken() 
 {
     scanner(srcFile);                               // scans input file
-    char* str;
     tExpr* struktura;                               // struct used to store new token
-    if ((struktura = customMalloc(sizeof(tExpr))) == NULL)
-    {
-        fatalError(ERR_AllocFailed);                     // allocation error
-        return NULL;
-    }
+    struktura = customMalloc(sizeof(tExpr));
     struktura->terminal = TERMINAL;                 // default
     struktura->type = token.type;                   // sets type of token
     struktura->data = NULL;
     switch (token.type) {
         case INT_NUMBER: 
-            if ((struktura->data = customMalloc(sizeof(int))) == NULL)
-            {
-                fatalError(ERR_AllocFailed);             // allocation failed
-                return NULL;
-            }
+            struktura->data = customMalloc(sizeof(int));
             *((int*)struktura->data) = token.int_numb;      // stores value into data
         break;
         case DOUBLE_NUMBER:
-            if ((struktura->data = customMalloc(sizeof(double))) == NULL)
-            {
-                fatalError(ERR_AllocFailed);             // allocation failed
-                return NULL;
-            }
+            struktura->data = customMalloc(sizeof(double));
             *((double*)struktura->data) = token.double_numb;    // stores value into data
         break;
         case STRING:
         case IDENTIFIER:
-            /*if ((str = customMalloc(strlen(token.area)+1)) == NULL)
-            {
-                fatalError(ERR_AllocFailed);             // allocation failed
-                return NULL;
-            }
-            struktura->data = str;                  // defines size of data
-            strcpy(struktura->data, token.area);    // stores data from token*/
 			struktura->data = strDuplicate(token.area);
         break;
     }
@@ -81,7 +51,7 @@ tExpr* FirstTerminal (tList *Z)
     }
 
     if(ptr == NULL || ptr->data == NULL) {
-        fatalError(ERR_SYNTAX);
+//        fatalError(ERR_SYNTAX);
         return NULL;
     }
 
@@ -114,14 +84,10 @@ void Push (tList *Z, tExpr *val)
 {
     tElemPtr ukazatel = NULL;
     if(Z->First != NULL) ukazatel = Z->First;
-    tElemPtr struktura = customMalloc(sizeof(struct tElem));  // allocation of new tElem
-    if(struktura != NULL) 
-    {  
-        Z->First = struktura;
-        struktura->data = val;
-        struktura->ptr = ukazatel;
-    }
-    else fatalError(ERR_AllocFailed);                        // in case of allocation error
+    tElemPtr struktura = customMalloc(sizeof(struct tElem));  // allocation of new tElem 
+    Z->First = struktura;
+    struktura->data = val;
+    struktura->ptr = ukazatel;
 }
 
 /* returns first element from stack*/
@@ -154,11 +120,6 @@ void InsertAbove(tList *Z, tExpr* cur, tExpr* new) {
 
     if(curPtr != NULL) {
         tElemPtr newPtr = customMalloc(sizeof(struct tElem));
-        if(newPtr == NULL) 
-        {
-            fatalError(ERR_AllocFailed);
-            return;
-        }
         newPtr->data = new;
         curPtr2->ptr = newPtr;
         newPtr->ptr = curPtr;
@@ -196,8 +157,7 @@ bool addInstruction(tInstruction * instr)
 bool initInstrList()
 {
     int size = INITIAL_SIZE;
-    if ((instructionList.array = customMalloc(size * sizeof(tInstruction))) == NULL)
-        return false;
+    instructionList.array = customMalloc(size * sizeof(tInstruction));
     instructionList.lenght = size;
     instructionList.occupied = 0;
     return true;
@@ -285,7 +245,7 @@ void TrojAdres(int gramatika, tExpr* input1, tExpr* input2, tExpr* output)
         default: fatalError(ERR_ParamType); return;          // no grammar
     }
     // checks for type of first input, decides what kind of type will be used
-    switch (input1->type) 
+    switch (output->type) 
     {
         case INT_NUMBER: type = INT_NUMBER; break;
         case DOUBLE_NUMBER: type = DOUBLE_NUMBER; break;
@@ -294,11 +254,7 @@ void TrojAdres(int gramatika, tExpr* input1, tExpr* input2, tExpr* output)
     }
     // pushes instruction into array of instructions
     tInstruction* instrBeingAdded;
-    if ((instrBeingAdded = customMalloc(sizeof(tInstruction))) == NULL)
-    {
-        fatalError(ERR_AllocFailed);                         // allocation failed
-        return;
-    }
+    instrBeingAdded = customMalloc(sizeof(tInstruction));
     instrBeingAdded->operator = operator;
     instrBeingAdded->type = type;
     instrBeingAdded->input1 = input1->data;
@@ -307,11 +263,7 @@ void TrojAdres(int gramatika, tExpr* input1, tExpr* input2, tExpr* output)
     else
         instrBeingAdded->input2 = NULL;
     instrBeingAdded->output = output->data;
-    if((addInstruction(instrBeingAdded)) != true)
-    {
-        fatalError(ERR_AllocFailed);                         // allocation failed
-        return;
-    }
+    addInstruction(instrBeingAdded);
 }
 
 //------------------------------//
@@ -348,7 +300,6 @@ tExpr* SemId(tExpr* identifier, hTab* table)
 
 tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table) 
 {
-    char* str;
     if (expr1->type == IDENTIFIER)
         expr1 = SemId(expr1, table);
     if (gramatika != 11) 
@@ -366,11 +317,7 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
         }
     }
     tExpr *struktura;
-    if ((struktura = customMalloc(sizeof(tExpr))) == NULL) 
-    {
-        fatalError(ERR_AllocFailed); 
-        return NULL;
-    }
+    struktura = customMalloc(sizeof(tExpr));
     struktura->terminal = NETERMINAL;
     struktura->data = NULL;
     switch (gramatika) 
@@ -382,11 +329,7 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
             if (expr1->type == DOUBLE_NUMBER || expr3->type == DOUBLE_NUMBER) 
             {
                 struktura->type = DOUBLE_NUMBER;
-                if ((struktura->data = customMalloc(sizeof(double))) == NULL) 
-                {
-                    fatalError(ERR_AllocFailed); 
-                    return NULL;
-                }
+                struktura->data = customMalloc(sizeof(double));
             }
             else if (expr1->type == STRING || expr3->type == STRING) 
             {
@@ -396,11 +339,7 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
             else 
             {
                 struktura->type = INT_NUMBER;
-                if ((struktura->data = customMalloc(sizeof(int))) == NULL) 
-                {
-                    fatalError(ERR_AllocFailed); 
-                    return NULL;
-                }
+                struktura->data = customMalloc(sizeof(int));
             }
             TrojAdres(gramatika, expr1, expr3, struktura);
             break;
@@ -413,21 +352,13 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
             if (expr1->type == INT_NUMBER && expr3->type == DOUBLE_NUMBER) 
             {
                 int docasna_prom = *((int *)expr1->data);
-                if ((expr1->data = customRealloc(expr1->data, sizeof(double))) == NULL) 
-                {
-                    fatalError(ERR_AllocFailed); 
-                    return NULL;
-                }
+                expr1->data = customRealloc(expr1->data, sizeof(double));
                 *((double*)expr1->data) = docasna_prom;
             }
             if (expr1->type == DOUBLE_NUMBER && expr3->type == INT_NUMBER) 
             {
                 int docasna_prom = *((int *)expr3->data);
-                if ((expr3->data = customRealloc(expr3->data, sizeof(double))) == NULL) 
-                {
-                    fatalError(ERR_AllocFailed); 
-                    return NULL;
-                }
+                expr3->data = customRealloc(expr3->data, sizeof(double));
                 *((double*)expr3->data) = docasna_prom;
             }
             if ((expr1->type == INT_NUMBER && expr3->type == INT_NUMBER) ||
@@ -435,11 +366,7 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
             (expr1->type == STRING && expr3->type == STRING)) 
             {
                 struktura->type = INT_NUMBER;
-                if ((struktura->data = customMalloc(sizeof(int))) == NULL) 
-                {
-                    fatalError(ERR_AllocFailed); 
-                    return NULL;
-                }
+                struktura->data = customMalloc(sizeof(int));
                 TrojAdres(gramatika, expr3, expr1, struktura);
             }
             else 
@@ -453,29 +380,14 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
             {
                 case INT_NUMBER: 
                     struktura->type = INT_NUMBER; 
-                    if ((struktura->data = customMalloc(sizeof(int))) == NULL) 
-                    {
-                        fatalError(ERR_AllocFailed); 
-                        return NULL;
-                    }
+                    struktura->data = customMalloc(sizeof(int));
                 break;
                 case DOUBLE_NUMBER: 
                     struktura->type = DOUBLE_NUMBER; 
-                    if ((struktura->data = customMalloc(sizeof(double))) == NULL) 
-                    {
-                        fatalError(ERR_AllocFailed); 
-                        return NULL;
-                    }
+                    struktura->data = customMalloc(sizeof(double));
                 break;
                 case STRING: 
                     struktura->type = STRING; 
-                    /*if ((str = customMalloc(strlen(token.area)+1)) == NULL)
-                    {
-                        fatalError(ERR_AllocFailed);             // allocation failed
-                        return NULL;
-                    }
-                    struktura->data = str;                  // defines size of data
-                    strcpy(struktura->data, expr1->data);    // stores data from tokenbreak;*/
 					struktura->data = strDuplicate(expr1->data);
                 break;
                 default: fatalError(ERR_IncompatibleExpr); 
@@ -488,27 +400,15 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
             {
                 case INT_NUMBER: 
                     struktura->type = INT_NUMBER;
-                    if ((struktura->data = customMalloc(sizeof(int))) == NULL) 
-                    {
-                        fatalError(ERR_AllocFailed); 
-                        return NULL;
-                    } 
+                    struktura->data = customMalloc(sizeof(int));
                 break;
                 case DOUBLE_NUMBER: 
                     struktura->type = DOUBLE_NUMBER; 
-                    if ((struktura->data = customMalloc(sizeof(double))) == NULL) 
-                    {
-                        fatalError(ERR_AllocFailed); 
-                        return NULL;
-                    }
+                    struktura->data = customMalloc(sizeof(double));
                 break;
                 case STRING: 
                     struktura->type = STRING; 
-                    if ((str = customMalloc(strlen(token.area)+1)) == NULL)
-                    {
-                        fatalError(ERR_AllocFailed);             // allocation failed
-                        return NULL;
-                    }
+                    struktura->data = strDuplicate(expr2->data);
                 break;
                 default: fatalError(ERR_IncompatibleExpr); return NULL;
             }
@@ -551,29 +451,24 @@ int OperatorToIndex (tExpr* op)
 //------------------------------//
 //  PRECEDENCNI SYNTAX ANALYZA  //
 //------------------------------//
-void PrecedencniSA (hTab *table, int PrecType) 
+int PrecedencniSA (hTab *table, int PrecType) 
 {
-    int gramatika, LeftTerminal, RightTerminal;                                      // declaration of variables
-    tExpr* input, *pred1, *pred2, *pred3, *top, *start, *priority;
+    int gramatika;                                      // declaration of variables
+    tExpr* input, *pred1, *pred2, *pred3, *top, *start, *priority, *type;
     input = pred1 = pred2 = pred3 = top = start = NULL;
     tList* Z;                                           
-    if ((Z = customMalloc(sizeof(tList))) == NULL)            // allocation of stack
-    {
-        fatalError(ERR_AllocFailed);                         // in case of allocation error
-        return;
-    }
+    Z = customMalloc(sizeof(tList));
     Init(Z);
-    if ((start = customMalloc(sizeof(tExpr))) == NULL)        // allocation of first element
-    {
-        fatalError(ERR_AllocFailed);                         // allocation error
-        return;
-    }
-        if (PrecType == CALL_EXPRESSION)
-        LeftTerminal = RightTerminal = start->type = SEMICOLON;
+    start = customMalloc(sizeof(tExpr));
+    if (PrecType == CALL_EXPRESSION)
+        start->type = SEMICOLON;
     else
     {
-        LeftTerminal = start->type = L_BRACKET;                            // sets default info for first element
-        RightTerminal = R_BRACKET;                      // sets default info for first element
+        priority = customMalloc(sizeof(tExpr));
+        priority->data = NULL;
+        priority->type = 5948;
+        Push(Z, priority);
+        start->type = L_BRACKET;                            // sets default info for first element
     }
     start->terminal = TERMINAL;
     start->data = NULL;
@@ -583,8 +478,16 @@ void PrecedencniSA (hTab *table, int PrecType)
     while (1)  
     {      
         top = FirstTerminal(Z);                         // loads top of stack
-        if(top->type == LeftTerminal && input->type == RightTerminal)
-            break;
+        if (PrecType == CALL_EXPRESSION)
+        {
+            if(top->type == SEMICOLON && input->type == SEMICOLON)
+                break;
+        }
+        else
+        {
+            if(top == NULL && input->type == R_BRACKET)
+                break;
+        }
         priority = NULL;                         // priority accoring to precedence table
         switch (precedencni_tabulka[OperatorToIndex(top)][OperatorToIndex(input)]) 
         {
@@ -593,11 +496,7 @@ void PrecedencniSA (hTab *table, int PrecType)
                 input = NextToken();                    // pop next token
             break;
             case '<':                                   // if stack has lower priority than nexttoken
-                if ((priority = customMalloc(sizeof(tExpr))) == NULL)
-                {
-                    fatalError(ERR_AllocFailed);             // allocation error
-                    return;
-                }
+                priority = customMalloc(sizeof(tExpr));
                 priority->type = 5948;                  // sets priority->type as lower priority
                 InsertAbove(Z, top, priority);
                 Push(Z, input);
@@ -617,19 +516,20 @@ void PrecedencniSA (hTab *table, int PrecType)
                 {                                       // if grammar is found
                     top = SemA(pred3, pred2, pred1, gramatika, table);
                     Push(Z, top);                       // push NETERMINAL with output pointer
+                    type = top;
                 }
                 else 
                 {
                     fatalError(ERR_SYNTAX);
-                    return;
+                    return -1;
                 }
                 pred3 = pred2 = pred1 = NULL;
             break;
             case ' ':                                   // possible error
                 fatalError(ERR_SYNTAX);                      // is error
-                return;
-            default: fatalError(ERR_SYNTAX); return;
+                return -1;
+            default: fatalError(ERR_SYNTAX); return -1;
         }
     }
-    //errorState.state = ERR_None;                        // no error was found
+    return type->type;
 }
