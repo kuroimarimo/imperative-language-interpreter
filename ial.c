@@ -27,7 +27,7 @@ char * strDuplicate(char * src)                                // UNFINISHED!
     
     srcLength = strlen(src) + 1;                // + 1 takes into account the end of string character
     
-	dest = customMalloc(srcLength * sizeof(char));
+	dest = customMalloc((int) srcLength * sizeof(char));
     
     if ((dest = strcpy(dest, src)) == NULL)
 		return NULL;							//zavolat error.h
@@ -171,7 +171,7 @@ hashElem * addElem (hTab * table, char * key, tData * data)
 
     newElem->next = table->table[hFunct(key, table->size)];
 
-    newElem->key = customMalloc((strlen(key) + 1) * sizeof(char));
+    newElem->key = customMalloc(((int) strlen(key) + 1) * sizeof(char));
     strcpy(newElem->key, key);
 
 //    if (!strDuplicate(&newElem->key, &key))
@@ -231,9 +231,11 @@ void removeElem (hTab * table, char * key)
 
     else        // synonyms pointing to the element that's being removed -> we have to relink the list
     {
-        while ((tmp->next != NULL) && strcmp(key, tmp->next->key))      // finds the preceding element to the element to be removed
+        while (strcmp(key, tmp->next->key))         // finds the preceding element to the element to be removed
         {
-            tmp = tmp->next;
+            if (tmp->next != NULL)
+                return;
+            tmp = tmp->next;                        // end of list and no such element found
         }
 
         removed = tmp->next;
