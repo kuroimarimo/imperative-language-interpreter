@@ -549,15 +549,15 @@ void rule_keyword()
 //rule:      <while-loop> -> ( <expression> ) <statement>
 int rule_while()
 {
-    scanner();
+    /*scanner();
     if (token.type != L_BRACKET)
-        fatalError(ERR_SYNTAX);
+        fatalError(ERR_SYNTAX);*/
 
 	PrecedencniSA(tableStackTop(localSTstack), CALL_CONDITION);
 
-    scanner();
+    /*scanner();
     if (token.type != R_BRACKET)
-        fatalError(ERR_SYNTAX);
+        fatalError(ERR_SYNTAX);*/
 
     scanner();
 	rule_statement(ALLOW_PUSH);
@@ -577,9 +577,9 @@ int rule_do()
     if (token.type != K_WHILE)
         fatalError(ERR_SYNTAX);
 
-    scanner();
+    /*scanner();
     if (token.type != L_BRACKET)
-        fatalError(ERR_SYNTAX);
+        fatalError(ERR_SYNTAX);*/
 
 	PrecedencniSA(tableStackTop(localSTstack), CALL_CONDITION);
 
