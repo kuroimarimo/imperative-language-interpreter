@@ -367,7 +367,7 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
             {
                 struktura->type = INT_NUMBER;
                 struktura->data = customMalloc(sizeof(int));
-                TrojAdres(gramatika, expr3, expr1, struktura);
+                TrojAdres(gramatika, expr1, expr3, struktura);
             }
             else 
             {
