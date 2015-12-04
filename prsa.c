@@ -460,19 +460,19 @@ int PrecedencniSA (hTab *table, int PrecType)
     Z = customMalloc(sizeof(tList));
     Init(Z);
     start = customMalloc(sizeof(tExpr));
-    if (PrecType == CALL_EXPRESSION)
-        start->type = SEMICOLON;
-    else
-    {
-        priority = customMalloc(sizeof(tExpr));
-        priority->data = NULL;
-        priority->type = 5948;
-        Push(Z, priority);
-        start->type = L_BRACKET;                            // sets default info for first element
-    }
+    start->type = SEMICOLON;
     start->terminal = TERMINAL;
     start->data = NULL;
     Push(Z, start);                                         // stores into stack
+    if (PrecType == CALL_CONDITION)                         // no need for L_BRACKET
+    {
+        input = NextToken();
+        if (input->type != L_BRACKET)
+        {
+            fatalError(ERR_SYNTAX);
+            return -1;
+        }
+    }
     input = NextToken();                                    // pops first token
     while (1)  
     {      
@@ -484,7 +484,7 @@ int PrecedencniSA (hTab *table, int PrecType)
         }
         else
         {
-            if(top == NULL && input->type == R_BRACKET)
+            if(top->type == SEMICOLON && input->type == R_BRACKET)
                 break;
         }
         priority = NULL;                                    // priority accoring to precedence table
