@@ -6,10 +6,11 @@ int tokenCopy (tToken *dst, tToken src)
 
     if (src.area != NULL)
     {
-        if ((dst->area = customMalloc((strlen(src.area) + 1) * sizeof(char))) == NULL)
+        /*if ((dst->area = customMalloc((strlen(src.area) + 1) * sizeof(char))) == NULL)
             return ERR_AllocFailed;
 
-        strcpy(dst->area, src.area);
+        strcpy(dst->area, src.area);*/
+		dst->area = strDuplicate(src.area);
     }
 
     dst->int_numb = src.int_numb;
@@ -102,7 +103,7 @@ void fillToken (char character) {  // naplnit token
 
         /// prvni inicializace
     if (token.counter == 0) {
-        token.area = (char *) customMalloc(2);   /// 2 charactery + \O
+        token.area = (char *) customMalloc(3);   /// 2 charactery + \O
         token.sizeof_area = 2;
     }
     else if (token.counter == token.sizeof_area) {      /// navyseni kapacity o dvojnasobek

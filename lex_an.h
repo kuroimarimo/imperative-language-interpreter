@@ -9,6 +9,7 @@
 
 #include "error.h"
 #include "garbage_collector.h"
+#include "ial.h"
 
 /** jednotlivé stavy */
 enum {

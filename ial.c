@@ -171,8 +171,9 @@ hashElem * addElem (hTab * table, char * key, tData * data)
 
     newElem->next = table->table[hFunct(key, table->size)];
 
-    newElem->key = customMalloc(((int) strlen(key) + 1) * sizeof(char));
-    strcpy(newElem->key, key);
+    /*newElem->key = customMalloc(((int) strlen(key) + 1) * sizeof(char));
+    strcpy(newElem->key, key);*/
+	newElem->key = strDuplicate(key);
 
 //    if (!strDuplicate(&newElem->key, &key))
 //        return NULL;                    // Malloc failed.
