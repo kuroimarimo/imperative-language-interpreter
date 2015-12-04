@@ -102,12 +102,11 @@ void fillToken (char character) {  // naplnit token
 
         /// prvni inicializace
     if (token.counter == 0) {
-        token.area = (char *) customMalloc(3);   /// 2 charactery + \O
+        token.area = (char *) customMalloc(2);   /// 2 charactery + \O
         token.sizeof_area = 2;
     }
     else if (token.counter == token.sizeof_area) {      /// navyseni kapacity o dvojnasobek
         token.sizeof_area = token.sizeof_area * 2;
-
         token.area = (char *) customRealloc(token.area, (token.sizeof_area + 1));
     }
 
@@ -690,6 +689,7 @@ int scanner () {
         else if (token.type == BINARY || token.type == OCTAL || token.type == HEXADECIMAL)
         {
             numberConverter(base);
+            token.type = INT_NUMBER;
 
             if (token.int_numb <= 0 || token.int_numb > 255)
             {
