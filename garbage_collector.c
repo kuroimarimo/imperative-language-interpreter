@@ -50,7 +50,7 @@ void * customMalloc(int size)
 {
 	void * temp = malloc(size);
 	if (temp == NULL)
-		return NULL;			//volanie error.h funkcie
+		fatalError(ERR_AllocFailed);			//volanie error.h funkcie
 
 	if (appendGarbage(&garbageList, temp) == NULL)
 	{
