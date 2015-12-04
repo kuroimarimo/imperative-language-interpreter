@@ -299,27 +299,7 @@ void hTabFree (hTab * table)
 int lenght(char *s)
 {
     return (int) strlen(s);
-/*int x=0;
-int pocet=0;
 
-while(s[x]!='\0'){
-pocet++;
-putchar(s[x]);
-	if(s[x]== '\\'){
-	pocet--;
-		if((s[x+1]=='x')&&(isdigit(s[x+2]))){
-			pocet=pocet-2;
-		}
-		if((s[x+1]=='x')&&(isdigit(s[x+3]))){
-			pocet--;
-		}
-
-	}
-
-x++;
-}
-pocet--;
-return pocet;*/
 }
 
 char *substr (char *s, int i, int n) {
@@ -337,6 +317,63 @@ char *substr (char *s, int i, int n) {
 
     return subs;
 }
+
+
+char *concat (char *s1, char *s2){
+
+int lenght1=(int) strlen(s1);  //delka prvního
+int lenght2=(int) strlen(s2);   //delka druhého
+
+char *pomocna= customMalloc((lenght1 + lenght2)*sizeof(char));  // naalokuju si pamět velikosti prvniho a druheho řetězce
+if(pomocna==NULL) return NULL ;
+strncpy(pomocna,s1,lenght1);  //zkopiruju prvni řetězec do pomocne 
+strncpy(pomocna+lenght1,s2,lenght2);  //zkopiruju druhy řetězec na pozici lenght1 -1  musime odstranit (\0)
+return pomocna; 
+}
+
+
+int find(char*s, char*search){
+
+int lenght_s=(int)strlen (s);
+int lenght_search=(int) strlen (search);
+if (lenght_search==0)  //pokud je podřetězec prázdný vrať nulu 
+    return 0;
+int counter_s=0;   //počítadlo projitých znaků řetězce s 
+int counter_found_search=0;   //počitadlo nalezených stejných znaků 
+
+
+
+        while (counter_s<lenght_s){  //dokud je počítadlo projitých znaků menší než délka 
+            
+            
+
+            if (s[counter_s]!=search[counter_found_search]) {  //pokud jsou znaky rozdílné, počet stejných znaků dej na nulu
+            counter_found_search=0;
+            }
+            
+            if( s[counter_s]==search[counter_found_search]){  //pokud jsou znaky stejné 
+                
+                    counter_found_search++;   //inkrementuj počítadlo najítých znaků 
+                                
+                    if (counter_found_search==lenght_search) { //pokud je počet najitých znaků stejný jako délka substringu 
+                        
+                            return counter_s-counter_found_search+1;   //vrať rozdíl +1 - pozice počítaná od nuly 
+                    }
+                    
+            }
+                    
+
+            counter_s++;    
+
+        }
+
+
+return -1; //pokud jsem nenašel vratím -1
+
+    
+}
+
+
 
 char *sort (char *s) {
     int left = 0;
