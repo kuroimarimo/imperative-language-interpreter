@@ -72,6 +72,7 @@ void rule_callParam(hashElem * funcCall);
 void rule_callParamList(hashElem * funcCall);		//TODO
 
 //rules for built-in functions
+int rule_builtIn(hashElem * assignee);
 void rule_BLength();
 int rule_BSubstr();
 int rule_BConcat();

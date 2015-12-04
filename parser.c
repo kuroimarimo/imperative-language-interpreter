@@ -17,7 +17,7 @@ void parse()
     
 	tableStackDispose(localSTstack);
 
-	if (!isFunct(F_MAIN))					//there's no main
+	if (!isFunct(F_MAIN) || (findElem(globalST, F_MAIN)->data.state != DEFINED))				//there's no main
 		fatalError(ERR_UndefinedFunction);
 }
 
@@ -248,7 +248,7 @@ void rule_varDecl(hashElem * assignee)
         return;
 
     if (token.type == ASSIGNMENT)
-        rule_expression(assignee);
+        PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION);
 	else
 		fatalError(ERR_SYNTAX);
 }
@@ -273,25 +273,12 @@ void rule_expression(hashElem * assignee)
 			break;
 
 		case B_LENGTH:
-			rule_BLength();
-			return;
-
 		case B_SUBSTR:
-			rule_BSubstr();
-			return;
-
 		case B_CONCAT:
-			rule_BConcat();
-			return;
-
 		case B_FIND:
-			rule_BFind();
-			return;
-
 		case B_SORT:
-			rule_BSort();
-			return;
-
+			rule_builtIn(assignee);
+			break;
 		default:
 			ungetToken();
 			PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION);		//TODO pouzivat cely stack, treba na to vytvorit funkciu
@@ -562,15 +549,15 @@ void rule_keyword()
 //rule:      <while-loop> -> ( <expression> ) <statement>
 int rule_while()
 {
-    scanner();
+    /*scanner();
     if (token.type != L_BRACKET)
-        fatalError(ERR_SYNTAX);
+        fatalError(ERR_SYNTAX);*/
 
 	PrecedencniSA(tableStackTop(localSTstack), CALL_CONDITION);
 
-    scanner();
+    /*scanner();
     if (token.type != R_BRACKET)
-        fatalError(ERR_SYNTAX);
+        fatalError(ERR_SYNTAX);*/
 
     scanner();
 	rule_statement(ALLOW_PUSH);
@@ -590,9 +577,9 @@ int rule_do()
     if (token.type != K_WHILE)
         fatalError(ERR_SYNTAX);
 
-    scanner();
+    /*scanner();
     if (token.type != L_BRACKET)
-        fatalError(ERR_SYNTAX);
+        fatalError(ERR_SYNTAX);*/
 
 	PrecedencniSA(tableStackTop(localSTstack), CALL_CONDITION);
 
@@ -733,6 +720,8 @@ int rule_funcCall(hashElem * assignee)	//id (<call_list>;
 	hashElemInit(&funcCall);
 
 	funcCall.key = strDuplicate(token.area);
+	if (!convertType(assignee->data.type, findElem(globalST, funcCall.key)->data.type))
+		fatalError(ERR_IncompatibleExpr);
 
 	scanner();
 	if (token.type != L_BRACKET)
@@ -896,136 +885,86 @@ void rule_BLength()
 	}
 }
 
-int rule_BSubstr()
+int rule_builtIn(hashElem * assignee)
 {
-	/*scanner();
-	if (token.type != L_BRACKET)
-		return ERR_SYNTAX;
-
-	scanner();
-
+	int functionType;
 	switch (token.type)
 	{
-	case STRING:
-		break;
-
-	case IDENTIFIER:
-		if (findVar(token.area)->data.type == VAR_STRING)
+		case B_LENGTH:
+		case B_FIND:
+			functionType = FUNC_INT;
 			break;
-		else
-			return ERR_ParamType;
 
-	case R_BRACKET:
-		return ERR_ParamNumber;
-
-	default:
-		return ERR_SYNTAX;
+		case B_SUBSTR:
+		case B_CONCAT:
+		case B_SORT:
+			functionType = FUNC_STRING;
+			break;
 	}
 
-	scanner();
-	switch (token.type)
-	{
-	case R_BRACKET:
-		break;
+	hashElem funcCall;
+	funcCall.key = NULL;
+	funcCall.data.params = NULL;
+	hashElemInit(&funcCall);
 
-	case COMMA:
-		scanner();
-		switch (token.type)
-		{
-		case IDENTIFIER:
-		case INT_NUMBER:
-		case DOUBLE_NUMBER:
-		case STRING:
-			return ERR_ParamNumber;
-		default:
-			return ERR_SYNTAX;
-		}
+	//funcCall.key = strDuplicate(token.area);
 
-	default:
-		return ERR_SYNTAX;
-	}
-
-	scanner();
-	switch (token.type)
-	{
-	case SEMICOLON:
-		return ERR_None;
-
-	default:
-		return ERR_SYNTAX;
-	}*/
-
-	return ERR_None;
-}
-
-int rule_BConcat()
-{
-	return ERR_None;
-}
-
-int rule_BFind()
-{
-	return ERR_None;
-}
-
-void rule_BSort()
-{
 	scanner();
 	if (token.type != L_BRACKET)
-		fatalError(ERR_SYNTAX);				//Či?
+		fatalError(ERR_SYNTAX);
 
-	scanner();
+	rule_callParam(&funcCall);
 
-	switch (token.type)
+	/*if (!compareParamTypes(&funcCall, findElem(globalST, funcCall.key)))
+		fatalError(ERR_ParamType);*/
+
+	switch (functionType)
 	{
-	case STRING:
-		break;
+		case B_LENGTH:
+		case B_SORT:
+			if (funcCall.data.numberOfParams != 1)
+				fatalError(ERR_ParamNumber);
 
-	case IDENTIFIER:
-		if (findVar(token.area)->data.type == VAR_STRING)
+			if (!convertType(funcCall.data.params[0].type, VAR_STRING))
+				fatalError(ERR_ParamType);
 			break;
-		else
-			fatalError(ERR_ParamType);
 
-	case R_BRACKET:
-		fatalError(ERR_ParamNumber);
+		case B_SUBSTR:
+			if (funcCall.data.numberOfParams != 3)
+				fatalError(ERR_ParamNumber);
 
-	default:
-		fatalError(ERR_SYNTAX);
+			if (!convertType(funcCall.data.params[0].type, VAR_STRING))
+				fatalError(ERR_ParamType);
+
+			if (!convertType(funcCall.data.params[1].type, VAR_INT))
+				fatalError(ERR_ParamType);
+
+			if (!convertType(funcCall.data.params[2].type, VAR_INT))
+				fatalError(ERR_ParamType);
+			break;
+
+		case B_CONCAT:
+		case B_FIND:
+			if (funcCall.data.numberOfParams != 2)
+				fatalError(ERR_ParamNumber);
+
+			if (!convertType(funcCall.data.params[0].type, VAR_STRING))
+				fatalError(ERR_ParamType);
+
+			if (!convertType(funcCall.data.params[1].type, VAR_STRING))
+				fatalError(ERR_ParamType);
+			break;
 	}
+
+	if (!convertType(assignee->data.type, functionType))
+		fatalError(ERR_IncompatibleExpr);
 
 	scanner();
-	switch (token.type)
-	{
-	case R_BRACKET:
-		break;
-
-	case COMMA:
-		scanner();
-		switch (token.type)
-		{
-		case IDENTIFIER:
-		case INT_NUMBER:
-		case DOUBLE_NUMBER:
-		case STRING:
-			fatalError(ERR_ParamNumber);
-		default:
-			fatalError(ERR_SYNTAX);
-		}
-
-	default:
+	if (token.type != SEMICOLON)
 		fatalError(ERR_SYNTAX);
-	}
 
-	scanner();
-	switch (token.type)
-	{
-	case SEMICOLON:
-		return;
-
-	default:
-		fatalError(ERR_SYNTAX);
-	}
+	hashElemInit(&funcCall);
+	return ERR_None;
 }
 
 int convertType(tSymbolType inType, tSymbolType outType)			//converts inType to outType
