@@ -51,7 +51,7 @@ typedef struct
 
 tInstrList instructionList;
 
-void PrecedencniSA (hTab *table, int PrecType);
+int PrecedencniSA (hTab *table, int PrecType);
 void Dispose (tList *Z);
 
 bool expandInstrList();
