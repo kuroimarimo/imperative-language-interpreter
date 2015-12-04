@@ -16,6 +16,8 @@
 
 #define INIT_ST_SIZE	16							//initial table stack and symnbol table size
 #define F_MAIN			"main"
+#define DENY_PUSH		0
+#define ALLOW_PUSH		1
 
 FILE* srcFile;
 hTab * globalST;									// global symbol table
@@ -28,7 +30,7 @@ tableStack *localSTstack;							// stack of local symbol tables
 
 int getType(int tokenType);							//converts keyword token to tSymbolType for variables
 int getFuncType(int tokenType);						//  -||- for functions									//merge var/func types?
-int parse();										// parse the code
+void parse();										// parse the code
 int isKeyword(int tokenType);						//checks whether the given token represents a keyword
 hashElem * findVar(char *key);						// checks whether the symbol with given key exists anywhere on symbol table stack
 													//and return fist found match
@@ -43,37 +45,37 @@ int convertType(tSymbolType inType, tSymbolType outType);			//type conversion
 																	
 //functions simulating LL grammar rules             TODO
 
-int rule_stList();									// <st-list> -> <statement> <st-list>     |   } 
-int rule_statement();								// <statement> -> type id <var-def> ;   ||      id = <expression> ;      ||        id (<param-list>) ;      ||      <keyword>	|| { <st-list>
-int rule_varDecl(hashElem * assignee);									// <var-decl> -> ;    |   = <expression> ;
-int rule_funcdef(hashElem * activeElem);            // <prog> -> type id <param-list> <func-defined> 
-int rule_funcDefined(hashElem * activeElem);        // <func-defined> -> { <st-list> <prog>     ||      ; <prog>
-int rule_paramList(hashElem * activeElem);          // <param-list> -> ( <param> <param-next>
-int rule_param(hashElem * activeElem);              // <param> -> type id
-int rule_paramNext(hashElem * activeElem);          // <param-next> -> , <param> <param-next>       |   )
-int rule_keyword();									// <keyword> -> auto <auto-decl>    ||      cin <cin> <cin-list>    ||  cout <cout> <cout-list>
+void rule_stList();									// <st-list> -> <statement> <st-list>     |   } 
+void rule_statement(int pushAllowed);								// <statement> -> type id <var-def> ;   ||      id = <expression> ;      ||        id (<param-list>) ;      ||      <keyword>	|| { <st-list>
+void rule_varDecl(hashElem * assignee);									// <var-decl> -> ;    |   = <expression> ;
+void rule_funcdef(hashElem * activeElem);            // <prog> -> type id <param-list> <func-defined> 
+void rule_funcDefined(hashElem * activeElem);        // <func-defined> -> { <st-list> <prog>     ||      ; <prog>
+void rule_paramList(hashElem * activeElem);          // <param-list> -> ( <param> <param-next>
+void rule_param(hashElem * activeElem);              // <param> -> type id
+void rule_paramNext(hashElem * activeElem);          // <param-next> -> , <param> <param-next>       |   )
+void rule_keyword();									// <keyword> -> auto <auto-decl>    ||      cin <cin> <cin-list>    ||  cout <cout> <cout-list>
 													// ||   for <for-decl>  ||  if <if-decl>    ||  return <rule-return>	|| while <while_loop>	|| do <do-loop>
-int rule_auto();									// <auto-decl> -> id = <expression>
+void rule_auto();									// <auto-decl> -> id = <expression>
 int rule_cin();										// <cin> -> >> id
-int rule_cinList();									// <cin-list> -> <cin> <cin-list>   ||  ;
+void rule_cinList();									// <cin-list> -> <cin> <cin-list>   ||  ;
 int rule_cout();									// <cout> -> << id
-int rule_coutList();								// <cout-list> -> <cout> <cout-list>   ||  ;
+void rule_coutList();								// <cout-list> -> <cout> <cout-list>   ||  ;
 int rule_for();										// <for-decl> -> ( id <var-decl> <expression> id = <expression> ) <st-list>
 int rule_if();										// <if-decl> -> ( <expression> ) <st-list> else <st-list>
-int rule_return();									// <return> -> expression
+void rule_return();									// <return> -> expression
 int rule_while();									// <while-loop> -> ( <expression> ) <statement>
 int rule_do();										// <do-loop> -> <statement> while ( <expression> )               
 
-int rule_expression(hashElem * assignee);			//calls precedence SA for expressions or rule_function() for functions
-int rule_funcCall();
-int rule_callParam(hashElem * funcCall);
-int rule_callParamList(hashElem * funcCall);		//TODO
+void rule_expression(hashElem * assignee);			//calls precedence SA for expressions or rule_function() for functions
+int rule_funcCall(hashElem * assignee);
+void rule_callParam(hashElem * funcCall);
+void rule_callParamList(hashElem * funcCall);		//TODO
 
 //rules for built-in functions
-int rule_BLength();
+void rule_BLength();
 int rule_BSubstr();
 int rule_BConcat();
 int rule_BFind();
-int rule_BSort();
+void rule_BSort();
 
 #endif
