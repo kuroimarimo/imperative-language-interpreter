@@ -49,13 +49,14 @@ tExpr* NextToken()
         break;
         case STRING:
         case IDENTIFIER:
-            if ((str = customMalloc(strlen(token.area)+1)) == NULL)
+            /*if ((str = customMalloc(strlen(token.area)+1)) == NULL)
             {
                 fatalError(ERR_AllocFailed);             // allocation failed
                 return NULL;
             }
             struktura->data = str;                  // defines size of data
-            strcpy(struktura->data, token.area);    // stores data from token
+            strcpy(struktura->data, token.area);    // stores data from token*/
+			struktura->data = strDuplicate(token.area);
         break;
     }
     return struktura;
@@ -468,13 +469,14 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
                 break;
                 case STRING: 
                     struktura->type = STRING; 
-                    if ((str = customMalloc(strlen(token.area)+1)) == NULL)
+                    /*if ((str = customMalloc(strlen(token.area)+1)) == NULL)
                     {
                         fatalError(ERR_AllocFailed);             // allocation failed
                         return NULL;
                     }
                     struktura->data = str;                  // defines size of data
-                    strcpy(struktura->data, expr1->data);    // stores data from tokenbreak;
+                    strcpy(struktura->data, expr1->data);    // stores data from tokenbreak;*/
+					struktura->data = strDuplicate(expr1->data);
                 break;
                 default: fatalError(ERR_IncompatibleExpr); 
                 return NULL;
