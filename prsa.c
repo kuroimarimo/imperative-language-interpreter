@@ -18,7 +18,7 @@ tExpr* NextToken()
     switch (token.type) {
         case INT_NUMBER: 
             struktura->data = customMalloc(sizeof(int));
-            *((int*)struktura->data) = token.int_numb;      // stores value into data
+            *((int*)struktura->data) = token.int_numb;          // stores value into data
         break;
         case DOUBLE_NUMBER:
             struktura->data = customMalloc(sizeof(double));
@@ -26,7 +26,7 @@ tExpr* NextToken()
         break;
         case STRING:
         case IDENTIFIER:
-			struktura->data = strDuplicate(token.area);
+            struktura->data = strDuplicate(token.area);
         break;
     }
     return struktura;
@@ -70,7 +70,7 @@ tExpr* FirstTerminal (tList *Z)
                 val = ukazatel->data;
             }
             else 
-            {                                           // in case of no terminal in stack
+            {                                                   // in case of no terminal in stack
                 fatalError(ERR_SYNTAX);
                 return NULL;
             }
@@ -84,7 +84,7 @@ void Push (tList *Z, tExpr *val)
 {
     tElemPtr ukazatel = NULL;
     if(Z->First != NULL) ukazatel = Z->First;
-    tElemPtr struktura = customMalloc(sizeof(struct tElem));  // allocation of new tElem 
+    tElemPtr struktura = customMalloc(sizeof(struct tElem));    // allocation of new tElem 
     Z->First = struktura;
     struktura->data = val;
     struktura->ptr = ukazatel;
@@ -136,7 +136,7 @@ bool expandInstrList()
 {
     int size = instructionList.lenght;
     instructionList.array = customRealloc(instructionList.array, size * 2 * sizeof(tInstruction));
-    return instructionList.array == NULL;        // allocation failed = false
+    return instructionList.array == NULL;
 }
 
 
@@ -173,14 +173,14 @@ int PrecG(tExpr *pred3, tExpr *pred2, tExpr *pred1)
         case NETERMINAL:                                        // in case of NETERMINAL
             if (pred3 == NULL)                                  // check for predecessor3
             {
-                fatalError(ERR_SYNTAX);                              // in case of empty error
+                fatalError(ERR_SYNTAX);                         // in case of empty error
                 return 0;
             }
-            if (pred3->terminal == NETERMINAL)                      // if pred3 is also NETERMINAL
+            if (pred3->terminal == NETERMINAL)                  // if pred3 is also NETERMINAL
             {
                 if (pred2 == NULL)                              // check for predecessor2
                 {
-                    fatalError(ERR_SYNTAX);                          // in case of empty error
+                    fatalError(ERR_SYNTAX);                     // in case of empty error
                     return 0;
                 }
                 switch (pred2->type)                            // what kind of operator is pred2
@@ -195,7 +195,7 @@ int PrecG(tExpr *pred3, tExpr *pred2, tExpr *pred1)
                     case LESS_EQUAL:    return 8;
                     case EQUAL:         return 9;
                     case NEGATION:      return 10;
-                    default: fatalError(ERR_SYNTAX); return 0;       // in case of other operator syntax error
+                    default: fatalError(ERR_SYNTAX); return 0;  // in case of other operator syntax error
                 }
             }
         break;
@@ -216,9 +216,9 @@ int PrecG(tExpr *pred3, tExpr *pred2, tExpr *pred1)
                     if (pred2->terminal == NETERMINAL)          // checks pred2 type (is supposed to by NETERMINAL)
                         if (pred3->type == R_BRACKET)           // checks pred3 for R_BRACKET
                             return 12;
-                default: fatalError(ERR_SYNTAX); return 0;           // in case of no rule returns error
+                default: fatalError(ERR_SYNTAX); return 0;      // in case of no rule returns error
             }
-    }                                         // in case of other possibility returns error
+    }
     return 0;
 }
 
@@ -272,14 +272,14 @@ void TrojAdres(int gramatika, tExpr* input1, tExpr* input2, tExpr* output)
 tExpr* SemId(tExpr* identifier, hTab* table) 
 {
     hashElem* element;
-    element = findElem(table, identifier->data);        // find and store identifier from hash table
-    //free(identifier->data);                             // no more need for identifier name, will use pointer
+    element = findElem(table, identifier->data);            // find and store identifier from hash table
+    //free(identifier->data);                               // no more need for identifier name, will use pointer
     if (element == NULL) 
     {
-        fatalError(ERR_UndefinedVariable);                   // error undefined variable
+        fatalError(ERR_UndefinedVariable);                  // error undefined variable
         return NULL;
     }
-    identifier->data = &element->data.value;            // stores pointer to data from hash table
+    identifier->data = &element->data.value;                // stores pointer to data from hash table
     switch (element->data.type) 
     {
         case VAR_INT:
@@ -388,7 +388,7 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
                 break;
                 case STRING: 
                     struktura->type = STRING; 
-					struktura->data = strDuplicate(expr1->data);
+                    struktura->data = strDuplicate(expr1->data);
                 break;
                 default: fatalError(ERR_IncompatibleExpr); 
                 return NULL;
@@ -453,9 +453,9 @@ int OperatorToIndex (tExpr* op)
 //------------------------------//
 int PrecedencniSA (hTab *table, int PrecType) 
 {
-    int gramatika;                                      // declaration of variables
+    int gramatika;                                          // declaration of variables
     tExpr* input, *pred1, *pred2, *pred3, *top, *start, *priority, *type;
-    input = pred1 = pred2 = pred3 = top = start = NULL;
+    input = pred1 = pred2 = pred3 = top = start = type = NULL;
     tList* Z;                                           
     Z = customMalloc(sizeof(tList));
     Init(Z);
@@ -472,12 +472,11 @@ int PrecedencniSA (hTab *table, int PrecType)
     }
     start->terminal = TERMINAL;
     start->data = NULL;
-    Push(Z, start);                                     // stores into stack
-    input = NextToken();                                // pops first token
-    top = FirstTerminal(Z);                             // loads top of stack
+    Push(Z, start);                                         // stores into stack
+    input = NextToken();                                    // pops first token
     while (1)  
     {      
-        top = FirstTerminal(Z);                         // loads top of stack
+        top = FirstTerminal(Z);                             // loads top of stack
         if (PrecType == CALL_EXPRESSION)
         {
             if(top->type == SEMICOLON && input->type == SEMICOLON)
@@ -488,34 +487,34 @@ int PrecedencniSA (hTab *table, int PrecType)
             if(top == NULL && input->type == R_BRACKET)
                 break;
         }
-        priority = NULL;                         // priority accoring to precedence table
+        priority = NULL;                                    // priority accoring to precedence table
         switch (precedencni_tabulka[OperatorToIndex(top)][OperatorToIndex(input)]) 
         {
-            case '=':                                   // in case of equal
-                Push(Z, input);                         // push into stack
-                input = NextToken();                    // pop next token
+            case '=':                                       // in case of equal
+                Push(Z, input);                             // push into stack
+                input = NextToken();                        // pop next token
             break;
-            case '<':                                   // if stack has lower priority than nexttoken
+            case '<':                                       // if stack has lower priority than nexttoken
                 priority = customMalloc(sizeof(tExpr));
-                priority->type = 5948;                  // sets priority->type as lower priority
+                priority->type = 5948;                      // sets priority->type as lower priority
                 InsertAbove(Z, top, priority);
                 Push(Z, input);
                 input = NextToken();
             break;
-            case '>':                                   // if stack has higher priority than nexttoken
+            case '>':                                       // if stack has higher priority than nexttoken
                 top = NULL;
                 do
                 {
-                    pred3 = pred2;                      // store 3rd predecessor
-                    pred2 = pred1;                      // store 2nd predecessor
-                    pred1 = top;                        // store 1st predecessor
-                    top = Pop(Z);                       // pop element
-                } while (top->type != 5948);            // until lower priority mark is found
+                    pred3 = pred2;                          // store 3rd predecessor
+                    pred2 = pred1;                          // store 2nd predecessor
+                    pred1 = top;                            // store 1st predecessor
+                    top = Pop(Z);                           // pop element
+                } while (top->type != 5948);                // until lower priority mark is found
                 gramatika = PrecG(pred3, pred2, pred1);
                 if (top->type == 5948 && gramatika != 0) 
-                {                                       // if grammar is found
+                {                                           // if grammar is found
                     top = SemA(pred3, pred2, pred1, gramatika, table);
-                    Push(Z, top);                       // push NETERMINAL with output pointer
+                    Push(Z, top);                           // push NETERMINAL with output pointer
                     type = top;
                 }
                 else 
@@ -525,8 +524,8 @@ int PrecedencniSA (hTab *table, int PrecType)
                 }
                 pred3 = pred2 = pred1 = NULL;
             break;
-            case ' ':                                   // possible error
-                fatalError(ERR_SYNTAX);                      // is error
+            case ' ':
+                fatalError(ERR_SYNTAX);                     // is error
                 return -1;
             default: fatalError(ERR_SYNTAX); return -1;
         }
