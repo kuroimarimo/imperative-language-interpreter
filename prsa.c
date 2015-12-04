@@ -453,7 +453,7 @@ int OperatorToIndex (tExpr* op)
 //------------------------------//
 int PrecedencniSA (hTab *table, int PrecType) 
 {
-    int gramatika;                                          // declaration of variables
+    int gramatika, LeftTerminal, RightTerminal;                                          // declaration of variables
     tExpr* input, *pred1, *pred2, *pred3, *top, *start, *priority, *type;
     input = pred1 = pred2 = pred3 = top = start = type = NULL;
     tList* Z;                                           
@@ -474,19 +474,21 @@ int PrecedencniSA (hTab *table, int PrecType)
         }
     }
     input = NextToken();                                    // pops first token
+    if (PrecType == CALL_EXPRESSION)
+    {
+        LeftTerminal = SEMICOLON;
+        RightTerminal = SEMICOLON;
+    }
+    else
+    {
+        LeftTerminal = SEMICOLON;
+        RightTerminal = R_BRACKET;
+    }
     while (1)  
     {      
         top = FirstTerminal(Z);                             // loads top of stack
-        if (PrecType == CALL_EXPRESSION)
-        {
-            if(top->type == SEMICOLON && input->type == SEMICOLON)
-                break;
-        }
-        else
-        {
-            if(top->type == SEMICOLON && input->type == R_BRACKET)
-                break;
-        }
+        if(top->type == LeftTerminal && input->type == RightTerminal)
+            break;
         priority = NULL;                                    // priority accoring to precedence table
         switch (precedencni_tabulka[OperatorToIndex(top)][OperatorToIndex(input)]) 
         {
