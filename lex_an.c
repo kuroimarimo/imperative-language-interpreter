@@ -279,10 +279,10 @@ int scanner () {
             else if ((c == '.') || (c == 'E') || (c == 'e') ) {
                 fillToken('0');
             }
-            else if (isalpha(c) || c == '_')
+/*          else if (isalpha(c) || c == '_')
             {
                 fatalError (ERR_LEXICAL);
-            }
+            }   */
             else {
                 test = false;
                 fillToken('0');
@@ -305,11 +305,11 @@ int scanner () {
             else if (c == 'e' || c == 'E') {
                 value = EXP_NUMBER;
                 fillToken(c);
-            }
+            }   /*
             else if (isalpha(c) || c == '_')
             {
                 fatalError (ERR_LEXICAL);
-            }
+            }   */
             else {
                 token.type = INT_NUMBER;
                 ungetc(c, source);
@@ -341,11 +341,11 @@ int scanner () {
             {
                 fillToken(c);
                 value = EXP_NUMBER;
-            }
+            }   /*
             else if (c == '.' || c == '_' || isalpha(c))  /// Lex_an chyba - zadana druha desetinna tecka
             {
                 fatalError (ERR_LEXICAL);
-            }
+            }   */
             else {
                 token.type = DOUBLE_NUMBER;
                 ungetc(c, source);
@@ -371,24 +371,25 @@ int scanner () {
             break;
 
         case EXP_NUMBER_SIGN:
-            if (isdigit(c)) {
+            if (isdigit(c))
+            {
                 fillToken(c);
                 value = EXP_NUMBER_END;    /// za E jsou cifry
-                }
+            }
             else
-               {
-                    fatalError (ERR_NumberShape);
-                }
+            {
+                fatalError (ERR_NumberShape);
+            }
 
             break;
 
         case EXP_NUMBER_END:
             if (isdigit(c))
                 fillToken(c);
-            else if (isalpha(c) || c == '_' || c == '.')
+/*          else if (isalpha(c) || c == '_' || c == '.')
             {
                 fatalError (ERR_LEXICAL);
-            }
+            }   */
             else {
                 token.type = DOUBLE_NUMBER;
                 ungetc(c, source);
@@ -403,10 +404,9 @@ int scanner () {
                 fillToken(c);
 
             else {
-                token.type = STRING;
-                /// ungetc(c, source); - vytvari nekonecny cyklus
+                token.type = STRING;    /// ungetc(c, source); - vytvari nekonecny cyklus
                 test = false;
-                }
+            }
             break;
 
         case STRING_ESCAPE:
@@ -436,9 +436,9 @@ int scanner () {
                 value = STRING_ESCAPE_x2;
             }
             else
-                {
-                        fatalError (ERR_StringEscape);
-                    }
+            {
+                fatalError (ERR_StringEscape);
+            }
 
             break;
 
@@ -448,21 +448,17 @@ int scanner () {
                 array_x [1] = c;
                 array_x [2] = '\0';
 
-                int number = (int) strtol(array_x, NULL, 16);
-
-                if (number >= 1 && number <= 255)
-                    fillToken(number + '\0');
-                else
-                   {
-                        fatalError (ERR_StringEscape);
-                    }
+                counter = (int) strtol(array_x, NULL, 16);
 
                 value = STRING;
             }
+
+            if (counter >= 1 && counter <= 255)
+                fillToken(counter + '\0');
             else
-               {
-                        fatalError (ERR_StringEscape);
-                    }
+            {
+                fatalError (ERR_StringEscape);
+            }
 
             break;
 
