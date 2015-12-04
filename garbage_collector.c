@@ -23,42 +23,23 @@ void * appendGarbage(tGarbageList * list, void * data)
 	return temp;
 }
 
-void   deleteGarbageItem(tGarbageList * list, void * deleted)
+void  updateGarbageItem(tGarbageList * list, void * old, void * new)
 {
 	struct garbage * temp = list->first;
 
 	if (temp == NULL)
-		return;
-
-	if (temp->data == deleted)			//the first item is being deleted
 	{
-		list->first = temp->next;
-		
-		if (temp->next == NULL)			//the first item is also the last item
-			list->last = NULL;
-		
-		free(temp);
+		if (appendGarbage(list, new) == NULL)
+			fatalError(ERR_AllocFailed);
 		return;
 	}
 
-	while (temp->next != NULL)
+	while (temp != NULL)
 	{
-		if (temp->next->data == deleted)
+		if (temp->data == old)
 		{
-			if (temp->next->next == NULL)	//we are removing the last item
-			{
-				free(temp->next);
-				temp->next = NULL;
-				list->last = temp;
-				return;
-			}
-			else
-			{
-				void * next = temp->next->next;
-				free(temp->next);
-				temp->next = next;			//relink the list
-				return;
-			}
+			temp->data = new;
+			return;
 		}
 
 	temp = temp->next;
@@ -92,13 +73,7 @@ void * customRealloc(void * data, int size)
 		fatalError(ERR_AllocFailed);
 
 	if (temp != data)
-		deleteGarbageItem(&garbageList, data);
-
-	if (appendGarbage(&garbageList, temp) == NULL)
-	{
-		free(temp);
-		fatalError(ERR_AllocFailed);
-	}
+		updateGarbageItem(&garbageList, data, temp);
 	
 	return temp;
 }

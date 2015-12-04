@@ -16,12 +16,12 @@ typedef struct
 	struct garbage * last;
 } tGarbageList;
 
-void garbageListInit(tGarbageList * list);
+void   garbageListInit(tGarbageList * list);
 void * appendGarbage(tGarbageList * list, void * data);
-void   deleteGarbageItem(tGarbageList * list, void * deleted);
+void   updateGarbageItem(tGarbageList * list, void * old, void * new);
 void * customMalloc(int size);
 void * customRealloc(void * data, int size);
-void garbageCleanup(tGarbageList * list);
+void   garbageCleanup(tGarbageList * list);
 
 tGarbageList garbageList;
 
