@@ -11,6 +11,8 @@
 #include "garbage_collector.h"
 #include "ial.h"
 
+#define SWAP(x, y, T) do { T TMP = x; x = y; y = TMP; } while (0)
+
 /** jednotlivé stavy */
 enum {
     START,              ///         Určení znaku
@@ -140,7 +142,7 @@ FILE *source;
     /// prototypy funkci
 
 void ungetToken();               //ungets the latest token, can be used only once in a row
-void tokenSwap();
+//void tokenSwap();
 int tokenCopy (tToken *dst, tToken src);   //"copies" the contents of src token to the dst token
 void initToken (); // function for inicialization Token .. it's called when you need delete old variables
 void fillToken (char character); // comes some character and function saves it to variable

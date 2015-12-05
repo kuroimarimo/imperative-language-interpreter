@@ -1,17 +1,10 @@
 #include "lex_an.h"
 
-
 int tokenCopy (tToken *dst, tToken src)
 {
 
     if (src.area != NULL)
-    {
-        /*if ((dst->area = customMalloc((strlen(src.area) + 1) * sizeof(char))) == NULL)
-            return ERR_AllocFailed;
-
-        strcpy(dst->area, src.area);*/
 		dst->area = strDuplicate(src.area);
-    }
 
     dst->int_numb = src.int_numb;
     dst->double_numb = src.double_numb;
@@ -24,38 +17,25 @@ int tokenCopy (tToken *dst, tToken src)
     return ERR_None;
 }
 
-void tokenSwap()
-{
-    tToken temp;
-
-    /*tokenCopy(&temp, token);
-    tokenCopy(&token, oldToken);
-    tokenCopy(&oldToken, temp);*/
-
-    temp = token;
-    token = oldToken;
-    oldToken = temp;
-
-    return;
-}
-
 void ungetToken()
 {
-    tokenSwap();
+    SWAP(token, oldToken, tToken);
     ungotToken = 1;
 
     return;
 }
 
-void initToken () {  // inicializovat token
+void initToken ()       // inicializovat token
+{
 
     token.area = NULL;
     token.counter = 0;
     token.type = TOK_NULL;
 
     static int tmp = 0;
-    if(!tmp){
-        token.counter_of_lines=1;
+    if(!tmp)
+    {
+        token.counter_of_lines = 1;
         tmp++;
     }
 
@@ -102,11 +82,13 @@ void fillToken (char character) {  // naplnit token
     // int extension_tok = 0;
 
         /// prvni inicializace
-    if (token.counter == 0) {
+    if (token.counter == 0)
+    {
         token.area = (char *) customMalloc(3);   /// 2 charactery + \O
         token.sizeof_area = 2;
     }
-    else if (token.counter == token.sizeof_area) {      /// navyseni kapacity o dvojnasobek
+    else if (token.counter == token.sizeof_area)
+    {      /// navyseni kapacity o dvojnasobek
         token.sizeof_area = token.sizeof_area * 2;
         token.area = (char *) customRealloc(token.area, (token.sizeof_area + 1));
     }
@@ -122,7 +104,7 @@ int scanner () {
 
     if (ungotToken)             //ungetToken was called
     {
-        tokenSwap();
+        SWAP(token, oldToken, tToken);
         ungotToken = 0;
         return 0;
     }
