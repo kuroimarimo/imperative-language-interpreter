@@ -78,6 +78,16 @@ void numberConverter(int base)
     token.int_numb = (int) strtol(token.area, NULL, base);
 }
 
+void stringEscape (int counter)
+{
+    if (counter >= 1 && counter <= 255)
+        fillToken(counter + '\0');
+    else
+    {
+        fatalError (ERR_StringEscape);
+    }
+}
+
 void fillToken (char character) {  // naplnit token
     // int extension_tok = 0;
 
@@ -115,7 +125,7 @@ int scanner () {
 
     int c = 0;
     int cx;
-    char array_x [3];
+    char array_x [9];
     int counter = 0;
     int base = 0;
     int value = START;
@@ -393,6 +403,7 @@ int scanner () {
 
         case STRING_ESCAPE:
             value = STRING;
+            counter = 0;
 
             if (c == 'n')
                 fillToken('\n');
@@ -403,19 +414,31 @@ int scanner () {
             else if (c == '"')
                 fillToken('\"');
             else if (c == 'x')
-                value = STRING_ESCAPE_x1;
+                value = ESCAPE_HEXADECIMAL;
+            else if (c == '0')
+                value = ESCAPE_OCTAL;
+            else if (c == 'b')
+                value = ESCAPE_BINARY;
             else {
                 fatalError (ERR_StringEscape);
             }
 
             break;
 
-        case STRING_ESCAPE_x1:
-            if (isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+        case ESCAPE_HEXADECIMAL:
+            if (counter < 2 && (isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')))
             {
-                array_x [0] = c;
-                array_x [1] = '\0';
-                value = STRING_ESCAPE_x2;
+                array_x [counter] = c;
+                array_x [counter + 1] = '\0';
+                counter++;
+
+                if (counter == 2)
+                {
+                    counter = (int) strtol(array_x, NULL, 16);
+                    stringEscape(counter);
+                    value = STRING;
+                    counter = 0;
+                }
             }
             else
             {
@@ -424,19 +447,43 @@ int scanner () {
 
             break;
 
-        case STRING_ESCAPE_x2:
-            if (isdigit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
+        case ESCAPE_OCTAL:
+            if (counter < 3 && (isdigit(c) || (c >= '0' && c <= '7')))
             {
-                array_x [1] = c;
-                array_x [2] = '\0';
+                array_x [counter] = c;
+                array_x [counter + 1] = '\0';
+                counter++;
 
-                counter = (int) strtol(array_x, NULL, 16);
-
-                value = STRING;
+                if (counter == 3)
+                {
+                    counter = (int) strtol(array_x, NULL, 8);
+                    stringEscape(counter);
+                    value = STRING;
+                    counter = 0;
+                }
+            }
+            else
+            {
+                fatalError (ERR_StringEscape);
             }
 
-            if (counter >= 1 && counter <= 255)
-                fillToken(counter + '\0');
+            break;
+
+        case ESCAPE_BINARY:
+            if (counter < 8 && (isdigit(c) || (c >= '0' && c <= '1')))
+            {
+                array_x [counter] = c;
+                array_x [counter + 1] = '\0';
+                counter++;
+
+                if (counter == 8)
+                {
+                    counter = (int) strtol(array_x, NULL, 2);
+                    stringEscape(counter);
+                    value = STRING;
+                    counter = 0;
+                }
+            }
             else
             {
                 fatalError (ERR_StringEscape);
