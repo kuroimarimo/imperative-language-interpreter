@@ -324,7 +324,7 @@ char *concat (char *s1, char *s2){
 int lenght1=(int) strlen(s1);  //delka prvního
 int lenght2=(int) strlen(s2);   //delka druhého
 
-char *pomocna= customMalloc((lenght1 + lenght2)*sizeof(char));  // naalokuju si pamět velikosti prvniho a druheho řetězce
+char *pomocna= customMalloc((lenght1 + lenght2 + 1)*sizeof(char));  // naalokuju si pamět velikosti prvniho a druheho řetězce
 if(pomocna==NULL) return NULL ;
 strncpy(pomocna,s1,lenght1);  //zkopiruju prvni řetězec do pomocne 
 strncpy(pomocna+lenght1,s2,lenght2);  //zkopiruju druhy řetězec na pozici lenght1 -1  musime odstranit (\0)
