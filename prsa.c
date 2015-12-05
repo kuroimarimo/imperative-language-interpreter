@@ -271,8 +271,8 @@ void TrojAdres(int gramatika, tExpr* input1, tExpr* input2, tExpr* output)
 //------------------------------//
 tExpr* SemId(tExpr* identifier, hTab* table) 
 {
-    hashElem* element;
-    element = findElem(table, identifier->data);            // find and store identifier from hash table
+    hashElem* element = findVar(identifier->data);
+    //element = findElem(table, identifier->data);            // find and store identifier from hash table
     //free(identifier->data);                               // no more need for identifier name, will use pointer
     if (element == NULL) 
     {
