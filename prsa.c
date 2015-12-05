@@ -9,7 +9,7 @@
 //--------------------------//
 tExpr* NextToken() 
 {
-    scanner(srcFile);                               // scans input file
+    scanner();                               // scans input file
     tExpr* struktura;                               // struct used to store new token
     struktura = customMalloc(sizeof(tExpr));
     struktura->terminal = TERMINAL;                 // default

@@ -19,7 +19,7 @@
 #define DENY_PUSH		0
 #define ALLOW_PUSH		1
 
-FILE* srcFile;
+tSymbolType functionType;							//return type of the currently processed function
 hTab * globalST;									// global symbol table
 tableStack *localSTstack;							// stack of local symbol tables
 //hashElem activeElem;								// symbol table element being modified
@@ -28,7 +28,8 @@ tableStack *localSTstack;							// stack of local symbol tables
 
 					/*Function definitions*/
 
-int getType(int tokenType);							//converts keyword token to tSymbolType for variables
+int getType(int tokenType);							//converts keyword token type to tSymbolType for variables
+int exprType(int type);								//converts number token type to tSymbolType for variables
 int getFuncType(int tokenType);						//  -||- for functions									//merge var/func types?
 void parse();										// parse the code
 int isKeyword(int tokenType);						//checks whether the given token represents a keyword

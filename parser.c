@@ -38,6 +38,7 @@ void rule_funcdef(hashElem * activeElem)
 		case K_INT:
 		case K_DOUBLE:
 		case K_STRING:
+			functionType = getType(token.type);
 			break;
 
 		default:
@@ -247,14 +248,20 @@ void rule_varDecl(hashElem * assignee)
     if (token.type == SEMICOLON)
         return;
 
-    if (token.type == ASSIGNMENT)
-        PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION);
+	if (token.type == ASSIGNMENT)
+	{
+		int retType = exprType(PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION));
+
+		if (!convertType(assignee->data.type, retType))
+			fatalError(ERR_IncompatibleExpr);
+	}
 	else
 		fatalError(ERR_SYNTAX);
 }
 
 void rule_expression(hashElem * assignee)
 {
+	int retType;
 	scanner();
 	switch (token.type)
 	{
@@ -267,7 +274,10 @@ void rule_expression(hashElem * assignee)
 			else
 			{
 				ungetToken();
-				PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION);		//TODO pouzivat cely stack, treba na to vytvorit funkciu
+				retType = exprType(PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION));
+
+				if (!convertType(assignee->data.type, retType))
+					fatalError(ERR_IncompatibleExpr);
 				return;
 			}
 			break;
@@ -281,7 +291,10 @@ void rule_expression(hashElem * assignee)
 			break;
 		default:
 			ungetToken();
-			PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION);		//TODO pouzivat cely stack, treba na to vytvorit funkciu
+			retType = exprType(PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION));
+
+			if (!convertType(assignee->data.type, retType))
+					fatalError(ERR_IncompatibleExpr);
 			return;
 	}
 }
@@ -301,7 +314,10 @@ void rule_auto()
     if (token.type != ASSIGNMENT)
         fatalError(ERR_SYNTAX);
 
-    rule_expression(assignee);
+	int retType = exprType(PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION));
+
+	if (!convertType(assignee->data.type, retType))
+		fatalError(ERR_IncompatibleExpr);
 } 
 
 //rule:     <cin> -> >> id
@@ -406,10 +422,13 @@ int rule_if()
 //rule:     <return> -> expression
 void rule_return()
 {
-    PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION);				//TODO
+    int retType = exprType(PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION));
+
+	if (!convertType(functionType, retType))
+		fatalError(ERR_IncompatibleExpr);
 }
 
-//rule:     <for-decl> -> ( id <var-decl> <expression> id = <expression> ) { <st-list>
+//rule:     <for-decl> -> type ( id <var-decl> <expression> id = <expression> ) { <st-list>
 int rule_for()
 {
     scanner();
@@ -458,10 +477,12 @@ int rule_for()
     if (token.type != ASSIGNMENT)
         fatalError(ERR_SYNTAX);
 
-	PrecedencniSA(tableStackTop(localSTstack), CALL_CONDITION);		//rovno prsa namiesto expression?
+	int exType = exprType(PrecedencniSA(tableStackTop(localSTstack), 2));
+	if (!convertType(controlVar->data.type, exType))
+		fatalError(ERR_IncompatibleExpr);
 
-    scanner();
-    /*if (token.type != R_BRACKET)
+    /*scanner();
+    if (token.type != R_BRACKET)
         return ERR_SYNTAX;*/
 	
     scanner();
@@ -610,6 +631,24 @@ int getType(int tokenType)
         default:
             return -1;
     }
+}
+
+int exprType(int type)
+{
+	switch (type)
+	{
+	case INT_NUMBER:
+		return VAR_INT;
+
+	case DOUBLE_NUMBER:
+		return VAR_DOUBLE;
+
+	case STRING:
+		return VAR_STRING;
+
+	default:
+		return -1;
+	}
 }
 
 int getFuncType(int tokenType)
