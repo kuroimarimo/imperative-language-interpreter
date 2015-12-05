@@ -28,7 +28,7 @@ enum {
     EXP_NUMBER_SIGN,    ///         znamenkovy (+/-) 15E+8
     EXP_NUMBER_END,     ///
 
-    SEMICOLON = 10,     ///         ;
+    SEMICOLON,          ///         ;
     UNDERSCORE,         ///         _
 
     L_BRACKET,          ///         (
@@ -52,8 +52,9 @@ enum {
     QUESTION_MARK,      ///         ?
     STRING,             ///         ".."
     STRING_ESCAPE,      ///
-    STRING_ESCAPE_x1,   ///
-    STRING_ESCAPE_x2,   ///
+    ESCAPE_HEXADECIMAL, ///
+    ESCAPE_OCTAL,       ///
+    ESCAPE_BINARY,      ///
     COMMA,              ///         ,
 
     LESS,               ///         <
