@@ -33,7 +33,7 @@ tFrame * frameStackTop(tFrameStack * stack)
 	return stack->frames[stack->top];
 }
 
-tFrame * frameStackPop(tFrameStack * stack)
+void frameStackPop(tFrameStack * stack)
 {
 	--stack->top;
 }
