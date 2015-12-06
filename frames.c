@@ -14,6 +14,9 @@ tFrame * frameCreate(int numberOfVars, bool isBase)
 	temp->variables = customMalloc(numberOfVars * sizeof(tVariable));
 	temp->isBaseFrame = isBase;
 
+	for (int i = 0; i < numberOfVars; i++)
+		temp->variables[i].initialized = false;
+
 	return temp;
 }
 
