@@ -13,6 +13,9 @@ typedef struct
 	int top, size;
 } tableStack;
 
+hTab * globalST;									// global symbol table
+tableStack *localSTstack;							// stack of local symbol tables
+
 tableStack * tableStackInit(int size);
 int tableStackEmpty(tableStack * stack);
 hTab * tableStackTop(tableStack * stack);
@@ -20,5 +23,6 @@ void tableStackPop(tableStack * stack);
 hTab * tableStackPush(tableStack * stack, hTab * table);
 void tableStackDispose(tableStack * stack);
 hTab * getTableStackElem(tableStack * stack, int index);
+void tableStackResize(tableStack * stack);
 
 #endif

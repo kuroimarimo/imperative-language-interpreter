@@ -39,16 +39,19 @@ void tableStackPop(tableStack * stack)
 
 hTab * tableStackPush(tableStack * stack, hTab * table)
 {
-	if (stack->top == (stack->size - 1))		//stack is full
-	{
-		stack->elems = customRealloc(stack->elems, stack->size * 2);
-		stack->size *= 2;
-	}
+	if (stack->top >= (stack->size - 1))		//stack is full
+		tableStackResize(stack);
 	
 	stack->elems[stack->top + 1] = hTabInit(TABLE_SIZE);
 	
 	++stack->top;
 	return stack->elems[stack->top];
+}
+
+void tableStackResize(tableStack * stack)
+{
+	stack->elems = customRealloc(stack->elems, 2 * stack->size * sizeof(hTab*));
+	stack->size *= 2;
 }
 
 void tableStackDispose(tableStack * stack)
