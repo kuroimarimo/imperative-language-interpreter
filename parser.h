@@ -20,8 +20,7 @@
 #define ALLOW_PUSH		1
 
 tSymbolType functionType;							//return type of the currently processed function
-hTab * globalST;									// global symbol table
-tableStack *localSTstack;							// stack of local symbol tables
+
 //hashElem activeElem;								// symbol table element being modified
 //tData STdata;										// tData being created
 
@@ -74,10 +73,5 @@ void rule_callParamList(hashElem * funcCall);		//TODO
 
 //rules for built-in functions
 int rule_builtIn(hashElem * assignee);
-void rule_BLength();
-int rule_BSubstr();
-int rule_BConcat();
-int rule_BFind();
-void rule_BSort();
 
 #endif

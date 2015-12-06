@@ -11,7 +11,6 @@ void parse()
     activeElem.key = NULL;
 
     globalST = hTabInit(INIT_ST_SIZE);
-	localSTstack = tableStackInit(INIT_ST_SIZE);
 
     rule_funcdef(&activeElem);						//process function definition/declaration
     
@@ -25,6 +24,7 @@ void parse()
 void rule_funcdef(hashElem * activeElem)
 {
     hashElemInit(activeElem);
+	localSTstack = tableStackInit(INIT_ST_SIZE);
 
     scanner();
     if (token.type == EOF)				//the whole file has been processed
@@ -55,11 +55,13 @@ void rule_funcdef(hashElem * activeElem)
     rule_paramList(activeElem);							//process parameters
 
 	//main should be of type int and with no parameters
+
     if (!strcmp(activeElem->key, F_MAIN) && ((activeElem->data.numberOfParams != 0) || (activeElem->data.type != FUNC_INT)))
         fatalError(ERR_UndefinedFunction);
 
     rule_funcDefined(activeElem);						//process the rest of definition/declaration
 
+	tableStackDispose(localSTstack);
     rule_funcdef(activeElem);
 }
 
@@ -481,7 +483,8 @@ int rule_for()
     scanner();
     rule_statement(DENY_PUSH);													//body of the loop
 
-	tableStackPop(localSTstack);
+	if (token.type != R_CURLY_BRACKET)
+		tableStackPop(localSTstack);
 	return ERR_None;
 }
 
@@ -723,10 +726,11 @@ hashElem * findVar(char *key)									//finds the variable in the symbol table s
 {
 	hashElem * temp;
 
+
 	for (int i = localSTstack->top; i >= 0; i--)
 		if ((temp = findElem(getTableStackElem(localSTstack, i), key)) != NULL)
 			return temp;
-	
+
 	return NULL;										// the symbol wasn't found
 }
 
@@ -863,66 +867,6 @@ void rule_callParamList(hashElem * funcCall)
 		default:
 			fatalError(ERR_SYNTAX);
 	}	
-}
-
-void rule_BLength()
-{
-	scanner();
-	if (token.type != L_BRACKET)
-		fatalError(ERR_SYNTAX);
-
-	scanner();
-
-	switch (token.type)
-	{
-		case STRING:
-			break;
-		
-		case IDENTIFIER:
-			if (findVar(token.area)->data.type == VAR_STRING)
-				break;
-			else
-				fatalError(ERR_ParamType);
-		
-		case R_BRACKET:
-			fatalError(ERR_ParamNumber);
-		
-		default:
-			fatalError(ERR_SYNTAX);
-	}
-
-	scanner();
-	switch (token.type)
-	{
-		case R_BRACKET:
-			break;
-
-		case COMMA:
-			scanner();
-			switch (token.type)
-			{
-				case IDENTIFIER:
-				case INT_NUMBER:
-				case DOUBLE_NUMBER:
-				case STRING:
-					fatalError(ERR_ParamNumber);
-				default:
-					fatalError(ERR_SYNTAX);
-			}
-
-		default:
-			fatalError(ERR_SYNTAX);
-	}
-
-	scanner();
-	switch (token.type)
-	{
-		case SEMICOLON:
-			return;
-
-		default:
-			fatalError(ERR_SYNTAX);
-	}
 }
 
 int rule_builtIn(hashElem * assignee)
