@@ -27,7 +27,7 @@ typedef struct data
     tSymbolValue value;					
     tParam * params;					// function parameters
 	int numberOfParams;					// number of function parameters
-    //struct hTab * localTable;
+	int index;							// index of the variable in variable frame
     //instrList * instructions;			//TODO
 } tData;
 
