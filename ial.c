@@ -21,6 +21,13 @@ bool checkOverfill (unsigned int size, unsigned int numStoredElem)
  Return value depend on whether the allocation has succeeded or not. */
 char * strDuplicate(char * src)                                // UNFINISHED!
 {
+	if (src == NULL)
+	{
+		char * dest = customMalloc(sizeof(char));
+		dest = '\0';
+		return dest;
+	}
+
     size_t srcLength;
 	char * dest;
     //char * tmp = * dest;
@@ -89,18 +96,12 @@ hTab * expandTab(hTab * table)
 
     for (unsigned int i = 0; i < table->size; ++i)
     {
-        if (table->table[i])
-        {
-            tmp = table->table[i];
-
-            addElem(newTable, tmp->key, &tmp->data);
-
-            while (tmp->next)           // in case there are synonyms
-            {
-                tmp = tmp->next;
-                addElem(newTable, tmp->key, &tmp->data);
-            }
-        }
+		tmp = table->table[i];
+		while (tmp != NULL)
+		{
+			addElem(newTable, tmp->key, &tmp->data);
+			tmp = tmp->next;
+		}
     }
 
     hTabFree(table);
@@ -145,7 +146,7 @@ hashElem * addElem (hTab * table, char * key, tData * data)
 
     if (checkOverfill(table->size, table->numStoredElem))
     {
-        table = expandTab(table);
+        *table = *expandTab(table);
     }
 
     newElem = table->table[hFunct (key, table->size)];
