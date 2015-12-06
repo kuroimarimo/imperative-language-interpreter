@@ -65,3 +65,25 @@ void frameCreateAndPush(tFrameStack * stack, int numOfVars, bool isBase)
 {
 	frameStackPush(stack, frameCreate(numOfVars, isBase));
 }
+
+tVarCoordinates * varToFrame(char * key) 
+{
+	hashElem * temp;
+	int i;
+
+	
+	for (i = localSTstack->top; i >= 0; i--)
+		if ((temp = findElem(getTableStackElem(localSTstack, i), key)) != NULL)
+			break;
+
+	if (temp == NULL)
+		//fatalError(ERR_Internal);
+		return NULL;
+
+	tVarCoordinates * coordinates = customMalloc(sizeof(tVarCoordinates));
+	coordinates->frameOffset = i - localSTstack->top;
+	coordinates->frameOffset = temp->data.index;
+
+
+	return coordinates;
+}
