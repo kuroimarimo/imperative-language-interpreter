@@ -28,7 +28,7 @@ typedef struct data
     tParam * params;					// function parameters
 	int numberOfParams;					// number of function parameters
 	int index;							// index of the variable in variable frame
-	//tInstrList * instructions;			// fuctions instruction list
+	tInstrList * instructions;			// fuctions instruction list
 } tData;
 
 typedef struct hashElem

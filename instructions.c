@@ -1,4 +1,6 @@
 #include "instructions.h"
+#include "garbage_collector.h"
+#include "ial.h"
 
 //--------------------------//
 //     ISNTRUCTION ARRAY    //

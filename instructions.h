@@ -4,10 +4,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "garbage_collector.h"
-#include "ial.h"
-
-
 #define INITIAL_SIZE 32
 
 // INSTRUCTION ARRAY
