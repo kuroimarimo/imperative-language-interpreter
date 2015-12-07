@@ -39,3 +39,15 @@ bool initInstrList()
 	instructionList->occupied = 0;
 	return true;
 }
+
+void generateInstruction(int operation, void * input1, void * input2, void * output)
+{
+	tInstruction * instruction = customMalloc(sizeof(tInstruction));
+	instruction->operator = operation;
+	instruction->type = -1;
+	instruction->input1 = input1;
+	instruction->input2 = input2;
+	instruction->output = output;
+	
+	addInstruction(instruction);
+}

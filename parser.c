@@ -45,6 +45,8 @@ void rule_funcdef(hashElem * activeElem)
 
     activeElem->data.type = functionType;				//get function type
     activeElem->data.state = DECLARED;
+	
+	initInstrList();
 
     scanner();
     if (token.type != IDENTIFIER)
@@ -94,6 +96,7 @@ void rule_funcDefined(hashElem * activeElem)
         fatalError(ERR_AttemptedRedefFunction);		//function is already defined
 
 	temp->data.state = DEFINED;
+	temp->data.instructions = instructionList;		//
 
     scanner();
     rule_stList();									//process function body

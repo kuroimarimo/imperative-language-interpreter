@@ -3,8 +3,9 @@
 
 #include <stdbool.h>
 #include <stdlib.h>
+#include "3ak.h"
 
-#define INITIAL_SIZE 32
+#define INITIAL_SIZE 512
 
 // INSTRUCTION ARRAY
 typedef struct

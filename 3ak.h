@@ -23,7 +23,8 @@ enum adressCode {
 	OP_ELSE, 		// pokud neplati in1 -> out
 	OP_LABEL,		// in1 <- navesti pro goto
 	OP_GOTO,		// skok pro for -> out
-	OP_RETURN		// in1 ulozi -> out
+	OP_RETURN,		// in1 ulozi -> out
+	OP_CREATE_FRAME // create variable frame
 }; 
 
 #endif
