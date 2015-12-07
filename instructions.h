@@ -24,11 +24,13 @@ typedef struct
 	tInstruction * array;
 } tInstrList;
 
-tInstrList instructionList;					//TODO separatne zoznamy instrukcii pre kazdu funkciu
+tInstrList * instructionList;					//TODO separatne zoznamy instrukcii pre kazdu funkciu
 
 bool expandInstrList();
 bool addInstruction(tInstruction * instr);
 bool initInstrList();
 void debugInstrList();
+
+void generateInstruction(int operation, void * input1, void * input2, void * output);
 
 #endif

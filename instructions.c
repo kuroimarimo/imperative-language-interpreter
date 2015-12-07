@@ -8,9 +8,9 @@
 Returns true upon successful completion, else returns false. (realloc failed) */
 bool expandInstrList()
 {
-	int size = instructionList.lenght;
-	instructionList.array = customRealloc(instructionList.array, size * 2 * sizeof(tInstruction));
-	return instructionList.array == NULL;
+	int size = instructionList->lenght;
+	instructionList->array = customRealloc(instructionList->array, size * 2 * sizeof(tInstruction));
+	return instructionList->array == NULL;
 }
 
 
@@ -18,10 +18,10 @@ bool expandInstrList()
 Returns true upon successful completion, else returns false. (realloc failed) */
 bool addInstruction(tInstruction * instr)
 {
-	if (instructionList.lenght < (instructionList.occupied + 1) && !expandInstrList())
+	if (instructionList->lenght < (instructionList->occupied + 1) && !expandInstrList())
 		return false;
-	instructionList.array[instructionList.occupied] = *instr;
-	++instructionList.occupied;
+	instructionList->array[instructionList->occupied] = *instr;
+	++instructionList->occupied;
 	return true;
 }
 
@@ -31,8 +31,9 @@ Returns true upon successful completion, else returns false. (malloc failed)*/
 bool initInstrList()
 {
 	int size = INITIAL_SIZE;
-	instructionList.array = customMalloc(size * sizeof(tInstruction));
-	instructionList.lenght = size;
-	instructionList.occupied = 0;
+	instructionList = customMalloc(sizeof(tInstrList));
+	instructionList->array = customMalloc(size * sizeof(tInstruction));
+	instructionList->lenght = size;
+	instructionList->occupied = 0;
 	return true;
 }
