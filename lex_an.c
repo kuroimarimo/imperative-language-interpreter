@@ -45,7 +45,7 @@ void initToken ()       // inicializovat token
 void cmpKeyWords ()
 {
     const char *key_words [COUNT_OF_KEY_WORDS] = {
-        "cin", "cout", "auto", "int", "double", "string", "if", "else", "for", "return", "while", "do"
+        "cin", "cout", "auto", "int", "double", "string", "if", "else", "for", "return", "while", "do", "bool", "true", "false"
     };
 
     const char *built_in_functions [COUNT_OF_BUILT_IN_FUNCTIONS] = {
@@ -150,16 +150,15 @@ int scanner () {
                  fillToken(c);
                                 }
             else {
-           
+
         switch(c) {
-         case ' ':          // preskocim character mezery
-                
+            case ' ':          // preskocim character mezery
                 break;
             case '\t':
                 break;                  // preskocim character tabulatoru
             case '\n':
                 token.counter_of_lines++;
-                break;                  // preskocim character konce radku 
+                break;                  // preskocim character konce radku
             case '/':
                 value = DIVIDE;
                 break;
@@ -169,22 +168,26 @@ int scanner () {
             case '"':
                 value = STRING;
                 break;
-        
+
                          default:  {
 
                                 switch (c)
-                                {         
+                                {
                                 case '_':
                                     value = UNDERSCORE;
                                     break;
-
                                 case '!':
                                     value = EXCLAMATION_MARK;  //vykřičník
+                                    break;
+                                case '&':
+                                    value = AND;
+                                    break;
+                                case '|':
+                                    value = OR;
                                     break;
                                 case '?':
                                     value = QUESTION_MARK;
                      	 	 	 	break;
-                               
                                 case '<':
                                     value = LESS;
                                     break;
@@ -211,7 +214,6 @@ int scanner () {
                                         case ',':
                                             token.type = COMMA;
                                             break;
-
                                         case  '(':
                                             token.type = L_BRACKET;
                                             break;
@@ -239,14 +241,14 @@ int scanner () {
                                         default:
                                                 fatalError (ERR_UnknownChar);
 
-                                        }//posleni switch 
+                                        }//posleni switch
                                 } //předposlední switch
                              fillToken(c);
                             }//default
-            }//switch 
+            }//switch
         }//else
-           
-               
+
+
             break;
 
 
@@ -448,7 +450,7 @@ int scanner () {
             break;
 
         case ESCAPE_OCTAL:
-            if (counter < 3 && (isdigit(c) || (c >= '0' && c <= '7')))
+            if (counter < 3 && (c >= '0' && c <= '7'))
             {
                 array_x [counter] = c;
                 array_x [counter + 1] = '\0';
@@ -470,7 +472,7 @@ int scanner () {
             break;
 
         case ESCAPE_BINARY:
-            if (counter < 8 && (isdigit(c) || (c >= '0' && c <= '1')))
+            if (counter < 8 && (c >= '0' && c <= '1'))
             {
                 array_x [counter] = c;
                 array_x [counter + 1] = '\0';
@@ -671,6 +673,27 @@ int scanner () {
 
         break;
 
+    case AND:
+        if (c == '&') {
+            fillToken(c);
+            token.type = AND;
+        }
+        else {
+            fatalError (ERR_UnknownChar);
+        }
+
+        break;
+
+    case OR:
+        if (c == '|') {
+            fillToken(c);
+            token.type = OR;
+        }
+        else {
+            fatalError (ERR_UnknownChar);
+        }
+
+        break;
 
     case PLUS:
         if (c == '+') {

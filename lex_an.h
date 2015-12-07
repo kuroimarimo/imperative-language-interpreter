@@ -16,7 +16,7 @@
 /** jednotlivé stavy */
 enum {
     START,              ///         Určení znaku
-   
+
     NUMBER,             ///         0..9
     LETTER,             ///         a..z, A..Z
     NUMBER_START_ZERO,
@@ -26,7 +26,7 @@ enum {
     EXP_NUMBER_SIGN,    ///         znamenkovy (+/-) 15E+8
     EXP_NUMBER_END,     ///
 
-    SEMICOLON,          ///         ;     
+    SEMICOLON,          ///         ;
     UNDERSCORE,         ///         _  //10
 
     L_BRACKET,          ///         (
@@ -37,7 +37,7 @@ enum {
     R_CURLY_BRACKET,    ///         }
 
     PLUS,               ///         +
-    MINUS,              ///         -  
+    MINUS,              ///         -
     INCREMENT,          ///         ++
     DECREMENT,          ///         --   /20
     MULTIPLY,           ///         *
@@ -47,6 +47,8 @@ enum {
 
     EXCLAMATION_MARK,   ///         !
     NEGATION,           ///         !=
+    AND,                ///         &&
+    OR,                 ///         ||
     QUESTION_MARK,      ///         ?
     STRING,             ///         ".."
     STRING_ESCAPE,      ///
@@ -97,6 +99,7 @@ enum {
     K_RETURN,           ///
     K_WHILE,            ///
     K_DO,               ///
+    K_BOOL,             ///
 
         /// vestavene funkce
     B_LENGTH = 85,      ///
@@ -131,7 +134,7 @@ typedef struct {
 } tToken;
 
 
-#define COUNT_OF_KEY_WORDS 12
+#define COUNT_OF_KEY_WORDS 15
 #define COUNT_OF_BUILT_IN_FUNCTIONS 5
 
     /// globalni promenne
