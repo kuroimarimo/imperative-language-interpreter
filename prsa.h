@@ -11,8 +11,8 @@
 #include "lex_an.h"
 #include "error.h"
 #include "garbage_collector.h"
+#include "instructions.h"
 
-#define INITIAL_SIZE 32
 #define NETERMINAL 500
 #define TERMINAL 501
 #define CALL_EXPRESSION 0
@@ -33,30 +33,7 @@ typedef struct {            // ukazatel prvniho prvku
     tElemPtr First;
 } tList;
 
-// INSTRUCTION ARRAY
-typedef struct
-{
-    int operator;
-    int type;
-    void *input1;
-    void *input2;
-    void *output;
-} tInstruction;
-typedef struct
-{
-    int lenght;
-    int occupied;
-    tInstruction * array;
-} tInstrList;
-
-tInstrList instructionList;
-
 int PrecedencniSA (hTab *table, int PrecType);
 void Dispose (tList *Z);
-
-bool expandInstrList();
-bool addInstruction(tInstruction * instr);
-bool initInstrList();
-void debugInstrList();
 
 #endif
