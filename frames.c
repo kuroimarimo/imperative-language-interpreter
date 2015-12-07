@@ -8,11 +8,11 @@ void frameStackInit(tFrameStack * stack, int size)
 	stack->size = size;
 }
 
-tFrame * frameCreate(int numberOfVars, bool isBase)
+tFrame * frameCreate(int numberOfVars/*, bool isBase*/)
 {
 	tFrame * temp = customMalloc(sizeof(tFrame));
 	temp->variables = customMalloc(numberOfVars * sizeof(tVariable));
-	temp->isBaseFrame = isBase;
+	temp->isBaseFrame = /*isBase*/ false;								//frames aren't base frames by default, have to be changed by topToBase()
 
 	for (int i = 0; i < numberOfVars; i++)
 		temp->variables[i].initialized = false;
@@ -56,19 +56,19 @@ tFrame * getFrame(tFrameStack * stack, int index)
 	return stack->frames[stack->top - index];
 }
 
-tVariable * getVariable(tFrameStack * stack, int frameIndex, int varIndex)
+tVariable * getVariable(tFrameStack * stack, tVarCoordinates * coordinates)
 {
-	return &(getFrame(stack, frameIndex)->variables[varIndex]);
+	return &(getFrame(stack, coordinates->frameOffset)->variables[coordinates->index]);
 }
 
-void frameCreateAndPush(tFrameStack * stack, int numOfVars, bool isBase)
+void frameCreateAndPush(tFrameStack * stack, int numOfVars/*, bool isBase*/)
 {
-	frameStackPush(stack, frameCreate(numOfVars, isBase));
+	frameStackPush(stack, frameCreate(numOfVars/*, isBase*/));
 }
 
 tVarCoordinates * varToFrame(char * key) 
 {
-	hashElem * temp;
+	hashElem * temp = NULL;
 	int i;
 
 	
@@ -86,4 +86,9 @@ tVarCoordinates * varToFrame(char * key)
 
 
 	return coordinates;
+}
+
+void topToBase(tFrameStack * stack)					//changes the frame on top of the stack to a base frame
+{
+	stack->frames[stack->top]->isBaseFrame = true;
 }

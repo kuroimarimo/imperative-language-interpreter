@@ -143,6 +143,7 @@ void rule_param(hashElem * activeElem)
 		break;
 
 	default:
+		type = -1;
 		fatalError(ERR_SYNTAX);
 	}
 

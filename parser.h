@@ -13,6 +13,7 @@
 #include "prsa.h"
 #include "table_stack.h"
 #include "garbage_collector.h"
+#include "instructions.h"
 
 #define INIT_ST_SIZE	16							//initial table stack and symnbol table size
 #define F_MAIN			"main"

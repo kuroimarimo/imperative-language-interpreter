@@ -5,6 +5,8 @@
 #include <stdlib.h>
 
 #include "garbage_collector.h"
+#include "ial.h"
+
 
 #define INITIAL_SIZE 32
 
@@ -17,6 +19,7 @@ typedef struct
 	void *input2;
 	void *output;
 } tInstruction;
+
 typedef struct
 {
 	int lenght;

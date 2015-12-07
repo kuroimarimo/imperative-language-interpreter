@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-
+#include "instructions.h"
 #include "garbage_collector.h"
 #include "error.h"
 
@@ -28,7 +28,7 @@ typedef struct data
     tParam * params;					// function parameters
 	int numberOfParams;					// number of function parameters
 	int index;							// index of the variable in variable frame
-    //instrList * instructions;			//TODO
+	//tInstrList * instructions;			// fuctions instruction list
 } tData;
 
 typedef struct hashElem
