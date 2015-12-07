@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 	a = customRealloc(a, 15536);
 	garbageCleanup(&garbageList);
 	return 0;*/
-    initInstrList();
+    //initInstrList();
     
 /*
     bool test = true;
