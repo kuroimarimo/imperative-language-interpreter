@@ -16,9 +16,7 @@
 /** jednotlivé stavy */
 enum {
     START,              ///         Určení znaku
-    SWTICH_END,
-    BREAK,
-
+   
     NUMBER,             ///         0..9
     LETTER,             ///         a..z, A..Z
     NUMBER_START_ZERO,
@@ -28,8 +26,8 @@ enum {
     EXP_NUMBER_SIGN,    ///         znamenkovy (+/-) 15E+8
     EXP_NUMBER_END,     ///
 
-    SEMICOLON,          ///         ;
-    UNDERSCORE,         ///         _
+    SEMICOLON,          ///         ;     
+    UNDERSCORE,         ///         _  //10
 
     L_BRACKET,          ///         (
     R_BRACKET,          ///         )
@@ -39,9 +37,9 @@ enum {
     R_CURLY_BRACKET,    ///         }
 
     PLUS,               ///         +
-    MINUS,              ///         -
+    MINUS,              ///         -  
     INCREMENT,          ///         ++
-    DECREMENT,          ///         --
+    DECREMENT,          ///         --   /20
     MULTIPLY,           ///         *
     DIVIDE,             ///         /
     BACKSLASH,          ///

@@ -124,7 +124,6 @@ int scanner () {
     initToken();
 
     int c = 0;
-    int cx;
     char array_x [9];
     int counter = 0;
     int base = 0;
@@ -139,114 +138,115 @@ int scanner () {
                 /* Rozpoznani characteru  */
             if (isalpha(c)) {
                 value = LETTER;
-                cx = SWTICH_END;
+                 fillToken(c);
                 }
             else if (c == '0') {
                 value = NUMBER_START_ZERO;
+                 fillToken(c);
                 break;
                 }
             else if (isdigit(c)) {
                 value = NUMBER;
-                cx = SWTICH_END;
-                }
-            else
-                cx = c;
-
-
-            switch (cx)
-            {
-            case SWTICH_END:
-                break;
-            case '_':
-                value = UNDERSCORE;
-                break;
-            case ' ':          // preskocim character mezery
-                cx = BREAK;
+                 fillToken(c);
+                                }
+            else {
+           
+        switch(c) {
+         case ' ':          // preskocim character mezery
+                
                 break;
             case '\t':
-                cx = BREAK;
                 break;                  // preskocim character tabulatoru
             case '\n':
                 token.counter_of_lines++;
-                cx = BREAK;
-                break;                  // preskocim character konce radku
+                break;                  // preskocim character konce radku 
             case '/':
                 value = DIVIDE;
-                cx = BREAK;
                 break;
             case '\\':
                 value = BACKSLASH;
-                cx = BREAK;
                 break;
-            case '!':
-                value = EXCLAMATION_MARK;  //vykřičník
-                break;
-            case '?':
-                value = QUESTION_MARK;
- 	 	 	 	break;
             case '"':
                 value = STRING;
-                cx = BREAK;
                 break;
-            case '<':
-                value = LESS;
-                break;
-            case '>':
-                value = GREATER;
- 	 	 	    break;
-            case '=':
-                value = ASSIGNMENT;
- 	 	 	 	break;
-            case '+':
-                value = PLUS;
- 	 	 	 	break;
-            case '-':
-                value = MINUS;
-                break;
-            default:
-                    test = false;
+        
+                         default:  {
 
-                    switch (c)
-                    {
-                    case ';':
-                        token.type = SEMICOLON;
-                        break;
-                    case ',':
-                        token.type = COMMA;
-                        break;
+                                switch (c)
+                                {         
+                                case '_':
+                                    value = UNDERSCORE;
+                                    break;
 
-                    case  '(':
-                        token.type = L_BRACKET;
-                        break;
-                    case  ')':
-                        token.type = R_BRACKET;
-                        break;
-                    case  ']':
-                        token.type = L_SQUARE_BRACKET;
-                        break;
-                    case  '[':
-                        token.type = R_SQUARE_BRACKET;
-                        break;
-                    case  '{':
-                        token.type = L_CURLY_BRACKET;
-                        break;
-                    case  '}':
-                        token.type = R_CURLY_BRACKET;
-                        break;
-                    case  '*':
-                        token.type = MULTIPLY;
-                        break;
-                    case  '%':
-                        token.type = MODULO;
-                        break;
-                    default:
-                            fatalError (ERR_UnknownChar);
+                                case '!':
+                                    value = EXCLAMATION_MARK;  //vykřičník
+                                    break;
+                                case '?':
+                                    value = QUESTION_MARK;
+                     	 	 	 	break;
+                               
+                                case '<':
+                                    value = LESS;
+                                    break;
+                                case '>':
+                                    value = GREATER;
+                     	 	 	    break;
+                                case '=':
+                                    value = ASSIGNMENT;
+                     	 	 	 	break;
+                                case '+':
+                                    value = PLUS;
+                     	 	 	 	break;
+                                case '-':
+                                    value = MINUS;
+                                    break;
+                                default:
+                                        test = false;
 
-                    }
-            }
+                                        switch (c)
+                                        {
+                                        case ';':
+                                            token.type = SEMICOLON;
+                                            break;
+                                        case ',':
+                                            token.type = COMMA;
+                                            break;
 
-            if (cx != BREAK)
-                fillToken(c);
+                                        case  '(':
+                                            token.type = L_BRACKET;
+                                            break;
+                                        case  ')':
+                                            token.type = R_BRACKET;
+                                            break;
+                                        case  ']':
+                                            token.type = L_SQUARE_BRACKET;
+                                            break;
+                                        case  '[':
+                                            token.type = R_SQUARE_BRACKET;
+                                            break;
+                                        case  '{':
+                                            token.type = L_CURLY_BRACKET;
+                                            break;
+                                        case  '}':
+                                            token.type = R_CURLY_BRACKET;
+                                            break;
+                                        case  '*':
+                                            token.type = MULTIPLY;
+                                            break;
+                                        case  '%':
+                                            token.type = MODULO;
+                                            break;
+                                        default:
+                                                fatalError (ERR_UnknownChar);
+
+                                        }//posleni switch 
+                                } //předposlední switch
+                             fillToken(c);
+                            }//default
+            }//switch 
+        }//else
+           
+               
             break;
 
 
