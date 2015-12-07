@@ -761,7 +761,12 @@ int scanner () {
 
 
     if (c == EOF)
+    {
         token.type = EOF;
+
+        if (value == COMMENT || value == COMMENT_END)
+            fatalError (ERR_Comment);
+    }
 /* jestli nikdo nepotřebuje token.expression je mo
     if (token.type == INT_NUMBER || token.type== DOUBLE_NUMBER)
         token.expression = IDENTIFIER;

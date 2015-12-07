@@ -21,6 +21,7 @@ typedef enum
     ERR_StringEscape,
     ERR_NumberEscape,
     ERR_UnknownChar,
+    ERR_Comment,
 
     //// SYNTAX
     ERR_SYNTAX              = 200,          // TODO prepisat ked budeme mat konkretne chybove stavy

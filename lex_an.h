@@ -100,6 +100,8 @@ enum {
     K_WHILE,            ///
     K_DO,               ///
     K_BOOL,             ///
+    K_TRUE,             ///
+    K_FALSE,            ///
 
         /// vestavene funkce
     B_LENGTH = 85,      ///
