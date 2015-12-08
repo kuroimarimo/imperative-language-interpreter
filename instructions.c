@@ -53,11 +53,13 @@ bool initInstrList()
 	return true;
 }
 
-void generateInstruction(int operation, void * input1, void * input2, void * output)
+void generateInstruction(int operation, void * input1, void * input2, void * output)		//generates instruction for non-aritmetic operations
 {
 	tInstruction * instruction = customMalloc(sizeof(tInstruction));
 	instruction->operator = operation;
 	instruction->type = -1;
+
+
 	instruction->input1 = input1;
 	instruction->input2 = input2;
 	instruction->output = output;

@@ -18,7 +18,7 @@ typedef struct instr
 {
 	int operator;
 	int type;
-	tOperand *input1, *input2, *output;
+	void *input1, *input2, *output;
 	struct instr * next;
 } tInstruction;
 
@@ -37,6 +37,6 @@ bool addInstruction(tInstruction * instr);
 bool initInstrList();
 void debugInstrList();
 
-void generateInstruction(int operation, void * input1, void * input2, void * output);
+void generateInstruction(int operation, int type1, void * input1, int type2, void * input2, int outType, void * output);
 
 #endif
