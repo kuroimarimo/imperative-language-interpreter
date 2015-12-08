@@ -31,8 +31,6 @@ enum {
 
     L_BRACKET,          ///         (
     R_BRACKET,          ///         )
-    L_SQUARE_BRACKET,   ///         [
-    R_SQUARE_BRACKET,   ///         ]
     L_CURLY_BRACKET,    ///         {
     R_CURLY_BRACKET,    ///         }
 
@@ -43,13 +41,11 @@ enum {
     MULTIPLY,           ///         *
     DIVIDE,             ///         /
     BACKSLASH,          ///
-    MODULO,             ///         %
 
     EXCLAMATION_MARK,   ///         !
     NEGATION,           ///         !=
     AND,                ///         &&
     OR,                 ///         ||
-    QUESTION_MARK,      ///         ?
     STRING,             ///         ".."
     STRING_ESCAPE,      ///
     ESCAPE_HEXADECIMAL, ///
@@ -69,9 +65,6 @@ enum {
     LINE_COMMENT,       ///         // ...
     COMMENT,            ///         /* ...
     COMMENT_END,        ///         ... */
-
-    ANOTHER_CHAR,       ///         ostatni znaky
-
 
     TOK_NULL,           ///         prazdny/neinicializovany token  */
 
