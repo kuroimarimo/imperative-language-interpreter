@@ -8,13 +8,17 @@
 #define INITIAL_SIZE 512
 
 // INSTRUCTION ARRAY
+typedef struct
+{
+	int type;
+	void * operand;
+} tOperand;
+
 typedef struct instr
 {
 	int operator;
 	int type;
-	void *input1;
-	void *input2;
-	void *output;
+	tOperand *input1, *input2, *output;
 	struct instr * next;
 } tInstruction;
 
