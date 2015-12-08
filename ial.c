@@ -72,6 +72,7 @@ void hashElemInit (hashElem * elem)
     elem->data.numberOfParams = 0;
 	elem->data.value.int_value = 0;
 	elem->data.params = NULL;
+	elem->data.baseFrameSize = NULL;
     
     //if (elem->data.fParamTypes != NULL)
    /*     free(elem->data.fParamTypes);
@@ -117,6 +118,7 @@ bool tDataCopy (tData * destData, tData * srcData)
     destData->state = srcData->state;
     destData->value = srcData->value;
 	destData->numberOfParams = srcData->numberOfParams;
+	destData->baseFrameSize = srcData->baseFrameSize;
     
     //destData->localTable = srcData->localTable;   // not used if the element is variable; if it's a function, the table is later initialized
     

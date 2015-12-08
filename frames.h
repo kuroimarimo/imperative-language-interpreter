@@ -37,7 +37,7 @@ void frameStackPopUntilBase(tFrameStack * stack);							//pops all the frames to
 tFrame * getFrame(tFrameStack * stack, int index);							//returns frame >index< levels under top frame
 tVariable * getVariable(tFrameStack * stack, tVarCoordinates * coordinates);	//return variable with index varIndex form frame frameIndex levels under framestack top	
 void frameCreateAndPush(tFrameStack * stack, int numOfVars/*, bool isBase*/);
-
+void topToBase(tFrameStack * stack);										//sets the top frame as base frame
 tVarCoordinates * varToFrame(char * key);
 
 #endif

@@ -14,6 +14,7 @@
 #include "table_stack.h"
 #include "garbage_collector.h"
 #include "instructions.h"
+#include "frames.h"
 
 #define INIT_ST_SIZE	16							//initial table stack and symnbol table size
 #define F_MAIN			"main"
@@ -69,8 +70,8 @@ int rule_do();										// <do-loop> -> <statement> while ( <expression> )
 
 void rule_expression(hashElem * assignee);			//calls precedence SA for expressions or rule_function() for functions
 int rule_funcCall(hashElem * assignee);
-void rule_callParam(hashElem * funcCall);
-void rule_callParamList(hashElem * funcCall);		//TODO
+void rule_callParam(hashElem * funcCall, int  * paramIndex);
+void rule_callParamList(hashElem * funcCall, int  * paramIndex);		//TODO
 
 //rules for built-in functions
 int rule_builtIn(hashElem * assignee);

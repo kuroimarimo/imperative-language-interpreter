@@ -10,8 +10,8 @@
 // INSTRUCTION ARRAY
 typedef struct
 {
-	int type;
-	void * operand;
+	int type;				//|STRING, INT_NUMBER, DOUBLE_NUMBER|	|VAR_STRING, VAR_INT, VAR_DOUBLE|
+	void * operand;			//|---pointer-to-a-constant-value---|	|--------tVarCoordinates--------|
 } tOperand;
 
 typedef struct instr

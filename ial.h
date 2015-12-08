@@ -25,6 +25,7 @@ typedef struct data
     tSymbolType type;
     tState state;
     tSymbolValue value;					
+	int * baseFrameSize;
     tParam * params;					// function parameters
 	int numberOfParams;					// number of function parameters
 	int index;							// index of the variable in variable frame

@@ -77,7 +77,6 @@ tVarCoordinates * varToFrame(char * key)
 			break;
 
 	if (temp == NULL)
-		//fatalError(ERR_Internal);
 		return NULL;
 
 	tVarCoordinates * coordinates = customMalloc(sizeof(tVarCoordinates));
