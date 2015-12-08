@@ -409,7 +409,7 @@ int rule_cout()
 	{
 		case STRING:
 			output->type = STRING;
-			(char *)output->operand = strDuplicate(token.area);
+			output->operand = strDuplicate(token.area);
 			break;
 
 		case INT_NUMBER:
@@ -592,6 +592,9 @@ int rule_for()
 
     scanner();
     rule_statement(DENY_PUSH);													//body of the loop
+
+	//JUM TO THE ASSIGNMENT
+	generateInstruction(OP_GOTO, _assignment, NULL, NULL);
 
 	//FOR LOOP END LABEL
 	generateInstruction(OP_NOP, NULL, NULL, NULL);
