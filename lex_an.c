@@ -138,17 +138,20 @@ int scanner () {
                 /* Rozpoznani characteru  */
             if (isalpha(c)) {
                 value = LETTER;
-                 fillToken(c);
+                fillToken(c);
+                }
+            else if (c == '_') {
+                value = UNDERSCORE;
+                fillToken(c);
                 }
             else if (c == '0') {
                 value = NUMBER_START_ZERO;
-                 fillToken(c);
-                break;
+                fillToken(c);
                 }
             else if (isdigit(c)) {
                 value = NUMBER;
-                 fillToken(c);
-                                }
+                fillToken(c);
+                }
             else {
 
         switch(c) {
@@ -168,83 +171,77 @@ int scanner () {
             case '"':
                 value = STRING;
                 break;
+            case '!':
+                value = EXCLAMATION_MARK;  //vykřičník
+                break;
+            case '&':
+                value = AND;
+                break;
+            case '|':
+                value = OR;
+                break;
+/*            case '?':
+                value = QUESTION_MARK;
+                break;  */
+            case '<':
+                value = LESS;
+                break;
+            case '>':
+                value = GREATER;
+                break;
+            case '=':
+                value = ASSIGNMENT;
+                break;
+            case '+':
+                value = PLUS;
+                break;
+            case '-':
+                value = MINUS;
+                break;
+            default:
+                    test = false;
 
-                         default:  {
+                    switch (c)
+                    {
+                    case ';':
+                        token.type = SEMICOLON;
+                        break;
+                    case ',':
+                        token.type = COMMA;
+                        break;
+                    case  '(':
+                        token.type = L_BRACKET;
+                        break;
+                    case  ')':
+                        token.type = R_BRACKET;
+                        break;
+                /*    case  '[':
+                        token.type = L_SQUARE_BRACKET;
+                        break;
+                    case  ']':
+                        token.type = R_SQUARE_BRACKET;
+                        break;  */
+                    case  '{':
+                        token.type = L_CURLY_BRACKET;
+                        break;
+                    case  '}':
+                        token.type = R_CURLY_BRACKET;
+                        break;
+                    case  '*':
+                        token.type = MULTIPLY;
+                        break;
+                /*    case  '%':
+                        token.type = MODULO;
+                        break;  */
+                    default:
+                            fatalError (ERR_UnknownChar);
 
-                                switch (c)
-                                {
-                                case '_':
-                                    value = UNDERSCORE;
-                                    break;
-                                case '!':
-                                    value = EXCLAMATION_MARK;  //vykřičník
-                                    break;
-                                case '&':
-                                    value = AND;
-                                    break;
-                                case '|':
-                                    value = OR;
-                                    break;
-                                case '?':
-                                    value = QUESTION_MARK;
-                     	 	 	 	break;
-                                case '<':
-                                    value = LESS;
-                                    break;
-                                case '>':
-                                    value = GREATER;
-                     	 	 	    break;
-                                case '=':
-                                    value = ASSIGNMENT;
-                     	 	 	 	break;
-                                case '+':
-                                    value = PLUS;
-                     	 	 	 	break;
-                                case '-':
-                                    value = MINUS;
-                                    break;
-                                default:
-                                        test = false;
-
-                                        switch (c)
-                                        {
-                                        case ';':
-                                            token.type = SEMICOLON;
-                                            break;
-                                        case ',':
-                                            token.type = COMMA;
-                                            break;
-                                        case  '(':
-                                            token.type = L_BRACKET;
-                                            break;
-                                        case  ')':
-                                            token.type = R_BRACKET;
-                                            break;
-                                        case  ']':
-                                            token.type = L_SQUARE_BRACKET;
-                                            break;
-                                        case  '[':
-                                            token.type = R_SQUARE_BRACKET;
-                                            break;
-                                        case  '{':
-                                            token.type = L_CURLY_BRACKET;
-                                            break;
-                                        case  '}':
-                                            token.type = R_CURLY_BRACKET;
-                                            break;
-                                        case  '*':
-                                            token.type = MULTIPLY;
-                                            break;
-                                        case  '%':
-                                            token.type = MODULO;
-                                            break;
-                                        default:
-                                                fatalError (ERR_UnknownChar);
-
-                                        }//posleni switch
+                    }//posleni switch
+                                        /**
                                 } //předposlední switch
                              fillToken(c);
                             }//default
+                            */
             }//switch
         }//else
 
@@ -496,12 +493,12 @@ int scanner () {
     case LESS:
             if (c == '<')
             {
-                fillToken(c);
+                //fillToken(c);
                 token.type = C_OUT;
             }
             else if (c == '=')
             {
-                fillToken(c);
+                //fillToken(c);
                 token.type = LESS_EQUAL;
             }
             else
@@ -516,12 +513,12 @@ int scanner () {
    case GREATER:
             if (c == '>')
             {
-                fillToken(c);
+                //fillToken(c);
                 token.type = C_IN;
             }
             else if (c == '=')
             {
-                fillToken(c);
+                //fillToken(c);
                 token.type = GREATER_EQUAL;
             }
             else
@@ -536,7 +533,7 @@ int scanner () {
 
     case DIVIDE:
         if (c != '/' && c!= '*') {
-            fillToken('/');
+            //fillToken('/');
             token.type = DIVIDE;
 
             ungetc(c,source);
@@ -565,7 +562,7 @@ int scanner () {
         break;
 
     case BINARY:
-        if (counter == 8 && ((c >= '0' && c <= '1') /*|| isalpha(c)*/ )) {
+        if (counter == 8 && (c >= '0' && c <= '1')) {
             fatalError (ERR_NumberEscape);
         }
 
@@ -647,7 +644,7 @@ int scanner () {
 
     case ASSIGNMENT:
             if (c == '=') {
-                fillToken(c);
+                //fillToken(c);
                 token.type = EQUAL;
             }
             else {
@@ -663,7 +660,7 @@ int scanner () {
     case EXCLAMATION_MARK:
             if (c == '=')
             {
-                fillToken(c);
+                //fillToken(c);
                 token.type = NEGATION;
             }
             else {
@@ -675,7 +672,7 @@ int scanner () {
 
     case AND:
         if (c == '&') {
-            fillToken(c);
+            //fillToken(c);
             token.type = AND;
         }
         else {
@@ -686,7 +683,7 @@ int scanner () {
 
     case OR:
         if (c == '|') {
-            fillToken(c);
+            //fillToken(c);
             token.type = OR;
         }
         else {
@@ -697,7 +694,7 @@ int scanner () {
 
     case PLUS:
         if (c == '+') {
-            fillToken(c);
+            //fillToken(c);
             token.type = INCREMENT;
         }
         else {
@@ -712,7 +709,7 @@ int scanner () {
 
     case MINUS:
         if (c == '-') {
-            fillToken(c);
+            //fillToken(c);
             token.type = DECREMENT;
         }
         else {
