@@ -36,6 +36,9 @@ void printErrorDetails (EErrorTypes state)
         case ERR_UnknownChar:
             fprintf(stderr, "Unknown character.\n");
             break;
+        case ERR_Comment:
+            fprintf(stderr, "Unterminated comment.\n");
+            break;
         case ERR_SYNTAX:
             fprintf(stderr, "Syntax error.\n");
             break;
