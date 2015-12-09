@@ -15,6 +15,7 @@ tExpr* NextToken()
     struktura->terminal = TERMINAL;                 // default
     struktura->type = token.type;                   // sets type of token
     struktura->data = NULL;
+    struktura->identifier = 0;
     switch (token.type) {
         case INT_NUMBER: 
             struktura->data = customMalloc(sizeof(int));
@@ -188,9 +189,28 @@ int PrecG(tExpr *pred3, tExpr *pred2, tExpr *pred1)
 //------------------------------//
 //        GENEROVANI 3AK        //
 //------------------------------//
+tOperand *PomTrojAdres(tExpr* expr)
+{
+    tOperand *operand = customMalloc(sizeof(tOperand));
+    if (expr->identifier == 1)
+    {
+        switch(expr->type)
+        {
+            case INT_NUMBER: operand->type = VAR_INT; break;
+            case DOUBLE_NUMBER: operand->type = VAR_DOUBLE; break;
+            case STRING: operand->type = VAR_STRING; break;
+        }
+    }
+    else   
+        operand->type = expr->type;
+    operand->operand = expr->data;
+    return operand;
+}
+
 void TrojAdres(int gramatika, tExpr* input1, tExpr* input2, tExpr* output) 
 {
-    int operator, type;
+    int operator;
+    tOperand *in1, *in2, *out;
     switch (gramatika) 
     {
         case 1: operator = OP_SUM; break;
@@ -207,43 +227,37 @@ void TrojAdres(int gramatika, tExpr* input1, tExpr* input2, tExpr* output)
         case 12: operator = OP_ASSIGN; break;
         default: fatalError(ERR_ParamType); return;          // no grammar
     }
-    // checks for type of first input, decides what kind of type will be used
-    switch (output->type) 
-    {
-        case INT_NUMBER: type = INT_NUMBER; break;
-        case DOUBLE_NUMBER: type = DOUBLE_NUMBER; break;
-        case STRING: type = STRING; break;
-        default: fatalError(ERR_IncompatibleExpr); return;   // not id
-    }
+    //
+    in1 = PomTrojAdres(input1);
+    if (input2 != NULL) in2 = PomTrojAdres(input2);
+    out = PomTrojAdres(output);
     // pushes instruction into array of instructions
     tInstruction* instrBeingAdded;
     instrBeingAdded = customMalloc(sizeof(tInstruction));
     instrBeingAdded->operator = operator;
-    instrBeingAdded->type = type;
-    instrBeingAdded->input1 = input1->data;
+    instrBeingAdded->type = OPERAND;
+    instrBeingAdded->input1 = in1;
     if(input2 != NULL)
-        instrBeingAdded->input2 = input2->data;
+        instrBeingAdded->input2 = in2;
     else
         instrBeingAdded->input2 = NULL;
-    instrBeingAdded->output = output->data;
+    instrBeingAdded->output = out;
     addInstruction(instrBeingAdded);
 }
 
 //------------------------------//
 //   PREC. SEMANTICKA ANALYZA   //
 //------------------------------//
-tExpr* SemId(tExpr* identifier, hTab* table) 
+void SemId(tExpr* identifier) 
 {
+    
     hashElem* element = findVar(identifier->data);
-    //element = findElem(table, identifier->data);            // find and store identifier from hash table
-    //free(identifier->data);                               // no more need for identifier name, will use pointer
-    if (element == NULL) 
-    {
-        fatalError(ERR_UndefinedVariable);                  // error undefined variable
-        return NULL;
-    }
-    identifier->data = &element->data.value;                // stores pointer to data from hash table
-    switch (element->data.type) 
+    tVarCoordinates * coordinates;
+    coordinates = customMalloc(sizeof(tVarCoordinates));
+    coordinates = varToFrame(identifier->data);
+    identifier->data = coordinates;
+    identifier->identifier = 1;
+    switch (element->data.type)
     {
         case VAR_INT:
             identifier->type = INT_NUMBER;
@@ -256,21 +270,20 @@ tExpr* SemId(tExpr* identifier, hTab* table)
         break;
         default:
             fatalError(ERR_IncompatibleExpr);
-            return NULL;
+            return;
     }
-    return identifier;
 }
 
 tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table) 
 {
     if (expr1->type == IDENTIFIER)
-        expr1 = SemId(expr1, table);
+        SemId(expr1);
     if (gramatika != 11) 
     { // TO DO: update after bool types are added
         if (expr2->type == IDENTIFIER)
-            expr2 = SemId(expr2, table);
+            SemId(expr2);
         if (expr3->type == IDENTIFIER)
-            expr3 = SemId(expr3, table);
+            SemId(expr3);
         if ((expr1->type == STRING && (expr3->type == DOUBLE_NUMBER ||
             expr3->type == INT_NUMBER)) || ((expr1->type == DOUBLE_NUMBER ||
             expr1->type == INT_NUMBER) && expr3->type == STRING)) 
@@ -312,17 +325,20 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
         case 8:
         case 9:
         case 10:
-            if (expr1->type == INT_NUMBER && expr3->type == DOUBLE_NUMBER) 
+            if (expr1->identifier == 0 && expr3->identifier == 0)
             {
-                int docasna_prom = *((int *)expr1->data);
-                expr1->data = customRealloc(expr1->data, sizeof(double));
-                *((double*)expr1->data) = docasna_prom;
-            }
-            if (expr1->type == DOUBLE_NUMBER && expr3->type == INT_NUMBER) 
-            {
-                int docasna_prom = *((int *)expr3->data);
-                expr3->data = customRealloc(expr3->data, sizeof(double));
-                *((double*)expr3->data) = docasna_prom;
+                if (expr1->type == INT_NUMBER && expr3->type == DOUBLE_NUMBER) 
+                {
+                    int docasna_prom = *((int *)expr1->data);
+                    expr1->data = customRealloc(expr1->data, sizeof(double));
+                    *((double*)expr1->data) = docasna_prom;
+                }
+                if (expr1->type == DOUBLE_NUMBER && expr3->type == INT_NUMBER) 
+                {
+                    int docasna_prom = *((int *)expr3->data);
+                    expr3->data = customRealloc(expr3->data, sizeof(double));
+                    *((double*)expr3->data) = docasna_prom;
+                }
             }
             if ((expr1->type == INT_NUMBER && expr3->type == INT_NUMBER) ||
             (expr1->type == DOUBLE_NUMBER && expr3->type == DOUBLE_NUMBER) ||
