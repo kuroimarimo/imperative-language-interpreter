@@ -10,7 +10,7 @@
 #include "garbage_collector.h"
 #include "error.h"
 
-typedef enum {VAR_INT, VAR_DOUBLE, VAR_STRING, FUNC_INT, FUNC_DOUBLE, FUNC_STRING} tSymbolType;
+typedef enum {VAR_INT, VAR_DOUBLE, VAR_STRING, FUNC_INT, FUNC_DOUBLE, FUNC_STRING, OPERAND} tSymbolType;
 typedef union {int int_value; double double_value; char * string_value;} tSymbolValue;
 typedef enum  {DECLARED, DEFINED} tState;
 
