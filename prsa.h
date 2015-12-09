@@ -12,14 +12,18 @@
 #include "error.h"
 #include "garbage_collector.h"
 #include "instructions.h"
+#include "frames.h"
+#include "table_stack.h"
 
 #define NETERMINAL 500
 #define TERMINAL 501
 #define CALL_EXPRESSION 0
 #define CALL_CONDITION 1
+#define CALL_FOR 2
 
 typedef struct {
     int terminal;
+    int identifier;
     int type;
     void *data;
 } tExpr;
