@@ -35,28 +35,26 @@ int main(int argc, char** argv)
 	garbageCleanup(&garbageList);
 	return 0;*/
     //initInstrList();
-    
+
 /*
     bool test = true;
-
     while (test) {
         scanner(source);
         if (token.type == EOF)
             test = false;
-        else if (token.unie.area != NULL)
-            printf("Tok: %s %d\n", token.unie.area, token.type);
+        else
+            printf("Tok: %s %d\n", token.area, token.type);
     }
 */
- 
-    /*errorState.line = token.counter_of_lines;
 
+    /*errorState.line = token.counter_of_lines;
     if (errorState.state != ERR_None)
         printErrorDetails(errorState);
     else
         printf("Syntax OK.\n");*/
 
 	parse();               // parse the code
-	
+
     // cleanup
 	fclose(source);
 	garbageCleanup(&garbageList);
