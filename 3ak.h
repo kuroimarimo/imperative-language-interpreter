@@ -33,7 +33,7 @@ enum adressCode {
 	OP_DISPOSE_FRAME,		// dispose of the frame at the top of the framestack
 	OP_IF_JUMP,				// if input1, jump to *tInstruction output
 	OP_IFNOT_JUMP,			// if not input1, jump to *tInstruction output
-	OP_FUNC_CALL,			// call a function, starting on *tInstruction input1
+	OP_FUNC_CALL,			// call a function, starting on *tInstructionList input1
 	OP_BUILT_IN,			// calls built in function of type input1 (from lex_an.h), stores the result in *tVarCoordinates output
 	OP_GET_RETURN_VALUE,	// copies function return value to output 
 	OP_NOP					// doesn't do anything

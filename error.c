@@ -18,7 +18,7 @@ void printErrorDetails (EErrorTypes state)
  * Prints information about the occurred error - line number and appropriate message.
  */
 {
-    fprintf(stderr, "Error on line number %d. \n", token.counter_of_lines);
+    fprintf(stderr, "\nError on line number %d. \n", token.counter_of_lines);
 
     switch (state) {
         case ERR_LEXICAL:
@@ -70,7 +70,7 @@ void printErrorDetails (EErrorTypes state)
             fprintf(stderr, "Using \'auto\', but initialization is missing.\n");
             break;
         case ERR_OTHERSEMANTIC:
-            fprintf(stderr, "\n");
+            fprintf(stderr, "Semantic error.\n");
             break;
         case ERR_ReadInput:
             fprintf(stderr, "Interpreter error while reading from the input.\n");
@@ -82,7 +82,7 @@ void printErrorDetails (EErrorTypes state)
             fprintf(stderr, "Zero division.\n");
             break;
         case ERR_OtherRunningErr:
-            fprintf(stderr, "\n");
+            fprintf(stderr, "Runtime error.\n");
             break;
         case ERR_SegmentationFault:
             fprintf(stderr, "Segmentation fault.\n");
@@ -97,6 +97,7 @@ void printErrorDetails (EErrorTypes state)
             fprintf(stderr, "Invalid command line arguments.\n");
             break;
         default:
+			fprintf(stderr, "Undefined error.\n");
             break;
     }
 }

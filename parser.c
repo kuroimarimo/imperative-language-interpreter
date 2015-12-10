@@ -19,7 +19,7 @@ void parse()
 	if (!isFunct(F_MAIN) || (findElem(globalST, F_MAIN)->data.state != DEFINED))				//there's no main
 		fatalError(ERR_UndefinedFunction);
 
-	//interpret(findElem(globalST, F_MAIN)->data.instructions->first);
+	interpret(findElem(globalST, F_MAIN)->data.instructions->first);
 }
 
 // rule:    <prog> -> type id <param-list> <func-defined>   || EOF
@@ -837,7 +837,7 @@ int compareParams(hashElem * elem1, hashElem * elem2)								//compares function
 	if (elem1->data.numberOfParams != elem2->data.numberOfParams)
 		return 0;
 
-	for (int i = 0; i < elem1->data.numberOfParams; i++)
+	for (unsigned int i = 0; i < elem1->data.numberOfParams; i++)
 	{
 		if (elem1->data.params[i].type != elem2->data.params[i].type)
 			return 0;
@@ -853,7 +853,7 @@ int compareParamTypes(hashElem * elem1, hashElem * elem2)						//compares functi
 	if (elem1->data.numberOfParams != elem2->data.numberOfParams)
 		return 0;
 
-	for (int i = 0; i < elem1->data.numberOfParams; i++)
+	for (unsigned int i = 0; i < elem1->data.numberOfParams; i++)
 		if (!convertType(elem1->data.params[i].type, elem2->data.params[i].type))		//checks whether the parameter can be converted
 			return 0;
 
@@ -946,7 +946,7 @@ int rule_funcCall(hashElem * assignee)	//id ( <call_list> ;
 	if (token.type != SEMICOLON)
 		fatalError(ERR_SYNTAX);
 
-	generateInstruction(OP_FUNC_CALL, findElem(globalST, funcCall.key)->data.instructions->first, NULL, NULL);
+	generateInstruction(OP_FUNC_CALL, findElem(globalST, funcCall.key)->data.instructions, NULL, NULL);
 
 	//store the return value in the variable
 	generateInstruction(OP_GET_RETURN_VALUE, NULL, NULL, varToFrame(assignee->key));
