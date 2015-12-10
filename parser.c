@@ -1028,6 +1028,34 @@ int rule_builtIn(hashElem * assignee)
 			break;
 	}
 
+	// create frame variables for parameters
+	for (int i = 0; i < *paramCount; i++)
+	{
+		tVarCoordinates * param = customMalloc(sizeof(tVarCoordinates));
+		param->frameOffset = 0;
+		param->index = i;
+		int * type = customMalloc(sizeof(int));
+		switch (*function)
+		{
+			case B_LENGTH:
+			case B_SORT:
+			case B_CONCAT:
+			case B_FIND:
+				*type = VAR_STRING;
+				break;
+
+			case B_SUBSTR:
+				if (i == 0)
+					*type = VAR_STRING;
+				else
+					*type = VAR_INT;
+		}
+
+		generateInstruction(OP_CREATE_VAR, type, NULL, param);
+	}
+
+
+
 	hashElem funcCall;
 	funcCall.key = NULL;
 	funcCall.data.params = NULL;
