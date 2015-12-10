@@ -31,14 +31,14 @@ char * strDuplicate(char * src)                                // UNFINISHED!
     size_t srcLength;
 	char * dest;
     //char * tmp = * dest;
-    
+
     srcLength = strlen(src) + 1;                // + 1 takes into account the end of string character
-    
+
 	dest = customMalloc((int) srcLength * sizeof(char));
-    
+
     if ((dest = strcpy(dest, src)) == NULL)
 		return NULL;							//zavolat error.h
-    
+
     return dest;
 }
 
@@ -73,15 +73,15 @@ void hashElemInit (hashElem * elem)
 	elem->data.value.int_value = 0;
 	elem->data.params = NULL;
 	elem->data.baseFrameSize = NULL;
-    
+
     //if (elem->data.fParamTypes != NULL)
    /*     free(elem->data.fParamTypes);
     elem->data.fParamTypes = NULL;*/
-    
+
     //if (elem->data.localTable != NULL)
     //    hTabFree(elem->data.localTable);
     //elem->data.localTable = NULL;
-    
+
     //if (elem->key != NULL)
         //free(elem->key);
     elem->key = NULL;
@@ -119,9 +119,9 @@ bool tDataCopy (tData * destData, tData * srcData)
     destData->value = srcData->value;
 	destData->numberOfParams = srcData->numberOfParams;
 	destData->baseFrameSize = srcData->baseFrameSize;
-    
+
     //destData->localTable = srcData->localTable;   // not used if the element is variable; if it's a function, the table is later initialized
-    
+
     /*if (srcData->fParamTypes != NULL)			// there's data to copy
     //    return (strDuplicate(&destData->fParamTypes, &srcData->fParamTypes));
     {
@@ -138,7 +138,7 @@ bool tDataCopy (tData * destData, tData * srcData)
     }*/
 	destData->params = srcData->params;
 	return true;
-    
+
 }
 
 /* adds new element to a hash table */
@@ -180,12 +180,12 @@ hashElem * addElem (hTab * table, char * key, tData * data)
 
 //    if (!strDuplicate(&newElem->key, &key))
 //        return NULL;                    // Malloc failed.
-    
+
     if (!tDataCopy(&newElem->data, data) || !newElem->key)
     {
         return NULL;                    // Malloc failed.
     }
-    
+
     table->table[hFunct(key, table->size)] = newElem;
 
     ++table->numStoredElem;
@@ -225,7 +225,7 @@ void removeElem (hTab * table, char * key)
 
         if (tmp->data.localTable != NULL)
             hTabFree(tmp->data.localTable);*/
-		
+
 		/*if (tmp->data.params != NULL)
 			free(tmp->data.params);
 
@@ -307,13 +307,19 @@ int lenght(char *s)
 
 char *substr (char *s, int i, int n) {
 
-    int len = (int) strlen(s);    /// length of string
-    char * subs = NULL;
-    subs = customMalloc((len + 1)*sizeof(char));
+    //int len = (int) strlen(s);    /// length of string
+    //char * subs = NULL;
 
-    if (subs == NULL) {
-        /// chyba 10;
+    if (s == NULL || i < 0 || i > ((int) strlen(s)) || n < 0) {
+        fatalError(ERR_SegmentationFault);
         return NULL;
+    }
+
+    char *subs = customMalloc((n + 1)*sizeof(char));
+
+    if (n == 0) {
+        subs = "\0";
+        return subs;
     }
 
     strncpy(subs, s+i, n);
@@ -329,9 +335,9 @@ int lenght2=(int) strlen(s2);   //delka druhého
 
 char *pomocna= customMalloc((lenght1 + lenght2 + 1)*sizeof(char));  // naalokuju si pamět velikosti prvniho a druheho řetězce
 if(pomocna==NULL) return NULL ;
-strncpy(pomocna,s1,lenght1);  //zkopiruju prvni řetězec do pomocne 
+strncpy(pomocna,s1,lenght1);  //zkopiruju prvni řetězec do pomocne
 strncpy(pomocna+lenght1,s2,lenght2);  //zkopiruju druhy řetězec na pozici lenght1 -1  musime odstranit (\0)
-return pomocna; 
+return pomocna;
 }
 
 
@@ -339,41 +345,41 @@ int find(char*s, char*search){
 
 int lenght_s=(int)strlen (s);
 int lenght_search=(int) strlen (search);
-if (lenght_search==0)  //pokud je podřetězec prázdný vrať nulu 
+if (lenght_search==0)  //pokud je podřetězec prázdný vrať nulu
     return 0;
-int counter_s=0;   //počítadlo projitých znaků řetězce s 
-int counter_found_search=0;   //počitadlo nalezených stejných znaků 
+int counter_s=0;   //počítadlo projitých znaků řetězce s
+int counter_found_search=0;   //počitadlo nalezených stejných znaků
 
 
 
-        while (counter_s<lenght_s){  //dokud je počítadlo projitých znaků menší než délka 
-            
-            
+        while (counter_s<lenght_s){  //dokud je počítadlo projitých znaků menší než délka
+
+
 
             if (s[counter_s]!=search[counter_found_search]) {  //pokud jsou znaky rozdílné, počet stejných znaků dej na nulu
             counter_found_search=0;
             }
-            
-            if( s[counter_s]==search[counter_found_search]){  //pokud jsou znaky stejné 
-                
-                    counter_found_search++;   //inkrementuj počítadlo najítých znaků 
-                                
-                    if (counter_found_search==lenght_search) { //pokud je počet najitých znaků stejný jako délka substringu 
-                        
-                            return counter_s-counter_found_search+1;   //vrať rozdíl +1 - pozice počítaná od nuly 
-                    }
-                    
-            }
-                    
 
-            counter_s++;    
+            if( s[counter_s]==search[counter_found_search]){  //pokud jsou znaky stejné
+
+                    counter_found_search++;   //inkrementuj počítadlo najítých znaků
+
+                    if (counter_found_search==lenght_search) { //pokud je počet najitých znaků stejný jako délka substringu
+
+                            return counter_s-counter_found_search+1;   //vrať rozdíl +1 - pozice počítaná od nuly
+                    }
+
+            }
+
+
+            counter_s++;
 
         }
 
 
 return -1; //pokud jsem nenašel vratím -1
 
-    
+
 }
 
 
