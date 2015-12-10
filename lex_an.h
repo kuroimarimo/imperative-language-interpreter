@@ -27,7 +27,7 @@ enum {
     EXP_NUMBER_END,     ///
 
     SEMICOLON,          ///         ;
-    UNDERSCORE,         ///         _  //10
+    UNDERSCORE,         ///         _   /10
 
     L_BRACKET,          ///         (
     R_BRACKET,          ///         )
@@ -37,9 +37,9 @@ enum {
     PLUS,               ///         +
     MINUS,              ///         -
     INCREMENT,          ///         ++
-    DECREMENT,          ///         --   /20
+    DECREMENT,          ///         --
     MULTIPLY,           ///         *
-    DIVIDE,             ///         /
+    DIVIDE,             ///         /   /20
     BACKSLASH,          ///
 
     EXCLAMATION_MARK,   ///         !

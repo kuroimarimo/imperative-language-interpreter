@@ -146,7 +146,6 @@ int scanner () {
                 }
             else if (c == '0') {
                 value = NUMBER_START_ZERO;
-                fillToken(c);
                 }
             else if (isdigit(c)) {
                 value = NUMBER;
@@ -664,6 +663,7 @@ int scanner () {
                 token.type = NEGATION;
             }
             else {
+                token.type = EXCLAMATION_MARK;
                 ungetc(c, source);
             }
                 test = false;
