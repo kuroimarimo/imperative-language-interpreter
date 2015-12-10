@@ -84,6 +84,9 @@ void printErrorDetails (EErrorTypes state)
         case ERR_OtherRunningErr:
             fprintf(stderr, "\n");
             break;
+        case ERR_SegmentationFault:
+            fprintf(stderr, "Segmentation fault.\n");
+            break;
         case ERR_AllocFailed:
             fprintf(stderr, "Memory allocation error.\n");
             break;
