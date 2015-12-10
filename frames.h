@@ -8,7 +8,7 @@
 typedef struct {
 	bool initialized;
 	void * value;
-	tSymbolType type;
+	int type;
 } tVariable;
 
 typedef struct{
@@ -25,11 +25,11 @@ typedef struct {
 typedef struct					//coordinates of variable inside frame
 {
 	int frameOffset;			//how many levels under the frame stack top
-	int index;					//index in the frame
+	unsigned int index;					//index in the frame
 } tVarCoordinates;
 
 tFrame * frameCreate(int numberOfVars/*, bool isBase*/);
-void frameStackInit(tFrameStack * stack, int size);
+tFrameStack * frameStackInit(tFrameStack * stack, int size);
 void frameStackPush(tFrameStack * stack, tFrame * frame);
 tFrame * frameStackTop(tFrameStack * stack);
 void frameStackPop(tFrameStack * stack);
@@ -39,5 +39,7 @@ tVariable * getVariable(tFrameStack * stack, tVarCoordinates * coordinates);	//r
 void frameCreateAndPush(tFrameStack * stack, int numOfVars/*, bool isBase*/);
 void topToBase(tFrameStack * stack);										//sets the top frame as base frame
 tVarCoordinates * varToFrame(char * key);
+
+tFrameStack * frameStack;
 
 #endif

@@ -1,11 +1,13 @@
 #include "frames.h"
 
-void frameStackInit(tFrameStack * stack, int size)
+tFrameStack * frameStackInit(tFrameStack * stack, int size)
 {
 	stack = customMalloc(sizeof(tFrameStack));
 	stack->frames = customMalloc(size * sizeof(tFrame*));
 	stack->top = -1;
 	stack->size = size;
+	
+	return stack;
 }
 
 tFrame * frameCreate(int numberOfVars/*, bool isBase*/)
@@ -80,8 +82,8 @@ tVarCoordinates * varToFrame(char * key)
 		return NULL;
 
 	tVarCoordinates * coordinates = customMalloc(sizeof(tVarCoordinates));
-	coordinates->frameOffset = i - localSTstack->top;
-	coordinates->frameOffset = temp->data.index;
+	coordinates->frameOffset = localSTstack->top - i;
+	coordinates->index = temp->data.index;
 
 
 	return coordinates;
