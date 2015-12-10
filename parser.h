@@ -43,6 +43,7 @@ int compareParams(hashElem * elem1, hashElem * elem2);				//compares parameters 
 int compareSymbol(hashElem * elem, hashElem * activeElem);			// compares 2 hashElem symbols
 tParam * addParam(hashElem * elem, char * key, tSymbolType type);	//adds parameter to the parameter array
 int convertType(tSymbolType inType, tSymbolType outType);			//type conversion
+void processParam(int * paramIndex, hashElem * funcCall, int builtIn);
 
 																	
 //functions simulating LL grammar rules             TODO
@@ -70,8 +71,8 @@ int rule_do();										// <do-loop> -> <statement> while ( <expression> )
 
 void rule_expression(hashElem * assignee);			//calls precedence SA for expressions or rule_function() for functions
 int rule_funcCall(hashElem * assignee);
-void rule_callParam(hashElem * funcCall, int  * paramIndex);
-void rule_callParamList(hashElem * funcCall, int  * paramIndex);		//TODO
+void rule_callParam(hashElem * funcCall, int  * paramIndex, int builtIn);
+void rule_callParamList(hashElem * funcCall, int  * paramIndex, int builtIn);		//TODO
 
 //rules for built-in functions
 int rule_builtIn(hashElem * assignee);

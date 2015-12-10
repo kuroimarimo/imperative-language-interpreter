@@ -18,6 +18,8 @@ void parse()
 
 	if (!isFunct(F_MAIN) || (findElem(globalST, F_MAIN)->data.state != DEFINED))				//there's no main
 		fatalError(ERR_UndefinedFunction);
+
+	//interpret(findElem(globalST, F_MAIN)->data.instructions->first);
 }
 
 // rule:    <prog> -> type id <param-list> <func-defined>   || EOF
@@ -43,7 +45,7 @@ void rule_funcdef(hashElem * activeElem)
 	}
 
 
-    activeElem->data.type = functionType;				//get function type
+    activeElem->data.type = functionType;				//save the function type
     activeElem->data.state = DECLARED;
 	
 	initInstrList();
@@ -256,13 +258,13 @@ void rule_statement(int pushAllowed)
 //rule:     <var-decl> -> ;    |   = <expression> ;
 void rule_varDecl(hashElem * assignee)
 {
+
+	generateInstruction(OP_CREATE_VAR, &assignee->data.type, NULL, varToFrame(assignee->key));		//create the variable in the frame
+
     scanner();
 
 	if (token.type == SEMICOLON)					//only a declaration
-	{
-		generateInstruction(OP_CREATE_VAR, &assignee->data.type, NULL, varToFrame(assignee->key));		//create the variable in the frame
 		return;
-	}
 
 	if (token.type == ASSIGNMENT)					//a definition
 	{
@@ -353,13 +355,15 @@ void rule_auto()
     if (token.type != ASSIGNMENT)									//modifier auto requires assignment
         fatalError(ERR_SYNTAX);
 
-	int retType = exprType(PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION));
+	int  * retType = customMalloc(sizeof(int));
+	*retType = exprType(PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION));
 
-	addVar(id, tableStackTop(localSTstack), retType);				//save the variable to the symbol tableò
-	
+	addVar(id, tableStackTop(localSTstack), *retType);				//save the variable in the symbol table
+	generateInstruction(OP_CREATE_VAR, retType, NULL, varToFrame(id));		//create the variable in the frame
+
 	tOperand * variable = customMalloc(sizeof(tOperand));
 	variable->operand = varToFrame(id);
-	variable->type = retType;
+	variable->type = *retType;
 
 	generateInstruction(OP_ASSIGN, instructionList->last->output, NULL, variable);
 } 
@@ -497,50 +501,54 @@ void rule_return()
 
 	if (!convertType(retType, functionType))													//check whether if fits the function return type
 		fatalError(ERR_IncompatibleExpr);
-	
-	generateInstruction(OP_RETURN, NULL, NULL, instructionList->last->output);
+
+	int * type = customMalloc(sizeof(int));
+	*type = functionType;
+
+	generateInstruction(OP_RETURN, instructionList->last->output, type, NULL);
 }
 
 //rule:     <for-decl> -> type ( id <var-decl> <expression> id = <expression> <statement>
 int rule_for()
 {
-    scanner();
+	scanner();
 	if (token.type != L_BRACKET)
 		fatalError(ERR_SYNTAX);
 
 	hTab * temp = hTabInit(INIT_ST_SIZE);				//create local symbol table
 	tableStackPush(localSTstack, temp);
+	generateInstruction(OP_CREATE_FRAME, &tableStackTop(localSTstack)->numStoredElem, NULL, NULL);
 
-    scanner();
+	scanner();
 	int type;
 
 
 	// INITIAL DECLARATON/DEFINITION
 	switch (token.type)									//variable declaration/definition should follow
 	{
-		case K_INT:
-		case K_DOUBLE:
-		case K_STRING:
-			type = getType(token.type);
-			scanner();
-			if (token.type != IDENTIFIER)
-				fatalError(ERR_SYNTAX);
-
-			hashElem * variable = addVar(token.area, tableStackTop(localSTstack), type);
-			rule_varDecl(variable);
-			break;
-
-		case K_AUTO:
-			rule_auto();
-			break;
-		default:
+	case K_INT:
+	case K_DOUBLE:
+	case K_STRING:
+		type = getType(token.type);
+		scanner();
+		if (token.type != IDENTIFIER)
 			fatalError(ERR_SYNTAX);
+
+		hashElem * variable = addVar(token.area, tableStackTop(localSTstack), type);
+		rule_varDecl(variable);
+		break;
+
+	case K_AUTO:
+		rule_auto();
+		break;
+	default:
+		fatalError(ERR_SYNTAX);
 	}
 
 	// CONDITION LABEL
 	generateInstruction(OP_NOP, NULL, NULL, NULL);
 	tInstruction * _for_condition = instructionList->last;
-	
+
 	//CONDITION
 	PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION);			//condition for iteration
 
@@ -549,7 +557,7 @@ int rule_for()
 	generateInstruction(OP_IFNOT_JUMP, instructionList->last->output, NULL, _for_body);
 
 	//ELSE JUMP TO FOR LOOP END
-	tInstruction * _for_end = customMalloc(sizeof(tInstruction));			
+	tInstruction * _for_end = customMalloc(sizeof(tInstruction));
 	generateInstruction(OP_GOTO, _for_end, NULL, NULL);
 
 	//ASSIGNMENT LABEL
@@ -557,19 +565,19 @@ int rule_for()
 	tInstruction * _assignment = instructionList->last;
 
 	//ASSIGNMENT
-    scanner();
-    if (token.type != IDENTIFIER)											//assignment should follow
-        fatalError(ERR_SYNTAX);
+	scanner();
+	if (token.type != IDENTIFIER)											//assignment should follow
+		fatalError(ERR_SYNTAX);
 
 	hashElem * controlVar;
 	if ((controlVar = findVar(token.area)) == NULL)							//the variable hasn't been declared
 		fatalError(ERR_UndefinedVariable);
 
-    scanner();
-    if (token.type != ASSIGNMENT)
-        fatalError(ERR_SYNTAX);
+	scanner();
+	if (token.type != ASSIGNMENT)
+		fatalError(ERR_SYNTAX);
 
-	int exType = exprType(PrecedencniSA(tableStackTop(localSTstack), 2));		//process the expression
+	int exType = exprType(PrecedencniSA(tableStackTop(localSTstack), CALL_FOR));		//process the expression
 	if (!convertType(controlVar->data.type, exType))							//check whether it can be converted
 		fatalError(ERR_IncompatibleExpr);
 
@@ -582,16 +590,16 @@ int rule_for()
 	//JUMP TO CONDITION
 	generateInstruction(OP_GOTO, _for_condition, NULL, NULL);
 
-    /*scanner();
-    if (token.type != R_BRACKET)
-        return ERR_SYNTAX;*/
-	
-	//FOR LOOP BODY LABEL
+	/*scanner();
+	if (token.type != R_BRACKET)
+		return ERR_SYNTAX;*/
+
+		//FOR LOOP BODY LABEL
 	generateInstruction(OP_NOP, NULL, NULL, NULL);
 	*_for_body = *instructionList->last;
 
-    scanner();
-    rule_statement(DENY_PUSH);													//body of the loop
+	scanner();
+	rule_statement(DENY_PUSH);													//body of the loop
 
 	//JUM TO THE ASSIGNMENT
 	generateInstruction(OP_GOTO, _assignment, NULL, NULL);
@@ -601,7 +609,10 @@ int rule_for()
 	*_for_end = *instructionList->last;
 
 	if (token.type != R_CURLY_BRACKET)
+	{
 		tableStackPop(localSTstack);
+		generateInstruction(OP_DISPOSE_FRAME, NULL, NULL, NULL);
+	}
 	return ERR_None;
 }
 
@@ -702,6 +713,7 @@ int rule_while()
 
 	hTab * temp = hTabInit(INIT_ST_SIZE);				//create local symbol table
 	tableStackPush(localSTstack, temp);
+	generateInstruction(OP_CREATE_FRAME, &tableStackTop(localSTstack)->numStoredElem, NULL, NULL);
 
     scanner();
 	rule_statement(DENY_PUSH);										//loop body
@@ -714,6 +726,7 @@ int rule_while()
 	*_while_end = *instructionList->last;
 
 	tableStackPop(localSTstack);
+	generateInstruction(OP_DISPOSE_FRAME, NULL, NULL, NULL);
     return ERR_None;
 }
 
@@ -722,6 +735,7 @@ int rule_do()
 {    
 	hTab * temp = hTabInit(INIT_ST_SIZE);				//create local symbol table
 	tableStackPush(localSTstack, temp);
+	generateInstruction(OP_CREATE_FRAME, &tableStackTop(localSTstack)->numStoredElem, NULL, NULL);
 
 	//DO LOOP LABEL
 	generateInstruction(OP_NOP, NULL, NULL, NULL);
@@ -747,6 +761,7 @@ int rule_do()
         return ERR_SYNTAX;*/ //?????
 
 	tableStackPop(localSTstack);
+	generateInstruction(OP_DISPOSE_FRAME, NULL, NULL, NULL);
 
     scanner();
     if (token.type != SEMICOLON)
@@ -903,6 +918,18 @@ int rule_funcCall(hashElem * assignee)	//id ( <call_list> ;
 		fatalError(ERR_IncompatibleExpr);
 
 	generateInstruction(OP_CREATE_FRAME, findElem(globalST, funcCall.key)->data.baseFrameSize, NULL, NULL);
+	int numberOfParams = findElem(globalST, funcCall.key)->data.numberOfParams;
+	
+	// create frame variables for parameters
+	for (int i = 0; i < numberOfParams; i++)
+	{
+		tVarCoordinates * param = customMalloc(sizeof(tVarCoordinates));
+		param->frameOffset = 0;
+		param->index = i;
+		int * type = customMalloc(sizeof(int));
+		*type = findElem(globalST, funcCall.key)->data.params[i].type;
+		generateInstruction(OP_CREATE_VAR, type, NULL, param);
+	}
 
 	int paramIndex = 0;
 
@@ -910,7 +937,7 @@ int rule_funcCall(hashElem * assignee)	//id ( <call_list> ;
 	if (token.type != L_BRACKET)
 		fatalError(ERR_SYNTAX);
     
-	rule_callParam(&funcCall, &paramIndex);
+	rule_callParam(&funcCall, &paramIndex, -1);
 
 	if (!compareParamTypes(&funcCall, findElem(globalST, funcCall.key)))
 		fatalError(ERR_ParamType);
@@ -919,57 +946,26 @@ int rule_funcCall(hashElem * assignee)	//id ( <call_list> ;
 	if (token.type != SEMICOLON)
 		fatalError(ERR_SYNTAX);
 
+	generateInstruction(OP_FUNC_CALL, findElem(globalST, funcCall.key)->data.instructions->first, NULL, NULL);
+
+	//store the return value in the variable
+	generateInstruction(OP_GET_RETURN_VALUE, NULL, NULL, varToFrame(assignee->key));
+
 	hashElemInit(&funcCall);
 	return ERR_None;
 }
 
-void rule_callParam(hashElem * funcCall, int  * paramIndex)
+void rule_callParam(hashElem * funcCall, int  * paramIndex, int builtIn)
 {
 	scanner();
 
-	hashElem * temp;	
-	switch (token.type)
-	{
-		case R_BRACKET:
-			return;
+	processParam(paramIndex, funcCall, builtIn);
 
-		case IDENTIFIER:
-			if ((temp = findVar(token.area)) == NULL)
-				fatalError(ERR_UndefinedVariable);
-
-			addParam(funcCall, "", temp->data.type);
-			//pridanie premennej do ramca vytvaranej funckie
-			(*paramIndex)++;
-			rule_callParamList(funcCall, paramIndex);
-			return;
-
-		case INT_NUMBER:
-			addParam(funcCall, "", VAR_INT);
-			//pridanie premennej do ramca vytvaranej funckie
-			(*paramIndex)++;
-			rule_callParamList(funcCall, paramIndex);
-			return;
-
-		case DOUBLE_NUMBER:
-			addParam(funcCall, "", VAR_DOUBLE);
-			//pridanie premennej do ramca vytvaranej funckie
-			(*paramIndex)++;
-			rule_callParamList(funcCall, paramIndex);
-			return;
-
-		case STRING:
-			addParam(funcCall, "", VAR_STRING);
-			//pridanie premennej do ramca vytvaranej funckie
-			(*paramIndex)++;
-			rule_callParamList(funcCall, paramIndex);
-			return;
-
-		default:
-			fatalError(ERR_SYNTAX);
-	}
+	rule_callParamList(funcCall, paramIndex, builtIn);
+	return;
 }
 
-void rule_callParamList(hashElem * funcCall, int  * paramIndex)
+void rule_callParamList(hashElem * funcCall, int  * paramIndex, int builtIn)
 {
 	scanner();
 	switch (token.type)
@@ -984,66 +980,30 @@ void rule_callParamList(hashElem * funcCall, int  * paramIndex)
 			fatalError(ERR_SYNTAX);
 	}
 
-	hashElem * temp;
+	//hashElem * temp;
 	scanner();
-	switch (token.type)
-	{
-		case IDENTIFIER:
-			if ((temp = findVar(token.area)) == NULL)
-				fatalError(ERR_UndefinedVariable);
-
-			addParam(funcCall, "", temp->data.type);
-			//pridanie premennej do ramca vytvaranej funckie
-			(*paramIndex)++;
-			rule_callParamList(funcCall, paramIndex);
-			return;
-
-		case INT_NUMBER:
-			addParam(funcCall, "", VAR_INT);
-			//pridanie premennej do ramca vytvaranej funckie
-			(*paramIndex)++;
-			rule_callParamList(funcCall, paramIndex);
-			return;
-
-		case DOUBLE_NUMBER:
-			addParam(funcCall, "", VAR_DOUBLE);
-			//pridanie premennej do ramca vytvaranej funckie
-			(*paramIndex)++;
-			rule_callParamList(funcCall, paramIndex);
-			return;
-
-		case STRING:
-			addParam(funcCall, "", VAR_STRING);
-			//pridanie premennej do ramca vytvaranej funckie
-			(*paramIndex)++;
-			rule_callParamList(funcCall, paramIndex);
-			return;
-
-		default:
-			fatalError(ERR_SYNTAX);
-	}	
+	
+	processParam(paramIndex, funcCall, builtIn);
 }
 
 int rule_builtIn(hashElem * assignee)
 {
-	int functionType;	
-	int function = token.type;
+	int funcType;
+	int * function = customMalloc(sizeof(int));
+	*function = token.type;
 	int * paramCount = customMalloc(sizeof(int));
-
-	/*int paramCount = 1;
-	generateInstruction(OP_CREATE_FRAME, &paramCount, NULL, NULL);*/
 	
 	switch (token.type)					//get the function return type
 	{
 		case B_LENGTH:
 		case B_FIND:
-			functionType = FUNC_INT;
+			funcType = FUNC_INT;
 			break;
 
 		case B_SUBSTR:
 		case B_CONCAT:
 		case B_SORT:
-			functionType = FUNC_STRING;
+			funcType = FUNC_STRING;
 			break;
 	}
 
@@ -1080,12 +1040,12 @@ int rule_builtIn(hashElem * assignee)
 		fatalError(ERR_SYNTAX);
 
 	int paramIndex = 0;
-	rule_callParam(&funcCall, &paramIndex);					//scan for all the parameters
+	rule_callParam(&funcCall, &paramIndex, *function);					//scan for all the parameters
 
 	/*if (!compareParamTypes(&funcCall, findElem(globalST, funcCall.key)))
 		fatalError(ERR_ParamType);*/
 
-	switch (function)							//compare parameters with required parameters
+	switch (*function)							//compare parameters with required parameters
 	{
 		case B_LENGTH:
 		case B_SORT:
@@ -1123,13 +1083,14 @@ int rule_builtIn(hashElem * assignee)
 			break;
 	}
 
-	if (!convertType(assignee->data.type, functionType))			//check whether the return value can be converted
+	if (!convertType(assignee->data.type, funcType))			//check whether the return value can be converted
 		fatalError(ERR_IncompatibleExpr);
 
 	scanner();
 	if (token.type != SEMICOLON)
 		fatalError(ERR_SYNTAX);
 
+	generateInstruction(OP_BUILT_IN, function, NULL, varToFrame(assignee->key));
 	hashElemInit(&funcCall);
 	return ERR_None;
 }
@@ -1185,4 +1146,97 @@ int convertType(tSymbolType inType, tSymbolType outType)			//converts inType to 
 			return 0;
 
 	}
+}
+
+void processParam(int * paramIndex, hashElem * funcCall, int builtIn)
+{
+	hashElem * temp;
+	tOperand * variableIn;
+	tOperand * variableOut;
+	tVarCoordinates * coordinates;
+	void * value;
+
+	variableIn = customMalloc(sizeof(tOperand));
+
+	variableOut = customMalloc(sizeof(tOperand));
+	coordinates = customMalloc(sizeof(tVarCoordinates));
+	coordinates->frameOffset = 0;
+	coordinates->index = *paramIndex;
+	variableOut->operand = coordinates;
+	
+	switch (builtIn)
+	{
+		case -1:
+			variableOut->type = findElem(globalST, funcCall->key)->data.params[*paramIndex].type;
+			break;
+
+		case B_LENGTH:
+		case B_SORT:
+		case B_CONCAT:
+		case B_FIND:
+			variableOut->type = VAR_STRING;
+			break;
+
+		case B_SUBSTR:
+			if (*paramIndex == 0)
+				variableOut->type = VAR_STRING;
+			else
+				variableOut->type = VAR_INT;
+			break;
+
+		default:
+			break;
+	}
+	
+	++(*paramIndex);
+
+
+
+	switch (token.type)
+	{
+	case R_BRACKET:
+		return;
+
+	case IDENTIFIER:
+		if ((temp = findVar(token.area)) == NULL)
+			fatalError(ERR_UndefinedVariable);
+
+		addParam(funcCall, "", temp->data.type);
+
+		variableIn->operand = varToFrame(token.area);
+		variableIn->type = getType(token.type);
+		break;
+
+	case INT_NUMBER:
+		addParam(funcCall, "", VAR_INT);
+
+		value = customMalloc(sizeof(int));
+		*(int *)value = token.int_numb;
+		variableIn->operand = value;
+		variableIn->type = INT_NUMBER;
+		break;
+
+	case DOUBLE_NUMBER:
+		addParam(funcCall, "", VAR_DOUBLE);
+
+		
+		value = customMalloc(sizeof(double));
+		*(double *)value = token.double_numb;
+		variableIn->operand = value;
+		variableIn->type = DOUBLE_NUMBER;
+		break;
+
+	case STRING:
+		addParam(funcCall, "", VAR_STRING);
+
+		value = strDuplicate(token.area);
+		variableIn->operand = value;
+		variableIn->type = STRING;
+		break;
+
+	default:
+		fatalError(ERR_SYNTAX);
+	}
+
+	generateInstruction(OP_ASSIGN, variableIn, NULL, variableOut);
 }
