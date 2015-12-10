@@ -119,6 +119,7 @@ bool tDataCopy (tData * destData, tData * srcData)
     destData->value = srcData->value;
 	destData->numberOfParams = srcData->numberOfParams;
 	destData->baseFrameSize = srcData->baseFrameSize;
+	destData->index = srcData->index;
 
     //destData->localTable = srcData->localTable;   // not used if the element is variable; if it's a function, the table is later initialized
 
