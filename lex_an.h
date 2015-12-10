@@ -50,7 +50,7 @@ enum {
     STRING_ESCAPE,      ///
     ESCAPE_HEXADECIMAL, ///
     ESCAPE_OCTAL,       ///
-    ESCAPE_BINARY,      ///
+    ESCAPE_BINARY,      ///             /30
     COMMA,              ///         ,
 
     LESS,               ///         <
@@ -74,8 +74,8 @@ enum {
 
         /// typy tokenu
     IDENTIFIER = 60,    ///
-    KEY_WORD,           ///
-    BUILT_IN_FUNCTION,  ///
+//    KEY_WORD,           ///
+//    BUILT_IN_FUNCTION,  ///
     INT_NUMBER,         ///
     DOUBLE_NUMBER,      ///
 
@@ -97,7 +97,7 @@ enum {
     K_FALSE,            ///
 
         /// vestavene funkce
-    B_LENGTH = 85,      ///
+    B_LENGTH = 90,      ///
     B_SUBSTR,           ///
     B_CONCAT,           ///
     B_FIND,             ///
@@ -106,15 +106,6 @@ enum {
     MAX_OF_ENUM         ///
 
 };
-
-/*
-union unie {
-    int int_number;
-    double double_number;
-    char *area;
-} unie;
-*/
-
 
 typedef struct {
     char *area;

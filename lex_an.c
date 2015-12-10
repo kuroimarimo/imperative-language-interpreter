@@ -674,6 +674,7 @@ int scanner () {
         if (c == '&') {
             //fillToken(c);
             token.type = AND;
+            test = false;
         }
         else {
             fatalError (ERR_UnknownChar);
@@ -685,6 +686,7 @@ int scanner () {
         if (c == '|') {
             //fillToken(c);
             token.type = OR;
+            test = false;
         }
         else {
             fatalError (ERR_UnknownChar);

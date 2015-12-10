@@ -52,6 +52,7 @@ typedef enum
     ERR_UninitVar           = 800,
     ERR_ZeroDivision        = 900,
     ERR_OtherRunningErr     = 1000,            // TODO prepisat ked budeme mat konkretne chybove stavy
+    ERR_SegmentationFault,
 
     //// INTERNAL INTERPRETER ERRORS
     ERR_AllocFailed         = 9900,
