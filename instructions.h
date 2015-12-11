@@ -39,4 +39,18 @@ void debugInstrList();
 
 void generateInstruction(int operation, void * input1, void * input2, void * output);
 
+typedef struct {
+    int top;
+    int size;
+    tInstruction ** elems;
+} tInstrStack;
+
+tInstrStack * instrStack;
+
+tInstrStack * instrStackInit(int size);
+void instrStackResize(tInstrStack * stack);
+void instrStackPush(tInstrStack * stack, tInstruction * instr);
+tInstruction * instrStackPop(tInstrStack * stack);
+bool instrStackEmpty(tInstrStack * stack);
+
 #endif
