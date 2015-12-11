@@ -392,6 +392,8 @@ int scanner () {
                 value = STRING_ESCAPE;
             else if (c != '"')
                 fillToken(c);
+            else if (c <= 31)
+                fatalError (ERR_StringChar);
 
             else {
                 token.type = STRING;    /// ungetc(c, source); - vytvari nekonecny cyklus
