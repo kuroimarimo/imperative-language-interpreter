@@ -15,6 +15,7 @@
 #include "garbage_collector.h"
 #include "instructions.h"
 #include "frames.h"
+#include "interpret.h"
 
 #define INIT_ST_SIZE	16							//initial table stack and symnbol table size
 #define F_MAIN			"main"

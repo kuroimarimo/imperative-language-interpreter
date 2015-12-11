@@ -66,3 +66,39 @@ void generateInstruction(int operation, void * input1, void * input2, void * out
 	
 	addInstruction(instruction);
 }
+
+tInstrStack * instrStackInit(int size)
+{
+    tInstrStack * temp = customMalloc(sizeof(tInstrStack));
+    temp->top = -1;
+    temp->size = size;
+    temp->elems = customMalloc(sizeof(tInstruction *) * size);
+    
+    return temp;
+}
+
+void instrStackResize(tInstrStack * stack)
+{
+    stack->elems = customRealloc(stack, 2 * stack->size * sizeof(tInstruction *));
+    stack->size *= 2;
+}
+
+void instrStackPush(tInstrStack * stack, tInstruction * instr)
+{
+    if (stack->top >= (stack->size - 1))
+        instrStackResize(stack);
+    
+    stack->elems[++stack->top] = instr;
+}
+tInstruction * instrStackPop(tInstrStack * stack)
+{
+    void * temp = stack->elems[stack->top];
+    --stack->top;
+    
+    return temp;
+}
+
+bool instrStackEmpty(tInstrStack * stack)
+{
+    return stack->top < 0;
+}

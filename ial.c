@@ -23,7 +23,7 @@ char * strDuplicate(char * src)                                // UNFINISHED!
 {
 	if (src == NULL)
 	{
-		char * dest = customMalloc(sizeof(char));
+        char * dest; // = customMalloc(sizeof(char));
 		dest = '\0';
 		return dest;
 	}
