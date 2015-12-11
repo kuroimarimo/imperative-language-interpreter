@@ -30,13 +30,17 @@ typedef struct					//coordinates of variable inside frame
 
 tFrame * frameCreate(int numberOfVars/*, bool isBase*/);
 tFrameStack * frameStackInit(tFrameStack * stack, int size);
+
+void frameCreateAndPush(tFrameStack * stack, int numOfVars/*, bool isBase*/);
+
 void frameStackPush(tFrameStack * stack, tFrame * frame);
 tFrame * frameStackTop(tFrameStack * stack);
 void frameStackPop(tFrameStack * stack);
 void frameStackPopUntilBase(tFrameStack * stack);							//pops all the frames to the first found base frame (including the base frame)
+
 tFrame * getFrame(tFrameStack * stack, int index);							//returns frame >index< levels under top frame
 tVariable * getVariable(tFrameStack * stack, tVarCoordinates * coordinates);	//return variable with index varIndex form frame frameIndex levels under framestack top	
-void frameCreateAndPush(tFrameStack * stack, int numOfVars/*, bool isBase*/);
+
 void topToBase(tFrameStack * stack);										//sets the top frame as base frame
 tVarCoordinates * varToFrame(char * key);
 
