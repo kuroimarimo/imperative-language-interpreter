@@ -19,6 +19,8 @@ void parse()
 	if (!isFunct(F_MAIN) || (findElem(globalST, F_MAIN)->data.state != DEFINED))				//there's no main
 		fatalError(ERR_UndefinedFunction);
 
+	checkFuncDefinitions();
+
 	interpret(findElem(globalST, F_MAIN)->data.instructions->first);
 }
 
@@ -1267,4 +1269,21 @@ void processParam(int * paramIndex, hashElem * funcCall, int builtIn)
 	}
 
 	generateInstruction(OP_ASSIGN, variableIn, NULL, variableOut);
+}
+
+void checkFuncDefinitions()
+{
+	hashElem * temp;
+	for (int i = 0; i < globalST->size; i++)
+	{
+		temp = globalST->table[i];
+		
+		while (temp != NULL)
+		{
+			if (temp->data.state != DEFINED)
+				fatalError(ERR_UndefinedFunction);
+
+			temp = temp->next;
+		}
+	}
 }
