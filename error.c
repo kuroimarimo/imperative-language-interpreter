@@ -28,10 +28,13 @@ void printErrorDetails (EErrorTypes state)
             fprintf(stderr, "Number is in wrong shape.\n");
             break;
         case ERR_NumberEscape:
-            fprintf(stderr, "Number escape have too much characters.\n");
+            fprintf(stderr, "Number escape is in wrong shape.\n");
             break;
         case ERR_StringEscape:
             fprintf(stderr, "Error escaping string.\n");
+            break;
+        case ERR_StringChar:
+            fprintf(stderr, "Error invlid character.\n");
             break;
         case ERR_UnknownChar:
             fprintf(stderr, "Unknown character.\n");
