@@ -466,23 +466,22 @@ int rule_if()
 {
     PrecedencniSA(tableStackTop(localSTstack), CALL_CONDITION);		//process the condition
 
-	tInstruction * elseJump = customMalloc(sizeof(tInstruction));
-	generateInstruction(OP_IFNOT_JUMP, instructionList->last->output, NULL, elseJump);
+	tInstruction * elseJump = generateInstruction(OP_IFNOT_JUMP, instructionList->last->output, NULL, NULL);
 
     scanner();
 	rule_statement(ALLOW_PUSH);										//if statement
-
-	tInstruction * skipElse = customMalloc(sizeof(tInstruction));	//we were in if statement, skip else statement
-	generateInstruction(OP_GOTO, skipElse, NULL, NULL);
+	
+	//we were in if statement, skip else statement
+	tInstruction * skipElse = generateInstruction(OP_GOTO, NULL, NULL, NULL);
 
 	generateInstruction(OP_NOP, NULL, NULL, NULL);					//jump past if statement
-	*elseJump = *instructionList->last;
+	elseJump->output = instructionList->last;
 
     scanner();
     if (token.type != K_ELSE)
     {
 		generateInstruction(OP_NOP, NULL, NULL, NULL);					//jump past else statement
-		*skipElse = *instructionList->last;
+		skipElse->input1 = instructionList->last;
         ungetToken();
         return ERR_None;
     }
@@ -491,7 +490,7 @@ int rule_if()
 	rule_statement(ALLOW_PUSH);										//else statement
 
 	generateInstruction(OP_NOP, NULL, NULL, NULL);					//jump past else statement
-	*skipElse = *instructionList->last;
+	skipElse->input1 = instructionList->last;
 
     return ERR_None;
 }
@@ -555,12 +554,10 @@ int rule_for()
 	PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION);			//condition for iteration
 
 	//JUMP TO FOR LOOP BODY
-	tInstruction * _for_body = customMalloc(sizeof(tInstruction));
-	generateInstruction(OP_IFNOT_JUMP, instructionList->last->output, NULL, _for_body);
+	tInstruction * _for_body = generateInstruction(OP_IF_JUMP, instructionList->last->output, NULL, NULL);
 
 	//ELSE JUMP TO FOR LOOP END
-	tInstruction * _for_end = customMalloc(sizeof(tInstruction));
-	generateInstruction(OP_GOTO, _for_end, NULL, NULL);
+	tInstruction * _for_end = generateInstruction(OP_GOTO, NULL, NULL, NULL);
 
 	//ASSIGNMENT LABEL
 	generateInstruction(OP_NOP, NULL, NULL, NULL);
@@ -598,7 +595,7 @@ int rule_for()
 
 		//FOR LOOP BODY LABEL
 	generateInstruction(OP_NOP, NULL, NULL, NULL);
-	*_for_body = *instructionList->last;
+	_for_body->output = instructionList->last;
 
 	scanner();
 	rule_statement(DENY_PUSH);													//body of the loop
@@ -608,7 +605,7 @@ int rule_for()
 
 	//FOR LOOP END LABEL
 	generateInstruction(OP_NOP, NULL, NULL, NULL);
-	*_for_end = *instructionList->last;
+	_for_end->input1 = instructionList->last;
 
 	if (token.type != R_CURLY_BRACKET)
 	{
@@ -695,9 +692,9 @@ void rule_keyword()					//statement starts with a keyword, not an identifier
 //rule:      <while-loop> -> ( <expression> ) <statement>
 int rule_while()
 {
-    /*scanner();
-    if (token.type != L_BRACKET)
-        fatalError(ERR_SYNTAX);*/
+	hTab * temp = hTabInit(INIT_ST_SIZE);				//create local symbol table
+	tableStackPush(localSTstack, temp);
+	generateInstruction(OP_CREATE_FRAME, &tableStackTop(localSTstack)->numStoredElem, NULL, NULL);
 
 	//CONDITION LABEL
 	generateInstruction(OP_NOP, NULL, NULL, NULL);
@@ -706,29 +703,24 @@ int rule_while()
 	PrecedencniSA(tableStackTop(localSTstack), CALL_CONDITION);		//process the loop condition
 
 	//JUMP TO WHILE LOOP END
-	tInstruction * _while_end = customMalloc(sizeof(tInstruction));
-	generateInstruction(OP_IFNOT_JUMP, instructionList->last->output, NULL, _while_end);
+	tInstruction * _while_end = generateInstruction(OP_IFNOT_JUMP, instructionList->last->output, NULL, NULL);
 
-    /*scanner();
-    if (token.type != R_BRACKET)
-        fatalError(ERR_SYNTAX);*/
-
-	hTab * temp = hTabInit(INIT_ST_SIZE);				//create local symbol table
-	tableStackPush(localSTstack, temp);
-	generateInstruction(OP_CREATE_FRAME, &tableStackTop(localSTstack)->numStoredElem, NULL, NULL);
-
-    scanner();
+	scanner();
 	rule_statement(DENY_PUSH);										//loop body
 
-    //JUMP TO CONDITION
+	//JUMP TO CONDITION
 	generateInstruction(OP_GOTO, _condition, NULL, NULL);
 
 	//WHILE LOOP END LABEL
 	generateInstruction(OP_NOP, NULL, NULL, NULL);					//jump past if statement
-	*_while_end = *instructionList->last;
+	_while_end->output = instructionList->last;
 
-	tableStackPop(localSTstack);
-	generateInstruction(OP_DISPOSE_FRAME, NULL, NULL, NULL);
+	if (token.type != R_CURLY_BRACKET)
+	{
+		tableStackPop(localSTstack);
+		generateInstruction(OP_DISPOSE_FRAME, NULL, NULL, NULL);
+	}
+
     return ERR_None;
 }
 
