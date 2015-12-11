@@ -45,6 +45,7 @@ int compareSymbol(hashElem * elem, hashElem * activeElem);			// compares 2 hashE
 tParam * addParam(hashElem * elem, char * key, tSymbolType type);	//adds parameter to the parameter array
 int convertType(tSymbolType inType, tSymbolType outType);			//type conversion
 void processParam(int * paramIndex, hashElem * funcCall, int builtIn);
+void checkFuncDefinitions();
 
 																	
 //functions simulating LL grammar rules             TODO
