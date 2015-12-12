@@ -131,6 +131,11 @@ void InsertAbove(tList *Z, tExpr* cur, tExpr* new) {
 //--------------------------//
 int PrecG(tExpr *pred3, tExpr *pred2, tExpr *pred1) 
 {
+    if (pred1 == NULL)
+    {
+        fatalError(ERR_SYNTAX);                     // in case of empty error
+        return 0;
+    }
     switch (pred1->terminal)                                    // what kind of element is in predecessor1
     {
         case NETERMINAL:                                        // in case of NETERMINAL
@@ -285,6 +290,11 @@ void SemId(tExpr* identifier)
 {
     
     hashElem* element = findVar(identifier->data);
+    if (element == NULL)
+        {
+            fatalError(ERR_UndefinedVariable);
+            return;
+        }
     tVarCoordinates * coordinates;
     //coordinates = customMalloc(sizeof(tVarCoordinates));
     coordinates = varToFrame(identifier->data);

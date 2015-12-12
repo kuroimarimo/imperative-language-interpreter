@@ -1,6 +1,4 @@
 #include "instructions.h"
-#include "garbage_collector.h"
-#include "ial.h"
 
 //--------------------------//
 //     ISNTRUCTION ARRAY    //
@@ -53,7 +51,7 @@ bool initInstrList()
 	return true;
 }
 
-void generateInstruction(int operation, void * input1, void * input2, void * output)		//generates instruction for non-aritmetic operations
+tInstruction * generateInstruction(int operation, void * input1, void * input2, void * output)		//generates instruction for non-aritmetic operations
 {
 	tInstruction * instruction = customMalloc(sizeof(tInstruction));
 	instruction->operator = operation;
@@ -65,6 +63,7 @@ void generateInstruction(int operation, void * input1, void * input2, void * out
 	instruction->output = output;
 	
 	addInstruction(instruction);
+	return instructionList->last;
 }
 
 tInstrStack * instrStackInit(int size)
@@ -101,4 +100,61 @@ tInstruction * instrStackPop(tInstrStack * stack)
 bool instrStackEmpty(tInstrStack * stack)
 {
     return stack->top < 0;
+}
+
+tVarCoordinates * constToVar(int constType, void * data)
+{
+	int * type = customMalloc(sizeof(int));
+	tVarCoordinates * coordinates;
+	void * outData;
+	char str[512];
+	char * constID;
+
+	switch (constType)
+	{
+	case INT_NUMBER:
+		sprintf(str, "%d", *(int *)data);
+		constID = strDuplicate(str);
+		constID = concat("#", constID);
+
+		if (!findVar(constID))
+			addVar(constID, getTableStackElem(localSTstack, 0), VAR_INT);
+
+		coordinates = varToFrame(constID);
+		*type = VAR_INT;
+		outData = customMalloc(sizeof(int));
+		int a = *(int *)outData = *(int *)data;
+		break;
+
+	case DOUBLE_NUMBER:
+		sprintf(str, "%f", *(double *)data);
+		constID = strDuplicate(str);
+		constID = concat("#", constID);
+
+		if (!findVar(constID))
+			addVar(constID, getTableStackElem(localSTstack, 0), VAR_DOUBLE);
+		
+		coordinates = varToFrame(constID);
+		*type = VAR_DOUBLE;
+		outData = customMalloc(sizeof(double));
+		double b = *(double *)outData = *(double *)data;
+		break;
+
+	case STRING:
+		constID = strDuplicate(data);
+		constID = concat("#", constID);
+
+		if (!findVar(constID))
+			addVar(constID, getTableStackElem(localSTstack, 0), VAR_STRING);
+		
+		coordinates = varToFrame(constID);
+		*type = VAR_STRING;
+		outData = strDuplicate(data);
+		break;
+	}
+
+	generateInstruction(OP_CREATE_VAR, type, NULL, coordinates);
+	generateInstruction(OP_SET_CONSTANT, outData, NULL, coordinates);
+
+	return coordinates;
 }

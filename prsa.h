@@ -15,6 +15,7 @@
 #include "frames.h"
 #include "table_stack.h"
 
+
 #define NETERMINAL 500
 #define TERMINAL 501
 #define CALL_EXPRESSION 0
@@ -23,7 +24,7 @@
 
 typedef struct {
     int terminal;
-    int identifier;
+    int identifier;				//variable? 1/0
     int type;
     void *data;
 } tExpr;
