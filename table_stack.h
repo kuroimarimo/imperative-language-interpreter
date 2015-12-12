@@ -3,6 +3,7 @@
 
 #include "ial.h"
 #include "garbage_collector.h"
+
 #define TABLE_SIZE	16
 
 // Functions for work with stack of symbol tables

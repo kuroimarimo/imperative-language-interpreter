@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "instructions.h"
+//#include "instructions.h"
 #include "garbage_collector.h"
 #include "error.h"
 
@@ -19,6 +19,22 @@ typedef struct
 	tSymbolType type;
 	char * key;
 } tParam;
+
+typedef struct instr
+{
+    int operator;
+    int type;
+    void *input1, *input2, *output;
+    struct instr * next;
+} tInstruction;
+
+typedef struct
+{
+    /*int lenght;
+     int occupied;
+     tInstruction * array;*/
+    tInstruction * first, *last;
+} tInstrList;
 
 typedef struct data
 {

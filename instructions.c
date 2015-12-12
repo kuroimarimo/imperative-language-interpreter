@@ -5,65 +5,65 @@
 //--------------------------//
 
 /* Dynamically expands the array where the instructions are stored.
-Returns true upon successful completion, else returns false. (realloc failed) */
+ Returns true upon successful completion, else returns false. (realloc failed) */
 /*bool expandInstrList()
-{
+ {
 	int size = instructionList->lenght;
 	instructionList->array = customRealloc(instructionList->array, size * 2 * sizeof(tInstruction));
 	return instructionList->array == NULL;
-}*/
+ }*/
 
 
 /* Adds instruction to the global instruction list.
-Returns true upon successful completion, else returns false. (realloc failed) */
+ Returns true upon successful completion, else returns false. (realloc failed) */
 bool addInstruction(tInstruction * instr)
 {
-	/*if (instructionList->lenght < (instructionList->occupied + 1) && !expandInstrList())
-		return false;
-	instructionList->array[instructionList->occupied] = *instr;
-	++instructionList->occupied;
-	return true;*/
-
-	instr->next = NULL;
-
-	if (instructionList->last == NULL)
-		instructionList->first = instr;
-	else
-		instructionList->last->next = instr;
-
-	instructionList->last = instr;
-	return true;
+    /*if (instructionList->lenght < (instructionList->occupied + 1) && !expandInstrList())
+     return false;
+     instructionList->array[instructionList->occupied] = *instr;
+     ++instructionList->occupied;
+     return true;*/
+    
+    instr->next = NULL;
+    
+    if (instructionList->last == NULL)
+        instructionList->first = instr;
+    else
+        instructionList->last->next = instr;
+    
+    instructionList->last = instr;
+    return true;
 }
 
 
 /* Initialises the instruction list.
-Returns true upon successful completion, else returns false. (malloc failed)*/
+ Returns true upon successful completion, else returns false. (malloc failed)*/
 bool initInstrList()
 {
-	/*int size = INITIAL_SIZE;
-	instructionList = customMalloc(sizeof(tInstrList));
-	instructionList->array = customMalloc(size * sizeof(tInstruction));
-	instructionList->lenght = size;
-	instructionList->occupied = 0;*/
-
-	instructionList = customMalloc(sizeof(tInstrList));
-	instructionList->last = instructionList->first = NULL;
-	return true;
+    /*int size = INITIAL_SIZE;
+     instructionList = customMalloc(sizeof(tInstrList));
+     instructionList->array = customMalloc(size * sizeof(tInstruction));
+     instructionList->lenght = size;
+     instructionList->occupied = 0;*/
+    
+    instructionList = customMalloc(sizeof(tInstrList));
+    instructionList->last = instructionList->first = NULL;
+    return true;
 }
 
 tInstruction * generateInstruction(int operation, void * input1, void * input2, void * output)		//generates instruction for non-aritmetic operations
 {
-	tInstruction * instruction = customMalloc(sizeof(tInstruction));
-	instruction->operator = operation;
-	instruction->type = -1;
-
-
-	instruction->input1 = input1;
-	instruction->input2 = input2;
-	instruction->output = output;
-	
-	addInstruction(instruction);
-	return instructionList->last;
+    tInstruction * instruction = customMalloc(sizeof(tInstruction));
+    instruction->operator = operation;
+    instruction->type = -1;
+    
+    
+    instruction->input1 = input1;
+    instruction->input2 = input2;
+    instruction->output = output;
+    
+    addInstruction(instruction);
+    return instructionList->last;
 }
 
 tInstrStack * instrStackInit(int size)
@@ -104,57 +104,59 @@ bool instrStackEmpty(tInstrStack * stack)
 
 tVarCoordinates * constToVar(int constType, void * data)
 {
-	int * type = customMalloc(sizeof(int));
-	tVarCoordinates * coordinates;
-	void * outData;
-	char str[512];
-	char * constID;
-
-	switch (constType)
-	{
-	case INT_NUMBER:
-		sprintf(str, "%d", *(int *)data);
-		constID = strDuplicate(str);
-		constID = concat("#", constID);
-
-		if (!findVar(constID))
-			addVar(constID, getTableStackElem(localSTstack, 0), VAR_INT);
-
-		coordinates = varToFrame(constID);
-		*type = VAR_INT;
-		outData = customMalloc(sizeof(int));
-		int a = *(int *)outData = *(int *)data;
-		break;
-
-	case DOUBLE_NUMBER:
-		sprintf(str, "%f", *(double *)data);
-		constID = strDuplicate(str);
-		constID = concat("#", constID);
-
-		if (!findVar(constID))
-			addVar(constID, getTableStackElem(localSTstack, 0), VAR_DOUBLE);
-		
-		coordinates = varToFrame(constID);
-		*type = VAR_DOUBLE;
-		outData = customMalloc(sizeof(double));
-		double b = *(double *)outData = *(double *)data;
-		break;
-
-	case STRING:
-		constID = strDuplicate(data);
-		constID = concat("#", constID);
-
-		if (!findVar(constID))
-			addVar(constID, getTableStackElem(localSTstack, 0), VAR_STRING);
-		
-		coordinates = varToFrame(constID);
-		*type = VAR_STRING;
-		outData = strDuplicate(data);
-		break;
-	}
-
-	generateInstruction(OP_CREATE_VAR, type, NULL, coordinates);
-	generateInstruction(OP_SET_CONSTANT, outData, NULL, coordinates);
-
-	return coordinates;
+    int * type = customMalloc(sizeof(int));
+    tVarCoordinates * coordinates;
+    void * outData;
+    char str[512];
+    char * constID;
+    
+    switch (constType)
+    {
+        case INT_NUMBER:
+            sprintf(str, "%d", *(int *)data);
+            constID = strDuplicate(str);
+            constID = concat("#", constID);
+            
+            if (!findVar(constID))
+                addVar(constID, getTableStackElem(localSTstack, 0), VAR_INT);
+            
+            coordinates = varToFrame(constID);
+            *type = VAR_INT;
+            outData = customMalloc(sizeof(int));
+            int a = *(int *)outData = *(int *)data;
+            break;
+            
+        case DOUBLE_NUMBER:
+            sprintf(str, "%f", *(double *)data);
+            constID = strDuplicate(str);
+            constID = concat("#", constID);
+            
+            if (!findVar(constID))
+                addVar(constID, getTableStackElem(localSTstack, 0), VAR_DOUBLE);
+            
+            coordinates = varToFrame(constID);
+            *type = VAR_DOUBLE;
+            outData = customMalloc(sizeof(double));
+            double b = *(double *)outData = *(double *)data;
+            break;
+            
+        case STRING:
+            constID = strDuplicate(data);
+            constID = concat("#", constID);
+            
+            if (!findVar(constID))
+                addVar(constID, getTableStackElem(localSTstack, 0), VAR_STRING);
+            
+            coordinates = varToFrame(constID);
+            *type = VAR_STRING;
+            outData = strDuplicate(data);
+            break;
+    }
+    
+    generateInstruction(OP_CREATE_VAR, type, NULL, coordinates);
+    generateInstruction(OP_SET_CONSTANT, outData, NULL, coordinates);
+    /*     operand->type = expr->type;
+     operand->operand = expr->data;*/
+    
+    return coordinates;
 }

@@ -87,6 +87,7 @@ void garbageCleanup(tGarbageList * list)
 	{
 		if (temp->data != NULL)
 			free(temp->data);
+		temp->data = NULL;
 
 		next = temp->next;
 		free(temp);
