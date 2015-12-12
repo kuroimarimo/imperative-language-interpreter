@@ -1,3 +1,8 @@
+/*
+**  lex_an.c
+*/
+
+
 #include "lex_an.h"
 
 int tokenCopy (tToken *dst, tToken src)
@@ -136,12 +141,8 @@ int scanner () {
         switch (value) {
         case START:
                 /* Rozpoznani characteru  */
-            if (isalpha(c)) {
-                value = LETTER;
-                fillToken(c);
-                }
-            else if (c == '_') {
-                value = UNDERSCORE;
+            if (isalpha(c) || c == '_') {
+                value = IDENTIFIER;
                 fillToken(c);
                 }
             else if (c == '0') {
@@ -249,8 +250,7 @@ int scanner () {
 
 
 
-       case LETTER:       /// identifikator, zacina pismenem nebo '_' ; dalsi charactery mohou byt cisla
-       case UNDERSCORE:
+       case IDENTIFIER:       /// identifikator, zacina pismenem nebo '_' ; dalsi charactery mohou byt cisla
 
             if (isalpha(c) || c == '_' || isdigit(c) )
                 fillToken(c);
@@ -392,7 +392,8 @@ int scanner () {
                 value = STRING_ESCAPE;
             else if (c != '"')
                 fillToken(c);
-
+            else if (c <= 31)
+                fatalError (ERR_StringChar);
             else {
                 token.type = STRING;    /// ungetc(c, source); - vytvari nekonecny cyklus
                 test = false;
