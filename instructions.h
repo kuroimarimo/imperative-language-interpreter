@@ -43,5 +43,6 @@ void instrStackPush(tInstrStack * stack, tInstruction * instr);
 tInstruction * instrStackPop(tInstrStack * stack);
 bool instrStackEmpty(tInstrStack * stack);
 tVarCoordinates * constToVar(int constType, void * data);
+tVarCoordinates * tempToVar(int constType);
 
 #endif

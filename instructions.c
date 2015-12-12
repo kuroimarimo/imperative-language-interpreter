@@ -160,3 +160,57 @@ tVarCoordinates * constToVar(int constType, void * data)
     
     return coordinates;
 }
+
+tVarCoordinates * tempToVar(int constType)
+{
+	int * type = customMalloc(sizeof(int));
+	tVarCoordinates * coordinates;
+	void * outData;
+	char str[512];
+	char * tempID;
+
+	static int counter = 0;
+
+	switch (constType)
+	{
+	case INT_NUMBER:
+		sprintf(str, "%d", counter++);
+		tempID = strDuplicate(str);
+		tempID = concat("$", tempID);
+		addVar(tempID, getTableStackElem(localSTstack, 0), VAR_INT);
+
+		coordinates = varToFrame(tempID);
+		*type = VAR_INT;
+		outData = customMalloc(sizeof(int));
+		break;
+
+	case DOUBLE_NUMBER:
+		sprintf(str, "%d", counter++);
+		tempID = strDuplicate(str);
+		tempID = concat("$", tempID);
+		addVar(tempID, getTableStackElem(localSTstack, 0), VAR_INT);
+
+		coordinates = varToFrame(tempID);
+		*type = VAR_DOUBLE;
+		outData = customMalloc(sizeof(double));
+		break;
+
+	case STRING:
+		sprintf(str, "%d", counter++);
+		tempID = strDuplicate(str);
+		tempID = concat("$", tempID);
+		addVar(tempID, getTableStackElem(localSTstack, 0), VAR_INT);
+
+		coordinates = varToFrame(tempID);
+		*type = VAR_STRING;
+		outData = NULL;
+		break;
+	}
+
+	generateInstruction(OP_CREATE_VAR, type, NULL, coordinates);
+	//generateInstruction(OP_SET_CONSTANT, outData, NULL, coordinates);
+	/*     operand->type = expr->type;
+	operand->operand = expr->data;*/
+
+	return coordinates;
+}
