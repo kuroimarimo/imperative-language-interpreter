@@ -8,6 +8,7 @@
 #include "ial.h"
 #include "lex_an.h"
 
+char * inputString();
 void interpret(tInstruction * instruction);
 
 #endif

@@ -25,7 +25,7 @@ enum adressCode {
 	OP_GOTO,				// skok pro for -> out
 	OP_RETURN,				// converts input1 to type input2 and stores the result somewhere //TODO where?
 	
-	
+	OP_SET_CONSTANT,		// assigns value *input1 to frame variable output
 	
 	OP_CREATE_VAR,			// create variable of type *(tSymbolType*)input1 at *tVarCoordinates output
 	OP_CREATE_FRAME,		// create variable frame of size *(int*)input1
