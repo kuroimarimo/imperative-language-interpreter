@@ -20,6 +20,7 @@ typedef enum
     ERR_NumberShape,
     ERR_StringEscape,
     ERR_NumberEscape,
+    ERR_StringChar,
     ERR_UnknownChar,
     ERR_Comment,
 
