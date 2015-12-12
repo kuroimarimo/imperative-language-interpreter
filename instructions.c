@@ -123,7 +123,7 @@ tVarCoordinates * constToVar(int constType, void * data)
             coordinates = varToFrame(constID);
             *type = VAR_INT;
             outData = customMalloc(sizeof(int));
-            int a = *(int *)outData = *(int *)data;
+            *(int *)outData = *(int *)data;
             break;
             
         case DOUBLE_NUMBER:
@@ -137,7 +137,7 @@ tVarCoordinates * constToVar(int constType, void * data)
             coordinates = varToFrame(constID);
             *type = VAR_DOUBLE;
             outData = customMalloc(sizeof(double));
-            double b = *(double *)outData = *(double *)data;
+            *(double *)outData = *(double *)data;
             break;
             
         case STRING:
