@@ -188,7 +188,7 @@ tVarCoordinates * tempToVar(int constType)
 		sprintf(str, "%d", counter++);
 		tempID = strDuplicate(str);
 		tempID = concat("$", tempID);
-		addVar(tempID, getTableStackElem(localSTstack, 0), VAR_INT);
+		addVar(tempID, getTableStackElem(localSTstack, 0), VAR_DOUBLE);
 
 		coordinates = varToFrame(tempID);
 		*type = VAR_DOUBLE;
@@ -199,7 +199,7 @@ tVarCoordinates * tempToVar(int constType)
 		sprintf(str, "%d", counter++);
 		tempID = strDuplicate(str);
 		tempID = concat("$", tempID);
-		addVar(tempID, getTableStackElem(localSTstack, 0), VAR_INT);
+		addVar(tempID, getTableStackElem(localSTstack, 0), VAR_STRING);
 
 		coordinates = varToFrame(tempID);
 		*type = VAR_STRING;
@@ -208,7 +208,7 @@ tVarCoordinates * tempToVar(int constType)
 	}
 
 	generateInstruction(OP_CREATE_VAR, type, NULL, coordinates);
-	//generateInstruction(OP_SET_CONSTANT, outData, NULL, coordinates);
+	generateInstruction(OP_SET_CONSTANT, outData, NULL, coordinates);
 	/*     operand->type = expr->type;
 	operand->operand = expr->data;*/
 
