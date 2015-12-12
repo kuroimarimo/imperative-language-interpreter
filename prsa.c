@@ -131,8 +131,8 @@ void InsertAbove(tList *Z, tExpr* cur, tExpr* new) {
 //--------------------------//
 int PrecG(tExpr *pred3, tExpr *pred2, tExpr *pred1) 
 {
-	
-	if (pred1 == NULL)
+    
+    if (pred1 == NULL)
     {
         fatalError(ERR_SYNTAX);                     // in case of empty error
         return 0;
@@ -196,48 +196,10 @@ int PrecG(tExpr *pred3, tExpr *pred2, tExpr *pred1)
 //------------------------------//
 tVarCoordinates *PomTrojAdres(tExpr* expr)
 {
-    //tOperand *operand = customMalloc(sizeof(tOperand));
-	/*tVarCoordinates * coordinates;
-	int * type = customMalloc(sizeof(int));*/
-	if (expr->identifier == 1)
-	{
-		/*switch(expr->type)
-		{
-			case INT_NUMBER: operand->type = VAR_INT; break;
-			case DOUBLE_NUMBER: operand->type = VAR_DOUBLE; break;
-			case STRING: operand->type = VAR_STRING; break;
-		}*/
-		return expr->data;
-	}
-	else
-		return constToVar(expr->type, expr->data);
-		/*switch (expr->type)
-		{
-			case INT_NUMBER:
-				addVar("TODO", getTableStackElem(localSTstack, 0), VAR_INT);
-				coordinates = varToFrame("TODO");
-				*type = INT_NUMBER;
-				break;
-
-			case DOUBLE_NUMBER:
-				addVar("TODO", getTableStackElem(localSTstack, 0), VAR_DOUBLE);
-				coordinates = varToFrame("TODO");
-				*type = DOUBLE_NUMBER;
-				break;
-
-			case STRING:
-				addVar(concat("#", expr->data), getTableStackElem(localSTstack, 0), VAR_STRING);
-				coordinates = varToFrame(concat("#", expr->data));
-				*type = STRING;
-				break;
-		}
-	
-	generateInstruction(OP_CREATE_VAR, type, NULL, coordinates);
-	generateInstruction(OP_SET_CONSTANT, expr->data, NULL, coordinates);*/
-   /*     operand->type = expr->type;
-    operand->operand = expr->data;*/
-
-    //return coordinates;
+    if (expr->identifier == 1)
+        return expr->data;
+    else
+        return constToVar(expr->type, expr->data);
 }
 
 void TrojAdres(int gramatika, tExpr* input1, tExpr* input2, tExpr* output) 
@@ -334,6 +296,7 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
     struktura = customMalloc(sizeof(tExpr));
     struktura->terminal = NETERMINAL;
     struktura->data = NULL;
+    struktura->identifier = 1;
     switch (gramatika) 
     {
         case 1:
@@ -341,20 +304,15 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
         case 3:
         case 4:
             if (expr1->type == DOUBLE_NUMBER || expr3->type == DOUBLE_NUMBER) 
-            {
                 struktura->type = DOUBLE_NUMBER;
-                struktura->data = customMalloc(sizeof(double));
-            }
             else if (expr1->type == STRING || expr3->type == STRING) 
             {
                 fatalError(ERR_IncompatibleExpr); 
                 return NULL;
             }
             else 
-            {
                 struktura->type = INT_NUMBER;
-                struktura->data = customMalloc(sizeof(int));
-            }
+            struktura->data = tempToVar(struktura->type);
             TrojAdres(gramatika, expr1, expr3, struktura);
             break;
         case 5:
@@ -385,7 +343,7 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
             (expr1->type == STRING && expr3->type == STRING)) 
             {
                 struktura->type = INT_NUMBER;
-                struktura->data = customMalloc(sizeof(int));
+                struktura->data = tempToVar(struktura->type);
                 TrojAdres(gramatika, expr1, expr3, struktura);
             }
             else 
@@ -399,19 +357,17 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
             {
                 case INT_NUMBER: 
                     struktura->type = INT_NUMBER; 
-                    struktura->data = customMalloc(sizeof(int));
                 break;
                 case DOUBLE_NUMBER: 
                     struktura->type = DOUBLE_NUMBER; 
-                    struktura->data = customMalloc(sizeof(double));
                 break;
                 case STRING: 
                     struktura->type = STRING; 
-                    struktura->data = strDuplicate(expr1->data);
                 break;
                 default: fatalError(ERR_IncompatibleExpr); 
                 return NULL;
             }
+            struktura->data = tempToVar(struktura->type);
             TrojAdres(gramatika, expr1, NULL, struktura);
         break;
         case 12:
@@ -419,18 +375,16 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
             {
                 case INT_NUMBER: 
                     struktura->type = INT_NUMBER;
-                    struktura->data = customMalloc(sizeof(int));
                 break;
                 case DOUBLE_NUMBER: 
                     struktura->type = DOUBLE_NUMBER; 
-                    struktura->data = customMalloc(sizeof(double));
                 break;
                 case STRING: 
                     struktura->type = STRING; 
-                    struktura->data = strDuplicate(expr2->data);
                 break;
                 default: fatalError(ERR_IncompatibleExpr); return NULL;
             }
+            struktura->data = tempToVar(struktura->type);
             TrojAdres(gramatika, expr2, NULL, struktura);
         break;
         default: fatalError(ERR_IncompatibleExpr); return NULL;
