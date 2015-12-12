@@ -8,7 +8,7 @@ void interpret(tInstruction * instruction)
     int inputInt;
     double inputDouble;
     tVariable *tempVar, *tempIn1, *tempIn2, *tempOut;
-    int i = 0;
+    //int i = 0;
     
     while (instruction != NULL)
     {
@@ -17,11 +17,56 @@ void interpret(tInstruction * instruction)
         switch (instruction->operator)
         {
             case OP_ASSIGN:
+				tempOut = getVariable(frameStack, instruction->output);
+				tempIn1 = getVariable(frameStack, instruction->input1);
+				
+				switch (tempOut->type)
+				{
+					case VAR_INT:
+						if (!tempOut->initialized)
+							tempOut->value = customMalloc(sizeof(int));
+						switch (tempIn1->type)
+						{
+							case VAR_INT:
+								*(int *)tempOut->value = *(int *)tempIn1->value;
+								break;
+
+							case VAR_DOUBLE:
+								*(int *)tempOut->value = (int) *(double *)tempIn1->value;
+								break;
+						}
+						break;
+
+
+					case VAR_DOUBLE:
+						if (!tempOut->initialized)
+							tempOut->value = customMalloc(sizeof(double));
+						switch (tempIn1->type)
+						{
+						case VAR_INT:
+							*(double *)tempOut->value = (double) *(int *)tempIn1->value;
+							break;
+
+						case VAR_DOUBLE:
+							*(double *)tempOut->value = *(double *)tempIn1->value;
+							break;
+						}
+						break;
+
+					case VAR_STRING:
+						tempOut->value = strDuplicate(tempIn1->value);
+						break;
+				}
+				tempOut->initialized = true;
+				break;
+
+				/*
                 switch (((tOperand *)instruction->output)->type)
                 {
                     case VAR_DOUBLE:
                         tempOut = getVariable(frameStack, (tVarCoordinates *)((tOperand *)instruction->output)->operand);
-                        tempOut->value = customMalloc(sizeof(double));
+                        if(!tempOut->initialized)
+							tempOut->value = customMalloc(sizeof(double));
                         switch (((tOperand *)instruction->input1)->type)
                         {
                             case VAR_DOUBLE:
@@ -55,7 +100,8 @@ void interpret(tInstruction * instruction)
                         
                     case VAR_INT:
                         tempOut = getVariable(frameStack, (tVarCoordinates *)((tOperand *)instruction->output)->operand);
-                        tempOut->value = customMalloc(sizeof(int));
+                        if (!tempOut->initialized)
+							tempOut->value = customMalloc(sizeof(int));
                         switch (((tOperand *)instruction->input1)->type)
                         {
                             case VAR_DOUBLE:
@@ -88,8 +134,7 @@ void interpret(tInstruction * instruction)
                         break;
                         
                     case INT_NUMBER:
-                        output = customMalloc(sizeof(int));
-                        ((tOperand *)instruction->output)->operand = output;
+						output = ((tOperand *)instruction->output)->operand;
                         switch (((tOperand *)instruction->input1)->type)
                         {
                             case VAR_DOUBLE:
@@ -121,8 +166,7 @@ void interpret(tInstruction * instruction)
                         break;
                         
                     case DOUBLE_NUMBER:
-                        output = customMalloc(sizeof(double));
-                        ((tOperand *)instruction->output)->operand = output;
+						output = ((tOperand *)instruction->output)->operand;
                         switch (((tOperand *)instruction->input1)->type)
                         {
                             case VAR_DOUBLE:
@@ -191,10 +235,8 @@ void interpret(tInstruction * instruction)
                     ((tOperand *)instruction->output)->operand = output;
                     break;
                     
-                default:
-                    printf("ASSIGN este neimplementovany.\n");
-                }
-                break;
+                default:*/
+                //}
                 
             case OP_SUM:
             case OP_MINUS:
@@ -209,75 +251,77 @@ void interpret(tInstruction * instruction)
             case OP_INT:
             case OP_DOUBLE:
             case OP_STRING:
+				printf("Neimplementovana instrukcia.\n");
+				break;
             case OP_COUT:               // zatial fungovalo vzdy
-                switch (((tOperand *)instruction->output)->type)
-            {
-                case INT_NUMBER:
-                    printf("%d", *(int *)((tOperand *)instruction->output)->operand);
-                    break;
+				tempOut = getVariable(frameStack, instruction->output);
+                switch (tempOut->type)
+				{
+					/*case INT_NUMBER:
+						printf("%d", *(int *)((tOperand *)instruction->output)->operand);
+						break;
                     
-                case DOUBLE_NUMBER:
-                    printf("%g", *(double *)((tOperand *)instruction->output)->operand);
-                    break;
+					case DOUBLE_NUMBER:
+						printf("%g", *(double *)((tOperand *)instruction->output)->operand);
+						break;
                     
-                case STRING:
-                    printf("%s", (char *)((tOperand *)instruction->output)->operand);
-                    break;
+					case STRING:
+						printf("%s", (char *)((tOperand *)instruction->output)->operand);
+						break;*/
                     
-                case VAR_INT:
-                    tempVar = getVariable(frameStack, (tVarCoordinates *)((tOperand *)instruction->output)->operand);
-                    if (!tempVar->initialized)
-                        fatalError(ERR_UninitVar);
+					case VAR_INT:
+						if (!tempOut->initialized)
+							fatalError(ERR_UninitVar);
                     
-                    printf("%d", *(int *)tempVar->value);
-                    break;
+						printf("%d", *(int *)tempOut->value);
+						break;
                     
-                case VAR_DOUBLE:
-                    tempVar = getVariable(frameStack, (tVarCoordinates *)((tOperand *)instruction->output)->operand);
-                    if (!tempVar->initialized)
-                        fatalError(ERR_UninitVar);
+					case VAR_DOUBLE:
+						if (!tempOut->initialized)
+							fatalError(ERR_UninitVar);
+
+						printf("%g", *(double *)tempOut->value);
+						break;
                     
-                    printf("%g", *(double *)tempVar->value);
-                    break;
+					case VAR_STRING:
+						if (!tempOut->initialized)
+							fatalError(ERR_UninitVar);
+
+						printf("%s", (char *)tempOut->value);
+						break;
                     
-                case VAR_STRING:
-                    tempVar = getVariable(frameStack, (tVarCoordinates *)((tOperand *)instruction->output)->operand);
-                    if (!tempVar->initialized)
-                        fatalError(ERR_UninitVar);
-                    
-                    printf("%s", (char *)tempVar->value);
-                    break;
-                    
-            }
+				}
                 break;
                 
             case OP_CIN:			//musi sa spravit inak ako cez scanf, pravdepodobne cez konecny automat OSEKAVA
                 tempVar = getVariable(frameStack, (tVarCoordinates *)instruction->output);
                 switch (tempVar->type)
-            {
-                case VAR_INT:
-                    if ((scanf("%d", &inputInt) < 0) || !isspace(fgetc(stdin)))
-                        fatalError(ERR_ReadInput);
+				{
+					case VAR_INT:
+						if ((scanf("%d", &inputInt) < 0) || !isspace(fgetc(stdin)))
+							fatalError(ERR_ReadInput);
                     
-                    tempVar->value = customMalloc(sizeof(int));
-                    *(int *)tempVar->value = inputInt;
-                    tempVar->initialized = true;
-                    break;
+						if (!tempVar->initialized)
+							tempVar->value = customMalloc(sizeof(int));
+						*(int *)tempVar->value = inputInt;
+						tempVar->initialized = true;
+						break;
                     
-                case VAR_DOUBLE:
-                    if ((scanf("%lf", &inputDouble) < 0) || !isspace(fgetc(stdin)))
-                        fatalError(ERR_ReadInput);
+					case VAR_DOUBLE:
+						if ((scanf("%lf", &inputDouble) < 0) || !isspace(fgetc(stdin)))
+							fatalError(ERR_ReadInput);
                     
-                    printf("Z CIN BOLO NACITANE CISLO %g\n", inputDouble);
+						//printf("Z CIN BOLO NACITANE CISLO %g\n", inputDouble);
                     
-                    tempVar->value = customMalloc(sizeof(double));
-                    *(double *)tempVar->value = inputDouble;
-                    tempVar->initialized = true;
-                    break;
+						if (!tempVar->initialized)
+							tempVar->value = customMalloc(sizeof(double));
+						*(double *)tempVar->value = inputDouble;
+						tempVar->initialized = true;
+						break;
                     
-                case VAR_STRING:
-                    break;
-            }
+					case VAR_STRING:
+						break;
+				}
                 break;
                 
             case OP_GOTO:
@@ -287,17 +331,24 @@ void interpret(tInstruction * instruction)
             case OP_RETURN:         // zaatial iba pre navrat z mainu
                 if (instrStackEmpty(instrStack))		//we're in main
                     return;
+				//nastavenie hodnoty TODO
+				frameStackPopUntilBase(frameStack);
+				instruction = instrStackPop(instrStack);
+				continue;
                 //else: store return value (somewhere), pop all frames up to base, jump to *tInstruction on top of the stack
                 //               printf("Najskor treba dorobit volanie funkcie.\n");
                 //               break;
                 
             case OP_CREATE_VAR:
-                tempVar = getVariable(frameStack, (tVarCoordinates *)instruction->output);
+                tempVar = getVariable(frameStack, instruction->output);
                 tempVar->type = *(int *)instruction->input1;
                 break;
                 
             case OP_CREATE_FRAME:       // recursion and blocks
-                frameCreateAndPush(frameStack, *(unsigned int *)instruction->input1);
+				//printf("Velkost zakladneho ramca v instrukcii: %d. \n", (unsigned int) *findElem(globalST, "fififi")->data.baseFrameSize);
+				//int a = (signed int) *(int *)instruction->input1;
+				//printf("_______________________%d______________________\n", a);
+                frameCreateAndPush(frameStack, *(int *)instruction->input1);
                 break;
                 
             case OP_SET_TOP_TO_BASE:    // nastavenie zakl ramca kvoli returnu a odstranovaniu
@@ -308,14 +359,42 @@ void interpret(tInstruction * instruction)
                 frameStackPop(frameStack);
                 break;
                 
-            case OP_IF_JUMP:
+			case OP_IF_JUMP:
+				tempIn1 = getVariable(frameStack, instruction->input1);
+				if (*(int *)tempIn1->value)
+				{
+					instruction = instruction->output;
+					continue;
+				}
+				break;
+
             case OP_IFNOT_JUMP:
+				tempIn1 = getVariable(frameStack, instruction->input1);
+				if (!*(int *)tempIn1->value)
+				{
+					instruction = instruction->output;
+					continue;
+				}
+				break;
+
             case OP_FUNC_CALL:
+				instrStackPush(instrStack, instruction->next);
+				instruction = ((tInstrList *)instruction->input1)->first;
+				continue;
+
             case OP_BUILT_IN:
             case OP_GET_RETURN_VALUE:
+				printf("ASSIGN este neimplementovany.\n");
+				break;
                 
             case OP_NOP:            // <3
                 break;
+
+			case OP_SET_CONSTANT:
+				tempOut = getVariable(frameStack, instruction->output);
+				tempOut->value = instruction->input1;
+				tempOut->initialized = true;
+				break;
                 
             default:
                 printf("NEIMPLEMENTOVANA INSTRUKCIA.\n");
