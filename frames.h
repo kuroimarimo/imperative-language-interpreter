@@ -11,9 +11,9 @@ typedef struct {
 	int type;
 } tVariable;
 
-typedef struct{
+typedef struct {
 	bool isBaseFrame;
-	tVariable * variables;
+	tVariable ** variables;
 } tFrame;
 
 typedef struct {
