@@ -1,8 +1,7 @@
 // TODO: add prec. for BOOLOP, 
-
 #include "prsa.h"
-#include "precedence_table.h"
 #include "parser.h"
+#include "precedence_table.h"
 
 //--------------------------//
 //        NEXT TOKEN        //
@@ -189,28 +188,56 @@ int PrecG(tExpr *pred3, tExpr *pred2, tExpr *pred1)
 //------------------------------//
 //        GENEROVANI 3AK        //
 //------------------------------//
-tOperand *PomTrojAdres(tExpr* expr)
+tVarCoordinates *PomTrojAdres(tExpr* expr)
 {
-    tOperand *operand = customMalloc(sizeof(tOperand));
-    if (expr->identifier == 1)
-    {
-        switch(expr->type)
-        {
-            case INT_NUMBER: operand->type = VAR_INT; break;
-            case DOUBLE_NUMBER: operand->type = VAR_DOUBLE; break;
-            case STRING: operand->type = VAR_STRING; break;
-        }
-    }
-    else   
-        operand->type = expr->type;
-    operand->operand = expr->data;
-    return operand;
+    //tOperand *operand = customMalloc(sizeof(tOperand));
+	/*tVarCoordinates * coordinates;
+	int * type = customMalloc(sizeof(int));*/
+	if (expr->identifier == 1)
+	{
+		/*switch(expr->type)
+		{
+			case INT_NUMBER: operand->type = VAR_INT; break;
+			case DOUBLE_NUMBER: operand->type = VAR_DOUBLE; break;
+			case STRING: operand->type = VAR_STRING; break;
+		}*/
+		return expr->data;
+	}
+	else
+		return constToVar(expr->type, expr->data);
+		/*switch (expr->type)
+		{
+			case INT_NUMBER:
+				addVar("TODO", getTableStackElem(localSTstack, 0), VAR_INT);
+				coordinates = varToFrame("TODO");
+				*type = INT_NUMBER;
+				break;
+
+			case DOUBLE_NUMBER:
+				addVar("TODO", getTableStackElem(localSTstack, 0), VAR_DOUBLE);
+				coordinates = varToFrame("TODO");
+				*type = DOUBLE_NUMBER;
+				break;
+
+			case STRING:
+				addVar(concat("#", expr->data), getTableStackElem(localSTstack, 0), VAR_STRING);
+				coordinates = varToFrame(concat("#", expr->data));
+				*type = STRING;
+				break;
+		}
+	
+	generateInstruction(OP_CREATE_VAR, type, NULL, coordinates);
+	generateInstruction(OP_SET_CONSTANT, expr->data, NULL, coordinates);*/
+   /*     operand->type = expr->type;
+    operand->operand = expr->data;*/
+
+    //return coordinates;
 }
 
 void TrojAdres(int gramatika, tExpr* input1, tExpr* input2, tExpr* output) 
 {
     int operator;
-    tOperand *in1, *in2, *out;
+    /*tOperand*/ /*void*/ tVarCoordinates *in1, *in2, *out;
     switch (gramatika) 
     {
         case 1: operator = OP_SUM; break;
@@ -227,7 +254,13 @@ void TrojAdres(int gramatika, tExpr* input1, tExpr* input2, tExpr* output)
         case 12: operator = OP_ASSIGN; break;
         default: fatalError(ERR_ParamType); return;          // no grammar
     }
-    //
+    
+	/*if (input1->type == INT_NUMBER)
+	{
+		printf("Som v precedencke, je tu cislo a je to cislo cele, vid cele cislo nasledujuce: %d", *(int *)input1->data);
+	}*/
+
+
     in1 = PomTrojAdres(input1);
     if (input2 != NULL) in2 = PomTrojAdres(input2);
     out = PomTrojAdres(output);
