@@ -14,9 +14,6 @@ enum adressCode {
 	OP_GE,					// in1 vetsirovno in2 -> out
 	OP_EQUALS,				// in1 rovna se in2 -> out
 	OP_DIFF,				// in1 ruzne od in2 -> out
-	OP_INT,					// aloc. 4 bajtu -> out
-	OP_DOUBLE,				// aloc 8 bajtu -> out
-	OP_STRING,				// aloc x bajtu -> out
 	OP_COUT,				// >> dalsi COUT, vystup -> out
 	OP_CIN,					// store stdin input in *tVarCoordinates output
 	OP_IF,					// pokud plati in1 -> out
