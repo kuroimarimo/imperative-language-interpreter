@@ -256,7 +256,7 @@ int find(char*s, char*search){
     int k;              ///pomocne - pro  pozici kde jsem práve v pomocném poli
     int r;
     
-    int *fail = customMalloc(sizeof(int)*lenght_search);
+    int *fail = customMalloc(sizeof(int)*(lenght_search+1));
     if(fail==NULL)
         return -1111;
     fail[0]=-1;                                 //první pozice -1
