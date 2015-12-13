@@ -371,9 +371,12 @@ void rule_auto()
 	*retType = exprType(PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION));
 
 	addVar(id, tableStackTop(localSTstack), *retType);				//save the variable in the symbol table
+	
+	tVarCoordinates * temp = customMalloc(sizeof(tVarCoordinates));
+	*temp = *(tVarCoordinates *)instructionList->last->output;
 	generateInstruction(OP_CREATE_VAR, retType, NULL, varToFrame(id));		//create the variable in the frame
 
-	generateInstruction(OP_ASSIGN, instructionList->last->output, NULL, varToFrame(id));
+	generateInstruction(OP_ASSIGN, temp, NULL, varToFrame(id));
 }
 
 //rule:     <cin> -> >> id
