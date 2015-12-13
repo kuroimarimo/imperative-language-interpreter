@@ -169,6 +169,7 @@ int scanner () {
                 value = BACKSLASH;
                 break;
             case '"':
+                fillToken('\0');
                 value = STRING;
                 break;
             case '!':
