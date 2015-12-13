@@ -152,7 +152,7 @@ int scanner () {
 
         switch (value) {
         case START:
-                /* Rozpoznani characteru  */
+                /* Rozpoznani characteru    */
             if (isalpha(c) || c == '_') {
                 value = IDENTIFIER;
                 fillToken(c);
@@ -231,17 +231,17 @@ int scanner () {
                     default:
                             fatalError (ERR_UnknownChar);
 
-                    }//posleni switch
-                                      
-            }//switch
-        }//else
-
-
-            break; //pokračuj dalším znakem 
+                     } // vnitrni switch
+            } // hlavni switch
+        } //else
 
 
 
-       case IDENTIFIER:       /// identifikator, zacina pismenem nebo '_' ; dalsi charactery mohou byt cisla
+            break; //pokračuj dalším znakem  
+
+
+
+       case IDENTIFIER:       /// identifikator,  zacina pismenem nebo '_' ; dalsi charactery mohou byt cisla
 
             if (isalpha(c) || c == '_' || isdigit(c) )
                 fillToken(c);
@@ -253,7 +253,7 @@ int scanner () {
             break;
 
         case NUMBER_START_ZERO:   //když číslo začíná nulou, ignoruj počáteční nuly
-            if (c == '0')           /// ignoruj nulu
+            if (c == '0')           // ignoruj nulu
                 break;
             else if ((isdigit(c))  ) {  /// 1 .. 9
             }
@@ -276,7 +276,7 @@ int scanner () {
 
             if (isdigit(c))
                 fillToken(c);
-            else if (c == '.') {    /// desetinne cislo -> double
+            else if (c == '.') {    // desetinne cislo -> double
                 value = DEC_NUMBER;
                 fillToken(c);
             }
@@ -297,7 +297,7 @@ int scanner () {
                 fillToken(c);
                 value = DEC_NUMBER_END;
             }
-            else /* if (c == '.')   || (c == 'e' || c == 'E'))    */
+            else 
                 {
                         fatalError (ERR_NumberShape);
                     }       /// Lex_an chyba - zadana druha desetinna tecka
@@ -368,7 +368,7 @@ int scanner () {
                 fillToken(c);
             else {
                 fillToken('\0');
-                token.type = STRING;    /// ungetc(c, source); - vytvari nekonecny cyklus
+                token.type = STRING;    
                 test = false;
             }
             break;
@@ -466,12 +466,11 @@ int scanner () {
     case LESS:
             if (c == '<')
             {
-                //fillToken(c);
                 token.type = C_OUT;
             }
             else if (c == '=')
             {
-                //fillToken(c);
+                
                 token.type = LESS_EQUAL;
             }
             else
@@ -486,12 +485,12 @@ int scanner () {
    case GREATER:
             if (c == '>')
             {
-                //fillToken(c);
+                
                 token.type = C_IN;
             }
             else if (c == '=')
             {
-                //fillToken(c);
+              
                 token.type = GREATER_EQUAL;
             }
             else
@@ -506,7 +505,7 @@ int scanner () {
 
     case DIVIDE:  //děleno nebo blokový komentář
         if (c != '/' && c!= '*') {
-            //fillToken('/');
+            
             token.type = DIVIDE;
 
             ungetc(c,source);
@@ -617,7 +616,7 @@ int scanner () {
 
     case ASSIGNMENT:
             if (c == '=') {
-                //fillToken(c);
+               
                 token.type = EQUAL;
             }
             else {
@@ -633,12 +632,11 @@ int scanner () {
     case EXCLAMATION_MARK:
             if (c == '=')
             {
-                //fillToken(c);
+                
                 token.type = NEGATION;
             }
             else {
-                token.type = EXCLAMATION_MARK;
-                ungetc(c, source);
+                 fatalError (ERR_UnknownChar);
             }
                 test = false;
 
@@ -647,7 +645,7 @@ int scanner () {
 
     case PLUS:
         if (c == '+') {
-            //fillToken(c);
+           
             token.type = INCREMENT;
         }
         else {
@@ -662,7 +660,7 @@ int scanner () {
 
     case MINUS:
         if (c == '-') {
-            //fillToken(c);
+            
             token.type = DECREMENT;
         }
         else {
