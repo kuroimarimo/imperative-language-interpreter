@@ -248,36 +248,43 @@ return pomocna;
 int find(char*s, char*search)
 {
 int SIndex=0;
-int SearchIndex=0;  //pomocne indexy 
+int SearchIndex=0;  //pomocne indexy
 
 int lenght_s=(int)strlen (s);
-int lenght_search=(int) strlen (search);  
+int lenght_search=(int) strlen (search);
 
 
-int k;  ///pomocne - pro  pozici kde jsem práve v pomocném poli 
+int k;  ///pomocne - pro  pozici kde jsem práve v pomocném poli
 int r;
 
-int *fail = customMalloc(sizeof(int)*lenght_search);   
+int *fail = customMalloc(sizeof(int)*lenght_search);
     if(fail==NULL)
         return -1111;
 fail[0]=-1;   //první pozice -1
-for (k=1;k<=lenght_search;k++){   //procházím dokud nedojdu na konec substringu 
-    r=fail[k-1];  
+for (k=1;k<=lenght_search;k++){   //procházím dokud nedojdu na konec substringu
+    r=fail[k-1];
 
-        while ((r>0) && (s[r]!=s[k-1]))      //použito zkratové vyhodnocení !!!  abych nepřistupoval mimo přidělenou paměť  
-        {                                   
+        while ((r>0) && (s[r]!=s[k-1]))      //použito zkratové vyhodnocení !!!  abych nepřistupoval mimo přidělenou paměť
+        {
 
-            r=fail[r];   
+            r=fail[r];
         }
-    fail[k]=r+1;  //přidej index na aktuální pozici 
+    fail[k]=r+1;  //přidej index na aktuální pozici
 
 
-} 
+}
 
 
+<<<<<<< HEAD
 while ((SIndex<lenght_s) && (SearchIndex<lenght_search))
 {
     if ((SearchIndex==-1) || (s[SIndex]==search[SearchIndex])){  //jestli jsi na začátku nebo se písmena rovnají 
+=======
+while ((SIndex<lenght_s) && (SearchIndex<lenght_search)){
+
+
+    if ((SearchIndex==-1) || (s[SIndex]==search[SearchIndex])){  //jestli jsi na začátku nebo se písmena rovnají
+>>>>>>> 0561473c41c7d5b0622cb41cc095d4b020c9e721
         SIndex++;
         SearchIndex++;
     }
@@ -285,13 +292,28 @@ while ((SIndex<lenght_s) && (SearchIndex<lenght_search))
     {
         SearchIndex=fail[SearchIndex];  //jinak ulož číslo indexu z pomocného pole
     }
+<<<<<<< HEAD
     }
+=======
+}
+
+
+>>>>>>> 0561473c41c7d5b0622cb41cc095d4b020c9e721
     if (SearchIndex>=lenght_search)   //jestli jsi našel tak vrať první substring - pozice počítaná od nuly
         return SIndex-lenght_search;
 
     else
+<<<<<<< HEAD
         return -1;  // not found
 }
+=======
+        return -1;  ///jestli jsi nenašel vrať -1
+
+
+}  //end of function
+
+
+>>>>>>> 0561473c41c7d5b0622cb41cc095d4b020c9e721
 
 char *sort (char *s)
 {
