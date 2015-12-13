@@ -193,25 +193,25 @@ void interpret(tInstruction * instruction)
                 {
                     case VAR_INT:
                         if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int * int
-                            tempOut->value.i = (tempIn1->value.i / tempIn2->value.i);
+                            tempOut->value.i = (tempIn1->value.i * tempIn2->value.i);
                         else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int * double
-                            tempOut->value.i = (tempIn1->value.i / tempIn2->value.d);
+                            tempOut->value.i = (tempIn1->value.i * tempIn2->value.d);
                         else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double * int
-                            tempOut->value.i = (tempIn1->value.d / tempIn2->value.i);
+                            tempOut->value.i = (tempIn1->value.d * tempIn2->value.i);
                         else                                                                        // double * double
-                            tempOut->value.i = (tempIn1->value.d / tempIn2->value.d);
+                            tempOut->value.i = (tempIn1->value.d * tempIn2->value.d);
                         tempOut->initialized = true;
                         break;
                         
                     case VAR_DOUBLE:
                         if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int * int
-                            tempOut->value.d = (tempIn1->value.i / tempIn2->value.i);
+                            tempOut->value.d = (tempIn1->value.i * tempIn2->value.i);
                         else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int * double
-                            tempOut->value.d = (tempIn1->value.i / tempIn2->value.d);
+                            tempOut->value.d = (tempIn1->value.i * tempIn2->value.d);
                         else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double * int
-                            tempOut->value.d = (tempIn1->value.d / tempIn2->value.i);
+                            tempOut->value.d = (tempIn1->value.d * tempIn2->value.i);
                         else                                                                        // double * double
-                            tempOut->value.d = (tempIn1->value.d / tempIn2->value.d);
+                            tempOut->value.d = (tempIn1->value.d * tempIn2->value.d);
                         tempOut->initialized = true;
                         break;
                 }
