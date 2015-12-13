@@ -1,3 +1,20 @@
+/*
+ *  Project name:
+ *  Implementace interpretu imperativního jazyka IFJ15
+ *
+ *  Date: 13.12.2015
+ *
+ *  Repository:
+ *  https://github.com/kuroimarimo/imperative-language-interpreter
+ *
+ *  Team:
+ *  Votjěch Václavík	(xvacla22)
+ *  Peter Vančo			(xvanco05)
+ *  Filip Vaško         (xvasko10)
+ *  Dominik Vašek		(xvasek06)
+ *  Valentína Straková	(xstrak27)
+ */
+
 #include "parser.h"
 
 int isKeyword(int tokenType)
@@ -988,7 +1005,7 @@ int rule_builtIn(hashElem * assignee)
 	}
 
 	// create frame variables for parameters
-	for (int i = 0; i < *paramCount; i++)
+	/*for (int i = 0; i < *paramCount; i++)
 	{
 		tVarCoordinates * param = customMalloc(sizeof(tVarCoordinates));
 		param->frameOffset = 0;
@@ -1011,7 +1028,7 @@ int rule_builtIn(hashElem * assignee)
 		}
 
 		generateInstruction(OP_CREATE_VAR, type, NULL, param);
-	}
+	}*/
 
 	hashElem funcCall;
 	funcCall.key = NULL;
@@ -1021,6 +1038,11 @@ int rule_builtIn(hashElem * assignee)
 	scanner();
 	if (token.type != L_BRACKET)
 		fatalError(ERR_SYNTAX);
+
+	hTab * callTab = hTabInit(INIT_ST_SIZE);
+	tableStackPush(localSTstack, callTab);
+
+	generateInstruction(OP_CREATE_FRAME, paramCount, NULL, NULL);
 
 	int paramIndex = 0;
 	rule_callParam(&funcCall, &paramIndex, *function);					//scan for all the parameters
@@ -1071,6 +1093,7 @@ int rule_builtIn(hashElem * assignee)
 		fatalError(ERR_SYNTAX);
 
 	generateInstruction(OP_BUILT_IN, function, NULL, varToFrame(assignee->key));
+	tableStackPop(localSTstack);
 	hashElemInit(&funcCall);
 	return ERR_None;
 }

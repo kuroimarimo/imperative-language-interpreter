@@ -1,3 +1,20 @@
+/*
+ *  Project name:
+ *  Implementace interpretu imperativního jazyka IFJ15
+ *
+ *  Date: 13.12.2015
+ *
+ *  Repository:
+ *  https://github.com/kuroimarimo/imperative-language-interpreter
+ *
+ *  Team:
+ *  Votjěch Václavík	(xvacla22)
+ *  Peter Vančo			(xvanco05)
+ *  Filip Vaško         (xvasko10)
+ *  Dominik Vašek		(xvasek06)
+ *  Valentína Straková	(xstrak27)
+ */
+
 #include "interpret.h"
 
 #define INIT_INPUT_SIZE 16
@@ -34,6 +51,7 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
     int inputInt;
     double inputDouble;
     tVariable *tempVar, *tempIn1, *tempIn2, *tempOut;
+	tVariable returnValue;
     //	char * inputStr;
 
     //int i = 0;
@@ -428,13 +446,90 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
             case OP_RETURN:         // zaatial iba pre navrat z mainu
                 if (instrStackEmpty(instrStack))		//we're in main
                     return;
-				//nastavenie hodnoty TODO
+
+				tempIn1 = getVariable(frameStack, instruction->input1);
+				if (!tempIn1->initialized)
+					fatalError(ERR_UninitVar);
+
+				switch (*(int *)instruction->input2)   //function return type
+				{
+					case FUNC_INT:
+						returnValue.type = VAR_INT;
+
+						switch (tempIn1->type)
+						{
+							case VAR_INT:
+								returnValue.value.i = tempIn1->value.i;
+								break;
+
+							case VAR_DOUBLE:
+								returnValue.value.i = (int)tempIn1->value.d;
+								break;
+						}
+						break;
+
+					case FUNC_DOUBLE:
+						returnValue.type = VAR_DOUBLE;
+
+						switch (tempIn1->type)
+						{
+							case VAR_INT:
+								returnValue.value.d = (double) tempIn1->value.i;
+								break;
+
+							case VAR_DOUBLE:
+								returnValue.value.d = tempIn1->value.d;
+								break;
+						}
+						break;
+
+					case FUNC_STRING:
+						returnValue.type = VAR_STRING;
+						returnValue.value.s = tempIn1->value.s;
+						break;
+				}
+
 				frameStackPopUntilBase(frameStack);
 				instruction = instrStackPop(instrStack);
 				continue;
-                //else: store return value (somewhere), pop all frames up to base, jump to *tInstruction on top of the stack
-                //               printf("Najskor treba dorobit volanie funkcie.\n");
-                //               break;
+
+			case OP_GET_RETURN_VALUE:
+				tempOut = getVariable(frameStack, instruction->output);
+
+				switch (*(int *)instruction->output) 
+				{
+					case VAR_INT:
+						switch (returnValue.type)
+						{
+							case VAR_INT:
+								tempOut->value.i = returnValue.value.i;
+								break;
+
+							case VAR_DOUBLE:
+								tempOut->value.i = (int) returnValue.value.d;
+								break;
+						}
+						break;
+
+					case VAR_DOUBLE:
+						switch (returnValue.type)
+						{
+							case VAR_INT:
+								tempOut->value.d = (double) returnValue.value.i;
+								break;
+
+							case VAR_DOUBLE:
+								tempOut->value.d = returnValue.value.d;
+								break;
+						}
+						break;
+
+					case VAR_STRING:
+						tempOut->value.s = returnValue.value.s;
+						break;
+				}
+				tempOut->initialized = true;
+				break;
                 
             case OP_CREATE_VAR:
                 tempVar = getVariable(frameStack, instruction->output);
@@ -482,8 +577,38 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
 				continue;
 
             case OP_BUILT_IN:
-            case OP_GET_RETURN_VALUE:
-				printf("OP_GET_RETURN_VALUE este neimplementovana.\n");
+				tempOut = getVariable(frameStack, instruction->output);
+				tVarCoordinates * tempParam = customMalloc(sizeof(tVarCoordinates));
+				tempParam->frameOffset = 0;
+				tempParam->index = 0;
+
+				switch (*(int *)instruction->input1)
+				{
+					case B_LENGTH:
+						switch (tempOut->type)
+						{
+							case VAR_INT:
+								tempOut->value.i = length(getVariable(frameStack, tempParam)->value.s);
+								break;
+
+							case VAR_DOUBLE:
+								tempOut->value.d = (double) length(getVariable(frameStack, tempParam)->value.s);
+								break;
+						}
+						break;
+
+					case B_SORT:
+						switch (tempOut->type)
+						{
+							case VAR_STRING:
+								tempOut->value.s = sort(getVariable(frameStack, tempParam)->value.s);
+								break;
+						}
+						break;
+				}
+
+				tempOut->initialized = true;
+				frameStackPop(frameStack);
 				break;
                 
             case OP_NOP:            // <3
