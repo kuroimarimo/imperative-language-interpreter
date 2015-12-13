@@ -113,9 +113,9 @@ tVarCoordinates * constToVar(int constType, void * data)
     switch (constType)
     {
         case INT_NUMBER:
-            sprintf(str, "%d", *(int *)data);
+            sprintf(str, "#%d", *(int *)data);
             constID = strDuplicate(str);
-            constID = concat("#", constID);
+            //constID = concat("#", constID);
             
             if (!findVar(constID))
                 addVar(constID, getTableStackElem(localSTstack, 0), VAR_INT);
@@ -127,9 +127,9 @@ tVarCoordinates * constToVar(int constType, void * data)
             break;
             
         case DOUBLE_NUMBER:
-            sprintf(str, "%f", *(double *)data);
+            sprintf(str, "#%f", *(double *)data);
             constID = strDuplicate(str);
-            constID = concat("#", constID);
+            //constID = concat("#", constID);
             
             if (!findVar(constID))
                 addVar(constID, getTableStackElem(localSTstack, 0), VAR_DOUBLE);
@@ -174,9 +174,8 @@ tVarCoordinates * tempToVar(int constType)
 	switch (constType)
 	{
 	case INT_NUMBER:
-		sprintf(str, "%d", counter++);
+		sprintf(str, "$%d", counter++);
 		tempID = strDuplicate(str);
-		tempID = concat("$", tempID);
 		addVar(tempID, getTableStackElem(localSTstack, 0), VAR_INT);
 
 		coordinates = varToFrame(tempID);
@@ -185,9 +184,8 @@ tVarCoordinates * tempToVar(int constType)
 		break;
 
 	case DOUBLE_NUMBER:
-		sprintf(str, "%d", counter++);
+		sprintf(str, "$%d", counter++);
 		tempID = strDuplicate(str);
-		tempID = concat("$", tempID);
 		addVar(tempID, getTableStackElem(localSTstack, 0), VAR_DOUBLE);
 
 		coordinates = varToFrame(tempID);
@@ -196,9 +194,8 @@ tVarCoordinates * tempToVar(int constType)
 		break;
 
 	case STRING:
-		sprintf(str, "%d", counter++);
+		sprintf(str, "$%d", counter++);
 		tempID = strDuplicate(str);
-		tempID = concat("$", tempID);
 		addVar(tempID, getTableStackElem(localSTstack, 0), VAR_STRING);
 
 		coordinates = varToFrame(tempID);
@@ -209,8 +206,6 @@ tVarCoordinates * tempToVar(int constType)
 
 	generateInstruction(OP_CREATE_VAR, type, NULL, coordinates);
 	generateInstruction(OP_SET_CONSTANT, outData, NULL, coordinates);
-	/*     operand->type = expr->type;
-	operand->operand = expr->data;*/
 
 	return coordinates;
 }
