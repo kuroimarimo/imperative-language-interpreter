@@ -94,7 +94,6 @@ hashElem * addElem  (hTab * table, char * key, tData * data);
 hashElem * findElem (hTab * table, char * key);
 
 void removeElem (hTab * table, char * key);
-
 int length(char *s);
 char *substr (char *s, int i, int n);
 int find(char*s, char*search);
