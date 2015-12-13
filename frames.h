@@ -5,9 +5,17 @@
 #include "table_stack.h"
 #include "garbage_collector.h"
 
+
+typedef union unionValue
+{
+    int i;
+    double d;
+    char * s;
+} TUnionValue;
+
 typedef struct {
 	bool initialized;
-	void * value;
+	TUnionValue /***/ value;
 	int type;
 } tVariable;
 
