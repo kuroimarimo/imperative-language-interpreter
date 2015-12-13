@@ -672,7 +672,7 @@ int scanner () {
 
         break;
 
-        }   // end main switch
+        }   //  end main switch
     }   // end while
 
 
