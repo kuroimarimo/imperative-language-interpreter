@@ -16,7 +16,7 @@
  */
 
 
-#include "prsa.h"
+#include "prec_analysis.h"
 #include "parser.h"
 #include "precedence_table.h"
 
@@ -275,7 +275,6 @@ void SemId(tExpr* identifier)
         return;
     }
     tVarCoordinates * coordinates;
-    //coordinates = customMalloc(sizeof(tVarCoordinates));
     coordinates = varToFrame(identifier->data);
     identifier->data = coordinates;
     identifier->identifier = 1;

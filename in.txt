@@ -1,42 +1,4 @@
-int funkcia (int a, double b)
-{
-	cout << "TOTO JE PARAMETER: " << a << b << "\n";
-	return a;
-}
-
-int f(string a )
-{
-	cout << a << "\n";
-	return 0;
-}
-
-int main()
-{
-	int b = 5 - 1.5;
-	cout << b << "\n";
-	b = funkcia (88, 28);
-	
-	double ddd;
-	ddd = length("retazec");
-	cout << ddd << "Je dlzka dlha.\n";
-	cout << "Retazec ma dlzku: " << b << "\n";
-	
-	
-	b = f("ja som vo funkciiiiii");
-	string retazec = "askfhdsfhskf";
-	retazec = substr(retazec, 2, 3);
-	cout << retazec << "\n";
-	//cout<<"vratilsomsa";
-	
-	retazec = concat("jeden", "druhy");
-	cout << "Spojene su " << retazec << "\n";
-	
-	b = find ("jasomkobylamala", "pes");
-	cout << "Naslo " << b << "\n";
-	return b;
-}
-
-/*int funkcia (int k)
+int funkcia (int k)
 {
 	cout << "\n\n\n\n\nsom vo funkcii\n\n\n\n\n\n";
 	cout << "Vstupny parameter je " << k << "\n";
@@ -46,62 +8,8 @@ int main()
 
 int main()
 {
-	cout << "TERAZ UZ INTERPRETUJEME\n";
-	int a = 20 - 30.5;
-	a = a + 1;
-	cout << a << << " je cislo\n";
-	
-	int z;
-	z = funkcia(a);
-	
-	{
-		cout << "aha\n";
-		{
-			
-			cout << "aj tu som\n";
-			
-			int z;
-			cin >> z;
-			cout << "Z je " << z << "\n";
-			
-			int a = 5;
-			do {
-				cout << a << " Ja som while.\n";
-				a = a + 1;}
-			while ( a < 10 );
-			
-			a = 7;
-			while (a >= 3)
-			{
-				cout << "SOm wjile c. " << a << "\n";
-				a = a - 1;
-				if (a == 3)
-					return a;
-			}
-			
-			for (int i = 5; i <= 7; i = i + 1){
-				cout << "SOM FOR " << i << "\n";}
-				
-			//cout << i;
-			
-			
-			
-			
-			
-			{
-				if ( a < 0 )
-				{
-					cout << "Ja by som sa mal cyklit.\n";
-					a = a + 1;
-				}
-				
-				else
-					cout << "Ja som else.";
-					
-				cout << "KOniec cyklov.\n";
-			}
-		}
-	}
-	
-	return 1;
-}*/
+double z;
+cin >> z;
+cout << "toto je z " << z << "\n";
+	return 0;
+}

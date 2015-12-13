@@ -424,8 +424,10 @@ void interpret(tInstruction * instruction)
                 {
                     case VAR_INT:
                         while (isspace(inputInt = getchar()))   // cleans the input off spaces
-                            if (inputInt == '\n' || !isdigit(inputInt))     // throws an error if there's no or non-numerical input
+                            if (inputInt == '\n')     // throws an error if there's no or non-numerical input
                                 fatalError(ERR_ReadInput);
+                        if (!isdigit(inputInt))
+                            fatalError(ERR_ReadInput);
                         ungetc(inputInt, stdin);                // returns the last loaded char (not white char) to stdin
                         
                         if (scanf("%d", &inputInt) < 0)
@@ -440,8 +442,10 @@ void interpret(tInstruction * instruction)
                         
                     case VAR_DOUBLE:
                         while (isspace(inputInt = getchar()))   // cleans the input off spaces
-                            if (inputInt == '\n' || !isdigit(inputInt))     // throws an error if there's no or non-numerical input
+                            if (inputInt == '\n')     // throws an error if there's no or non-numerical input
                                 fatalError(ERR_ReadInput);
+                        if (!isdigit(inputInt))
+                            fatalError(ERR_ReadInput);
                         ungetc(inputInt, stdin);                // returns the last loaded char (not white char) to stdin
 
                         if (scanf("%lf", &inputDouble) < 0)

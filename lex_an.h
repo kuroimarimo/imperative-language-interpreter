@@ -103,9 +103,6 @@ enum {
     K_RETURN,           ///
     K_WHILE,            ///
     K_DO,               ///
-/*  K_BOOL,             ///
-    K_TRUE,             ///
-    K_FALSE,            /// */
 
         /// vestavene funkce
     B_LENGTH = 90,      ///
@@ -113,9 +110,6 @@ enum {
     B_CONCAT,           ///
     B_FIND,             ///
     B_SORT,             ///
-
-/*    MAX_OF_ENUM         ///   */
-
 };
 
 typedef struct {
@@ -140,13 +134,13 @@ FILE *source;
 
     // prototypy funkci
 void ungetToken();               //ungets the latest token, can be used only once in a row
-int tokenCopy (tToken *dst, tToken src);   //"copies" the contents of src token to the dst token
-void initToken (); // function for inicialization Token .. it's called when you need delete old variables
-void fillToken (char character); // comes some character and function saves it to variable
-int scanner ();                   // it's automata which decode every lex which comes char by char ...
-void cmpKeyWords ();             //comare indetifier if it is a keyword
-void numberConverter(int base); // it covrets number (string) of chosen base to dec (int)
-void stringEscape (int counter); // it controls if it stringescape ok if isnt it calls fatalerror
+inline int tokenCopy (tToken *dst, tToken src);   //"copies" the contents of src token to the dst token
+inline void initToken ();        // function for inicialization Token ..called when you need delete old variables
+inline void fillToken (char character); // comes some character and function saves it to variable
+int scanner ();                         // automata to decode every lexem which comes char by char ...
+inline void cmpKeyWords ();             // compare indetifier if it is a keyword
+inline void numberConverter(int base);  // it covrets number (string) of chosen base to dec (int)
+inline void stringEscape (int counter); // it controls if it stringescape ok if isnt it calls fatalerror
 
 
 int ungotToken;

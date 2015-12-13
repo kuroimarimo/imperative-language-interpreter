@@ -46,7 +46,6 @@ void ungetToken()
 
 void initToken ()       // inicializovat token
 {
-
     token.area = NULL;
     token.counter = 0;
     token.type = TOK_NULL;
@@ -57,8 +56,6 @@ void initToken ()       // inicializovat token
         token.counter_of_lines = 1;
         tmp++;
     }
-
-
 }
 
 void cmpKeyWords ()
@@ -79,7 +76,6 @@ void cmpKeyWords ()
             return ;
         }
     }
-
 
     for (int i = 0; i < COUNT_OF_BUILT_IN_FUNCTIONS; i++)
     {
