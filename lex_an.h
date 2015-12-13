@@ -22,7 +22,6 @@ enum {
     START,              ///         Určení znaku
 
     NUMBER,             ///         0..9
-    LETTER,             ///         a..z, A..Z
     NUMBER_START_ZERO,
     DEC_NUMBER,         ///         1.234
     DEC_NUMBER_END,     ///         *.123
@@ -31,7 +30,6 @@ enum {
     EXP_NUMBER_END,     ///
 
     SEMICOLON,          ///         ;
-    UNDERSCORE,         ///         _   /10
 
     L_BRACKET,          ///         (
     R_BRACKET,          ///         )
