@@ -218,7 +218,7 @@ char *substr (char *s, int i, int n)
         return NULL;
     }
 
-    char *subs = customMalloc((n + 1)*sizeof(char));
+    char *subs = customMalloc((n + 2)*sizeof(char));
 
     if (n == 0) {
         subs = "\0";
@@ -226,6 +226,7 @@ char *substr (char *s, int i, int n)
     }
 
     strncpy(subs, s+i, n);
+	subs[n] = '\0';
 
     return subs;
 }
