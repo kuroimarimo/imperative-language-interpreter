@@ -943,6 +943,8 @@ void rule_callParamList(hashElem * funcCall, int  * paramIndex, int builtIn)
 	scanner();
 
 	processParam(paramIndex, funcCall, builtIn);
+
+	rule_callParamList(funcCall, paramIndex, builtIn);
 }
 
 int rule_builtIn(hashElem * assignee)
@@ -972,20 +974,34 @@ int rule_builtIn(hashElem * assignee)
 	case B_LENGTH:
 	case B_SORT:
 		*paramCount = 1;
-		generateInstruction(OP_CREATE_FRAME, paramCount, NULL, NULL);
+		//generateInstruction(OP_CREATE_FRAME, paramCount, NULL, NULL);
 		break;
 
 	case B_CONCAT:
 	case B_FIND:
 		*paramCount = 2;
-		generateInstruction(OP_CREATE_FRAME, paramCount, NULL, NULL);
+		//generateInstruction(OP_CREATE_FRAME, paramCount, NULL, NULL);
 		break;
 
 	case B_SUBSTR:
 		*paramCount = 3;
-		generateInstruction(OP_CREATE_FRAME, paramCount, NULL, NULL);
+		//generateInstruction(OP_CREATE_FRAME, paramCount, NULL, NULL);
 		break;
 	}
+
+	hashElem funcCall;
+	funcCall.key = NULL;
+	funcCall.data.params = NULL;
+	hashElemInit(&funcCall);
+
+	scanner();
+	if (token.type != L_BRACKET)
+		fatalError(ERR_SYNTAX);
+
+	hTab * callTab = hTabInit(INIT_ST_SIZE);
+	tableStackPush(localSTstack, callTab); 
+
+	generateInstruction(OP_CREATE_FRAME, paramCount, NULL, NULL);
 
 	// create frame variables for parameters
 	for (int i = 0; i < *paramCount; i++)
@@ -1013,19 +1029,10 @@ int rule_builtIn(hashElem * assignee)
 		generateInstruction(OP_CREATE_VAR, type, NULL, param);
 	}
 
-	hashElem funcCall;
-	funcCall.key = NULL;
-	funcCall.data.params = NULL;
-	hashElemInit(&funcCall);
-
-	scanner();
-	if (token.type != L_BRACKET)
-		fatalError(ERR_SYNTAX);
-
 	int paramIndex = 0;
 	rule_callParam(&funcCall, &paramIndex, *function);					//scan for all the parameters
 
-	switch (*function)							//compare parameters with required parameters
+	switch (*function)													//compare parameters with required parameters
 	{
 	case B_LENGTH:
 	case B_SORT:
@@ -1071,6 +1078,7 @@ int rule_builtIn(hashElem * assignee)
 		fatalError(ERR_SYNTAX);
 
 	generateInstruction(OP_BUILT_IN, function, NULL, varToFrame(assignee->key));
+	tableStackPop(localSTstack);
 	hashElemInit(&funcCall);
 	return ERR_None;
 }
