@@ -17,6 +17,8 @@
 
 #include "lex_an.h"
 
+#define SWAP(x, y, T) do { T TMP = x; x = y; y = TMP; } while (0)
+
 int tokenCopy (tToken *dst, tToken src)
 {
 
@@ -297,11 +299,10 @@ int scanner () {
                 fillToken(c);
                 value = DEC_NUMBER_END;
             }
-            else 
-                {
-                        fatalError (ERR_NumberShape);
-                    }       /// Lex_an chyba - zadana druha desetinna tecka
-          
+            else
+            {
+                fatalError (ERR_NumberFormat);
+            }
             break;
 
         case DEC_NUMBER_END:  //končím desetiné číslo 
@@ -329,9 +330,9 @@ int scanner () {
                 fillToken(c);
                 value = EXP_NUMBER_SIGN;     /// znamenkova mocnina exp. cisla: 1E-12
             }
-            else                /// za E nejsou cifry
-                {
-                    fatalError (ERR_NumberShape);
+            else
+                {                              // za E nejsou cifry
+                    fatalError (ERR_NumberFormat);
                 }
 
             break;
@@ -344,7 +345,7 @@ int scanner () {
             }
             else
             {
-                fatalError (ERR_NumberShape);
+                fatalError (ERR_NumberFormat);
             }
 
             break;
@@ -528,7 +529,7 @@ int scanner () {
         else if (c == 'x')
             value = HEXADECIMAL;
         else {
-            fatalError (ERR_NumberShape);
+            fatalError (ERR_NumberFormat);
         }
 
         break;
@@ -674,10 +675,6 @@ int scanner () {
 
         }   //  end main switch
     }   // end while
-
-
-
-
 
     if (token.area != NULL)
     {

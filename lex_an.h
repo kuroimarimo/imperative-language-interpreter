@@ -28,8 +28,6 @@
 #include "garbage_collector.h"
 #include "ial.h"
 
-#define SWAP(x, y, T) do { T TMP = x; x = y; y = TMP; } while (0)
-
 /** jednotlivé stavy */
 enum {
     START,              ///         Určení znaku

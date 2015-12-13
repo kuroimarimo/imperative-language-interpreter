@@ -298,7 +298,7 @@ void rule_varDecl(hashElem * assignee)
 		fatalError(ERR_SYNTAX);
 }
 
-//rule: <expression> -> <function-call>  || <built-in function> || TODO
+//rule: <expression> -> <function-call>  || <built-in function> 
 void rule_expression(hashElem * assignee)
 {
 	int retType;						//type of expression

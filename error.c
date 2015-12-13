@@ -33,15 +33,13 @@ void printErrorDetails (EErrorTypes state)
 {
     fprintf(stderr, "\nError on line number %d. \n", token.counter_of_lines);
 
-    switch (state) {
-        case ERR_LEXICAL:
-            fprintf(stderr, "Lexical error\n");
-            break;
-        case ERR_NumberShape:
-            fprintf(stderr, "Number is in wrong shape.\n");
+    switch (state)
+    {
+        case ERR_NumberFormat:
+            fprintf(stderr, "Incorrect number format.\n");
             break;
         case ERR_NumberEscape:
-            fprintf(stderr, "Number escape is in wrong shape.\n");
+            fprintf(stderr, "Incorrect format of escaped numerical char.\n");
             break;
         case ERR_StringEscape:
             fprintf(stderr, "Error escaping string.\n");
@@ -84,9 +82,6 @@ void printErrorDetails (EErrorTypes state)
             break;
         case ERR_AutoNoInit:
             fprintf(stderr, "Using \'auto\', but initialization is missing.\n");
-            break;
-        case ERR_OTHERSEMANTIC:
-            fprintf(stderr, "Semantic error.\n");
             break;
         case ERR_ReadInput:
             fprintf(stderr, "Interpreter error while reading from the input.\n");

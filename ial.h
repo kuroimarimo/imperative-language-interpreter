@@ -82,7 +82,7 @@ typedef struct hTab
 unsigned int hFunct(const char *str, unsigned hTabSize);
 
 char * strDuplicate(char * src);
-bool tDataCopy (tData * destData, tData * srcData);
+void tDataCopy (tData * destData, tData * srcData);
 
 hTab * hTabInit (unsigned int size);
 void hashElemInit (hashElem * elem);		//initialises default hashElem values
@@ -94,10 +94,7 @@ hashElem * addElem  (hTab * table, char * key, tData * data);
 hashElem * findElem (hTab * table, char * key);
 
 void removeElem (hTab * table, char * key);
-
-void hTabFree (hTab * table);
-
-int length(char *s);  //bult-in functions
+int length(char *s);
 char *substr (char *s, int i, int n);
 int find(char*s, char*search);
 char *concat (char *s1, char *s2);

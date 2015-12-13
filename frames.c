@@ -73,9 +73,6 @@ void frameStackPopUntilBase(tFrameStack * stack)
 
 tFrame * getFrame(tFrameStack * stack, int index)
 {
-    if (index > stack->top)
-        return NULL;								//TODO fatalError
-    
     return stack->frames[stack->top - index];
 }
 
