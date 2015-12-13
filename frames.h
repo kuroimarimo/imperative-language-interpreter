@@ -22,7 +22,6 @@
 #include "table_stack.h"
 #include "garbage_collector.h"
 
-
 typedef union unionValue
 {
     int i;
@@ -53,17 +52,17 @@ typedef struct					//coordinates of variable inside frame
 	unsigned int index;					//index in the frame
 } tVarCoordinates;
 
-tFrame * frameCreate(int numberOfVars/*, bool isBase*/);
+inline tFrame * frameCreate(int numberOfVars/*, bool isBase*/);
 tFrameStack * frameStackInit(tFrameStack * stack, int size);
 
 void frameCreateAndPush(tFrameStack * stack, int numOfVars/*, bool isBase*/);
 
-void frameStackPush(tFrameStack * stack, tFrame * frame);
-tFrame * frameStackTop(tFrameStack * stack);
+inline void frameStackPush(tFrameStack * stack, tFrame * frame);
+inline tFrame * frameStackTop(tFrameStack * stack);
 void frameStackPop(tFrameStack * stack);
 void frameStackPopUntilBase(tFrameStack * stack);							//pops all the frames to the first found base frame (including the base frame)
 
-tFrame * getFrame(tFrameStack * stack, int index);							//returns frame >index< levels under top frame
+inline tFrame * getFrame(tFrameStack * stack, int index);							//returns frame >index< levels under top frame
 tVariable * getVariable(tFrameStack * stack, tVarCoordinates * coordinates);	//return variable with index varIndex form frame frameIndex levels under framestack top	
 
 void topToBase(tFrameStack * stack);										//sets the top frame as base frame
