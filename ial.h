@@ -80,7 +80,7 @@ void removeElem (hTab * table, char * key);
 
 void hTabFree (hTab * table);
 
-int lenght(char *s);
+int length(char *s);
 char *substr (char *s, int i, int n);
 int find(char*s, char*search);
 char *concat (char *s1, char *s2);

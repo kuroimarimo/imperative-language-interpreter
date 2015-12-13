@@ -300,7 +300,7 @@ void hTabFree (hTab * table)
 	table = NULL;
 }
 
-int lenght(char *s)
+int length(char *s)
 {
     return (int) strlen(s);
 
