@@ -1,3 +1,20 @@
+/*
+ *  Project name:
+ *  Implementace interpretu imperativního jazyka IFJ15
+ *
+ *  Date: 13.12.2015
+ *
+ *  Repository:
+ *  https://github.com/kuroimarimo/imperative-language-interpreter
+ *
+ *  Team:
+ *  Votjěch Václavík	(xvacla22)
+ *  Peter Vančo			(xvanco05)
+ *  Filip Vaško         (xvasko10)
+ *  Dominik Vašek		(xvasek06)
+ *  Valentína Straková	(xstrak27)
+ */
+
 #include "ial.h"
 
 /* hashes string 'str' for hash table of size 'hTabSize' */
@@ -345,44 +362,61 @@ return pomocna;
 
 int find(char*s, char*search){
 
+
+
+int SIndex=0;
+int SearchIndex=0;  //pomocne indexy - kde prave jsem 
+
 int lenght_s=(int)strlen (s);
-int lenght_search=(int) strlen (search);
-if (lenght_search==0)  //pokud je podřetězec prázdný vrať nulu
-    return 0;
-int counter_s=0;   //počítadlo projitých znaků řetězce s
-int counter_found_search=0;   //počitadlo nalezených stejných znaků
+int lenght_search=(int) strlen (search);  //delky stringu 
 
 
+int k;  ///pomocne - pro  pozici kde jsem práve v pomocném poli 
+int r;
 
-        while (counter_s<lenght_s){  //dokud je počítadlo projitých znaků menší než délka
+int *fail = malloc(sizeof(int)*lenght_search);  //alokace pomocného pole 
+    if(fail==NULL)
+        return -1111;
+fail[0]=-1;   //nastavím si na první pozici -1
+for (k=1;k<=lenght_search;k++){   //procházím dokud nedojdu na konec substringu 
+    r=fail[k-1];  //v první iteraci si uložím -1 poté vždy číslo v pomocném poli 
 
+        while ((r>0) && (s[r]!=s[k-1]))      //použito zkratové vyhodnocení !!!  abch nepřistupoval mimo přidělenou paměť  
+        {                                   // za předpokladu že je r větší jak nula a nejsou stejné písmena na těchto indexech 
 
-
-            if (s[counter_s]!=search[counter_found_search]) {  //pokud jsou znaky rozdílné, počet stejných znaků dej na nulu
-            counter_found_search=0;
-            }
-
-            if( s[counter_s]==search[counter_found_search]){  //pokud jsou znaky stejné
-
-                    counter_found_search++;   //inkrementuj počítadlo najítých znaků
-
-                    if (counter_found_search==lenght_search) { //pokud je počet najitých znaků stejný jako délka substringu
-
-                            return counter_s-counter_found_search+1;   //vrať rozdíl +1 - pozice počítaná od nuly
-                    }
-
-            }
-
-
-            counter_s++;
-
+            r=fail[r];   //změň r 
+            
         }
+    fail[k]=r+1;  //přidej index na aktuální pozici 
 
 
-return -1; //pokud jsem nenašel vratím -1
+} 
 
 
+
+
+while ((SIndex<lenght_s) && (SearchIndex<lenght_search)){  //dokud nejsi na konci slov
+
+
+    if ((SearchIndex==-1) || (s[SIndex]==search[SearchIndex])){  //jestli jsi na začátku nebo se písmena rovnojí 
+        SIndex++;  //zvedni indexy 
+        SearchIndex++;
+    }
+    else{
+        SearchIndex=fail[SearchIndex];  //jinak ulož číslo indexu z pomocné tabulky
+    }
 }
+
+    //printf("%d \n %d ",SIndex-lenght_search, SearchIndex);
+
+    if (SearchIndex>=lenght_search)   //jestli jsi našel tak vrať první substring - pozice počítaná od nuly 
+        return SIndex-lenght_search;
+
+    else
+        return -1;  ///jestli jsi nenašel vrať -1
+    
+
+}  //end of function
 
 
 

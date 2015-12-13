@@ -1,7 +1,19 @@
 /*
-**  lex_an.c
-*/
-
+ *  Project name:
+ *  Implementace interpretu imperativního jazyka IFJ15
+ *
+ *  Date: 13.12.2015
+ *
+ *  Repository:
+ *  https://github.com/kuroimarimo/imperative-language-interpreter
+ *
+ *  Team:
+ *  Votjěch Václavík	(xvacla22)
+ *  Peter Vančo			(xvanco05)
+ *  Filip Vaško         (xvasko10)
+ *  Dominik Vašek		(xvasek06)
+ *  Valentína Straková	(xstrak27)
+ */
 
 #include "lex_an.h"
 
@@ -14,7 +26,6 @@ int tokenCopy (tToken *dst, tToken src)
     dst->int_numb = src.int_numb;
     dst->double_numb = src.double_numb;
     dst->type = src.type;
-   // dst->expression = src.expression;  je stále potřeba ... případvně vymazat z tokenu
     dst->counter_of_lines = src.counter_of_lines;
     dst->counter = src.counter;
     dst->sizeof_area = src.sizeof_area;
@@ -94,16 +105,15 @@ void stringEscape (int counter)
 }
 
 void fillToken (char character) {  // naplnit token
-    // int extension_tok = 0;
 
-        /// prvni inicializace
+        // prvni inicializace
     if (token.counter == 0)
     {
-        token.area = (char *) customMalloc(3);   /// 2 charactery + \O
+        token.area = (char *) customMalloc(3);   // 2 charactery + \O
         token.sizeof_area = 2;
     }
     else if (token.counter == token.sizeof_area)
-    {      /// navyseni kapacity o dvojnasobek
+    {      // navyseni kapacity o dvojnasobek
         token.sizeof_area = token.sizeof_area * 2;
         token.area = (char *) customRealloc(token.area, (token.sizeof_area + 1));
     }
@@ -180,9 +190,6 @@ int scanner () {
             case '|':
                 value = OR;
                 break;
-/*            case '?':
-                value = QUESTION_MARK;
-                break;  */
             case '<':
                 value = LESS;
                 break;
@@ -215,12 +222,6 @@ int scanner () {
                     case  ')':
                         token.type = R_BRACKET;
                         break;
-                /*    case  '[':
-                        token.type = L_SQUARE_BRACKET;
-                        break;
-                    case  ']':
-                        token.type = R_SQUARE_BRACKET;
-                        break;  */
                     case  '{':
                         token.type = L_CURLY_BRACKET;
                         break;
@@ -230,27 +231,19 @@ int scanner () {
                     case  '*':
                         token.type = MULTIPLY;
                         break;
-                /*    case  '%':
-                        token.type = MODULO;
-                        break;  */
                     default:
                             fatalError (ERR_UnknownChar);
 
-                    }//posleni switch
-                                        /**
-                                } //předposlední switch
-                             fillToken(c);
-                            }//default
-                            */
-            }//switch
-        }//else
+                    } // vnitrni switch
+            } // hlavni switch
+        } //else
 
 
             break;
 
 
 
-       case IDENTIFIER:       /// identifikator, zacina pismenem nebo '_' ; dalsi charactery mohou byt cisla
+       case IDENTIFIER:       // identifikator zacina pismenem nebo _ ; dalsi charactery mohou byt cisla
 
             if (isalpha(c) || c == '_' || isdigit(c) )
                 fillToken(c);
@@ -262,17 +255,13 @@ int scanner () {
             break;
 
         case NUMBER_START_ZERO:
-            if (c == '0')           /// ignoruj nulu
+            if (c == '0')           // ignoruj nulu
                 break;
-            else if ((isdigit(c))  ) {  /// 1 .. 9
+            else if ((isdigit(c))  ) {  // 1 .. 9
             }
             else if ((c == '.') || (c == 'E') || (c == 'e') ) {
                 fillToken('0');
             }
-/*          else if (isalpha(c) || c == '_')
-            {
-                fatalError (ERR_LEXICAL);
-            }   */
             else {
                 test = false;
                 fillToken('0');
@@ -288,18 +277,14 @@ int scanner () {
 
             if (isdigit(c))
                 fillToken(c);
-            else if (c == '.') {    /// desetinne cislo -> double
+            else if (c == '.') {    // desetinne cislo -> double
                 value = DEC_NUMBER;
                 fillToken(c);
             }
             else if (c == 'e' || c == 'E') {
-                value = EXP_NUMBER;
+                value = EXP_NUMBER; // exponencialni cislo -> double
                 fillToken(c);
-            }   /*
-            else if (isalpha(c) || c == '_')
-            {
-                fatalError (ERR_LEXICAL);
-            }   */
+            }
             else {
                 token.type = INT_NUMBER;
                 ungetc(c, source);
@@ -308,20 +293,16 @@ int scanner () {
             }
             break;
 
-        case DEC_NUMBER:    /// 123. -> musi prijit cislo, jinak chyba
+        case DEC_NUMBER:        // 123. -> musi prijit cislo, jinak chyba
             if (isdigit(c)) {
                 fillToken(c);
                 value = DEC_NUMBER_END;
             }
-            else /* if (c == '.')   || (c == 'e' || c == 'E'))    */
-                {
-                        fatalError (ERR_NumberShape);
-                    }       /// Lex_an chyba - zadana druha desetinna tecka
-            /*else {
-                token.type = DOUBLE_NUMBER;
-                ungetc(c, source);
-                test = false;
-            }*/
+            else
+            {
+                fatalError (ERR_NumberShape);
+            }
+
             break;
 
         case DEC_NUMBER_END:
@@ -331,11 +312,7 @@ int scanner () {
             {
                 fillToken(c);
                 value = EXP_NUMBER;
-            }   /*
-            else if (c == '.' || c == '_' || isalpha(c))  /// Lex_an chyba - zadana druha desetinna tecka
-            {
-                fatalError (ERR_LEXICAL);
-            }   */
+            }
             else {
                 token.type = DOUBLE_NUMBER;
                 ungetc(c, source);
@@ -347,14 +324,14 @@ int scanner () {
         case EXP_NUMBER:
             if (isdigit(c)) {
                 fillToken(c);
-                value = EXP_NUMBER_END;    /// za E jsou cifry
+                value = EXP_NUMBER_END;    // za E jsou cifry
             }
             else if (c == '+' || c == '-') {
                 fillToken(c);
-                value = EXP_NUMBER_SIGN;     /// znamenkova mocnina exp. cisla: 1E-12
+                value = EXP_NUMBER_SIGN;     // znamenkova mocnina exp. cisla: 1E-12
             }
-            else                /// za E nejsou cifry
-                {
+            else
+                {                              // za E nejsou cifry
                     fatalError (ERR_NumberShape);
                 }
 
@@ -364,7 +341,7 @@ int scanner () {
             if (isdigit(c))
             {
                 fillToken(c);
-                value = EXP_NUMBER_END;    /// za E jsou cifry
+                value = EXP_NUMBER_END;    // za E jsou cifry
             }
             else
             {
@@ -376,10 +353,6 @@ int scanner () {
         case EXP_NUMBER_END:
             if (isdigit(c))
                 fillToken(c);
-/*          else if (isalpha(c) || c == '_' || c == '.')
-            {
-                fatalError (ERR_LEXICAL);
-            }   */
             else {
                 token.type = DOUBLE_NUMBER;
                 ungetc(c, source);
@@ -396,7 +369,7 @@ int scanner () {
                 fillToken(c);
             else {
                 fillToken('\0');
-                token.type = STRING;    /// ungetc(c, source); - vytvari nekonecny cyklus
+                token.type = STRING;
                 test = false;
             }
             break;
@@ -419,9 +392,8 @@ int scanner () {
                 value = ESCAPE_OCTAL;
             else if (c == 'b')
                 value = ESCAPE_BINARY;
-            else {
+            else
                 fatalError (ERR_StringEscape);
-            }
 
             break;
 
@@ -493,15 +465,9 @@ int scanner () {
 
     case LESS:
             if (c == '<')
-            {
-                //fillToken(c);
                 token.type = C_OUT;
-            }
             else if (c == '=')
-            {
-                //fillToken(c);
                 token.type = LESS_EQUAL;
-            }
             else
             {
                 token.type = LESS;
@@ -513,28 +479,22 @@ int scanner () {
 
    case GREATER:
             if (c == '>')
-            {
-                //fillToken(c);
                 token.type = C_IN;
-            }
             else if (c == '=')
-            {
-                //fillToken(c);
                 token.type = GREATER_EQUAL;
-            }
             else
             {
                 token.type = GREATER;
                 ungetc(c,source);
-
             }
+
             test = false;
 
             break;
 
     case DIVIDE:
-        if (c != '/' && c!= '*') {
-            //fillToken('/');
+        if (c != '/' && c!= '*')
+        {
             token.type = DIVIDE;
 
             ungetc(c,source);
@@ -547,7 +507,7 @@ int scanner () {
 
         break;
 
-        case BACKSLASH:
+    case BACKSLASH:
         counter = 0;
 
         if (c == 'b')
@@ -644,10 +604,8 @@ int scanner () {
 
 
     case ASSIGNMENT:
-            if (c == '=') {
-                //fillToken(c);
+            if (c == '=')
                 token.type = EQUAL;
-            }
             else {
                 ungetc(c,source);
                 token.type = ASSIGNMENT;
@@ -660,11 +618,9 @@ int scanner () {
 
     case EXCLAMATION_MARK:
             if (c == '=')
-            {
-                //fillToken(c);
                 token.type = NEGATION;
-            }
-            else {
+            else
+            {
                 token.type = EXCLAMATION_MARK;
                 ungetc(c, source);
             }
@@ -674,7 +630,6 @@ int scanner () {
 
     case AND:
         if (c == '&') {
-            //fillToken(c);
             token.type = AND;
             test = false;
         }
@@ -686,7 +641,6 @@ int scanner () {
 
     case OR:
         if (c == '|') {
-            //fillToken(c);
             token.type = OR;
             test = false;
         }
@@ -697,10 +651,8 @@ int scanner () {
         break;
 
     case PLUS:
-        if (c == '+') {
-            //fillToken(c);
+        if (c == '+')
             token.type = INCREMENT;
-        }
         else {
             token.type = PLUS;
             ungetc(c, source);
@@ -712,10 +664,8 @@ int scanner () {
 
 
     case MINUS:
-        if (c == '-') {
-            //fillToken(c);
+        if (c == '-')
             token.type = DECREMENT;
-        }
         else {
             token.type = MINUS;
             ungetc(c, source);
@@ -768,11 +718,7 @@ int scanner () {
         if (value == COMMENT || value == COMMENT_END)
             fatalError (ERR_Comment);
     }
-/* jestli nikdo nepotřebuje token.expression je mo
-    if (token.type == INT_NUMBER || token.type== DOUBLE_NUMBER)
-        token.expression = IDENTIFIER;
-    else
-        token.expression = token.type;
-*/
+
+
     return ERR_None;
 }

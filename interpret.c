@@ -1,3 +1,20 @@
+/*
+ *  Project name:
+ *  Implementace interpretu imperativního jazyka IFJ15
+ *
+ *  Date: 13.12.2015
+ *
+ *  Repository:
+ *  https://github.com/kuroimarimo/imperative-language-interpreter
+ *
+ *  Team:
+ *  Votjěch Václavík	(xvacla22)
+ *  Peter Vančo			(xvanco05)
+ *  Filip Vaško         (xvasko10)
+ *  Dominik Vašek		(xvasek06)
+ *  Valentína Straková	(xstrak27)
+ */
+
 #include "interpret.h"
 
 #define INIT_INPUT_SIZE 16
@@ -480,7 +497,10 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
 				frameStackPopUntilBase(frameStack);
 				instruction = instrStackPop(instrStack);
 				continue;
-
+                //else: store return value (somewhere), pop all frames up to base, jump to *tInstruction on top of the stack
+                //               printf("Najskor treba dorobit volanie funkcie.\n");
+                //               break;
+                
 			case OP_GET_RETURN_VALUE:
 				tempOut = getVariable(frameStack, instruction->output);
 
@@ -678,7 +698,7 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
                         break;
                         
                     case VAR_STRING:
-                        tempOut->value.s = strDuplicate(instruction->input1);
+                        tempOut->value.s = instruction->input1;
                         break;
                 }
 				tempOut->initialized = true;
