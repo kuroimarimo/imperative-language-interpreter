@@ -169,7 +169,6 @@ int scanner () {
                 value = BACKSLASH;
                 break;
             case '"':
-                fillToken('\0');
                 value = STRING;
                 break;
             case '!':
@@ -396,6 +395,7 @@ int scanner () {
             else if (c != '"')
                 fillToken(c);
             else {
+                fillToken('\0');
                 token.type = STRING;    /// ungetc(c, source); - vytvari nekonecny cyklus
                 test = false;
             }
