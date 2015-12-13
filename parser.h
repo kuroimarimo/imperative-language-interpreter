@@ -27,7 +27,7 @@
 #include "lex_an.h"
 #include "error.h"
 #include "ial.h"
-#include "prsa.h"
+#include "prec_analysis.h"
 #include "table_stack.h"
 #include "garbage_collector.h"
 #include "instructions.h"
