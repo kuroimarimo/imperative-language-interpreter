@@ -1,47 +1,10 @@
 #include "interpret.h"
 
 #define INIT_INPUT_SIZE 16
+#define INIT_FRAMESTACK 64
+
 #define OPERATION(a,b,x) (a) x (b)
-
 #define stringify(x) #x
-
-const char* instrOp[] =
-{
-    stringify(OP_ASSIGN),              // prirazeni in1 -> out
-    stringify(OP_SUM),					// secteni in1, in2 -> out
-    stringify(OP_MINUS),				// odecteni in1, in2 -> out
-    stringify(OP_MUL),					// nasobeni in1, in2 -> out
-    stringify(OP_DIV),					// deleni in1, in2 -> out
-    stringify(OP_MOD),					// modulo in1, in2 -> out
-    stringify(OP_LT),					// in1 mensi nez in2 -> out
-    stringify(OP_GT),					// in1 vetsi nez in2 -> out
-    stringify(OP_LE),					// in1 mensirovno in2 -> out
-    stringify(OP_GE),					// in1 vetsirovno in2 -> out
-    stringify(OP_EQUALS),				// in1 rovna se in2 -> out
-    stringify(OP_DIFF),				// in1 ruzne od in2 -> out
-    stringify(OP_INT),					// aloc. 4 bajtu -> out
-    stringify(OP_DOUBLE),				// aloc 8 bajtu -> out
-    stringify(OP_STRING),				// aloc x bajtu -> out
-    stringify(OP_COUT),				// >> dalsi COUT, vystup -> out
-    stringify(OP_CIN),					// store stdin input in *tVarCoordinates output
-    stringify(OP_IF),					// pokud plati in1 -> out
-    stringify(OP_ELSE), 				// pokud neplati in1 -> out
-    stringify(OP_LABEL),				// in1 <- navesti pro goto
-    stringify(OP_GOTO),				// skok pro for -> out
-    stringify(OP_RETURN),
-    stringify(OP_SET_CONSTANT),
-    stringify(OP_CREATE_VAR),
-    stringify(OP_CREATE_FRAME),
-    stringify(OP_SET_TOP_TO_BASE),
-    stringify(OP_DISPOSE_FRAME),
-    stringify(OP_IF_JUMP),
-    stringify(OP_IFNOT_JUMP),
-    stringify(OP_FUNC_CALL),
-    stringify(OP_BUILT_IN),
-    stringify(OP_GET_RETURN_VALUE),
-    stringify(OP_NOP)
-};
-
 
 /* Reads a string terminated by white space character from input.
    Returns pointer to the string. */
@@ -51,7 +14,7 @@ char * inputString()
     int len = 0;
     int c;
     
-    char * str = customMalloc(size * sizeof(char));   // alloc for initial size
+    char * str = customMalloc(size * sizeof(char));         // allocates for initial size
     
     while(!isspace(c = getchar()))
     {
@@ -64,20 +27,55 @@ char * inputString()
     return customRealloc(str, len * sizeof(char));
 }
 
-void interpret(tInstruction * instruction)              // TODO frameStack, instrStack UNGLOBALIZE
+void interpret(tInstruction * instruction)                  // TODO frameStack, instrStack UNGLOBALIZE
 {
-    frameStack = frameStackInit(frameStack, 64);		//TODO makro
-    instrStack = instrStackInit(64);
+    frameStack = frameStackInit(frameStack, INIT_FRAMESTACK);
+    instrStack = instrStackInit(INIT_FRAMESTACK);
     int inputInt;
     double inputDouble;
     tVariable *tempVar, *tempIn1, *tempIn2, *tempOut;
-	char * inputStr;
+    //	char * inputStr;
 
     //int i = 0;
     
+    /*const char* instrOp[] =                               // debugging purposes only
+    {
+        stringify(OP_ASSIGN),
+        stringify(OP_SUM),
+        stringify(OP_MINUS),
+        stringify(OP_MUL),
+        stringify(OP_DIV),
+        stringify(OP_MOD),
+        stringify(OP_LT),
+        stringify(OP_GT),
+        stringify(OP_LE),
+        stringify(OP_GE),
+        stringify(OP_EQUALS),
+        stringify(OP_DIFF),
+        stringify(OP_COUT),
+        stringify(OP_CIN),
+        stringify(OP_IF),
+        stringify(OP_ELSE),
+        stringify(OP_LABEL),
+        stringify(OP_GOTO),
+        stringify(OP_RETURN),
+        stringify(OP_SET_CONSTANT),
+        stringify(OP_CREATE_VAR),
+        stringify(OP_CREATE_FRAME),
+        stringify(OP_SET_TOP_TO_BASE),
+        stringify(OP_DISPOSE_FRAME),
+        stringify(OP_IF_JUMP),
+        stringify(OP_IFNOT_JUMP),
+        stringify(OP_FUNC_CALL),
+        stringify(OP_BUILT_IN),
+        stringify(OP_GET_RETURN_VALUE),
+        stringify(OP_NOP)
+    };*/
+
+    
     while (instruction != NULL)
     {
-        //printf("Instrukcia %d\n", i++);
+        //printf("Instrukcia %d.\n", i++);
         
         switch (instruction->operator)
         {
@@ -163,15 +161,13 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                 switch (tempOut->type)
                 {
                     case VAR_INT:
-                        //if (!tempOut->initialized)
-                        //    tempOut->value = customMalloc(sizeof(TUnionValue));
                         tempOut->value.i = tempIn1->value.i - tempIn2->value.i;
+                        tempOut->initialized = true;
                         break;
                         
                     case VAR_DOUBLE:
-                        //if (!tempOut->initialized)
-                        //    tempOut->value = customMalloc(sizeof(TUnionValue));
                         tempOut->value.d = tempIn1->value.d - tempIn2->value.d;
+                        tempOut->initialized = true;
                         break;
                 }
                 break;
@@ -187,15 +183,13 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                 switch (tempOut->type)
                 {
                     case VAR_INT:
-                        //if (!tempOut->initialized)
-                        //    tempOut->value = customMalloc(sizeof(TUnionValue));
                         tempOut->value.i = tempIn1->value.i * tempIn2->value.i;
+                        tempOut->initialized = true;
                         break;
                         
                     case VAR_DOUBLE:
-                        //if (!tempOut->initialized)
-                        //    tempOut->value = customMalloc(sizeof(TUnionValue));
                         tempOut->value.d = tempIn1->value.d * tempIn2->value.d;
+                        tempOut->initialized = true;
                         break;
                 }
                 break;
@@ -214,15 +208,13 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                 switch (tempOut->type)
                 {
                     case VAR_INT:
-                        //if (!tempOut->initialized)
-                        //    tempOut->value = customMalloc(sizeof(TUnionValue));
                         tempOut->value.i = tempIn1->value.i / tempIn2->value.i;
+                        tempOut->initialized = true;
                         break;
                         
                     case VAR_DOUBLE:
-                        //if (!tempOut->initialized)
-                        //    tempOut->value = customMalloc(sizeof(TUnionValue));
                         tempOut->value.d = tempIn1->value.d / tempIn2->value.d;
+                        tempOut->initialized = true;
                         break;
                 }
                 break;
@@ -235,9 +227,6 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                 if (!tempIn1->initialized || !tempIn2->initialized)
                     fatalError(ERR_UninitVar);
                 
-                //if (!tempOut->initialized)
-                //    tempOut->value = customMalloc(sizeof(TUnionValue));
-                
                 if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)
                     tempOut->value.i = (tempIn1->value.i < tempIn2->value.i);
                 else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)
@@ -249,6 +238,7 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                 else
                     tempOut->value.i = strcmp(tempIn1->value.s, tempIn2->value.s) < 0? true : false;
                 
+                tempOut->initialized = true;
                 break;
                 
             case OP_GT:
@@ -258,9 +248,6 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                 
                 if (!tempIn1->initialized || !tempIn2->initialized)
                     fatalError(ERR_UninitVar);
-                
-                //if (!tempOut->initialized)
-                //    tempOut->value = customMalloc(sizeof(TUnionValue));
                 
                 if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)
                     tempOut->value.i = (tempIn1->value.i > tempIn2->value.i);
@@ -273,6 +260,7 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                 else
                     tempOut->value.i = strcmp(tempIn1->value.s, tempIn2->value.s) > 0? true : false;
                 
+                tempOut->initialized = true;
                 break;
                 
             case OP_LE:
@@ -282,9 +270,6 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                 
                 if (!tempIn1->initialized || !tempIn2->initialized)
                     fatalError(ERR_UninitVar);
-                
-                //if (!tempOut->initialized)
-                //    tempOut->value = customMalloc(sizeof(TUnionValue));
                 
                 if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)
                     tempOut->value.i = (tempIn1->value.i <= tempIn2->value.i);
@@ -297,6 +282,9 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                 else
                     tempOut->value.i = strcmp(tempIn1->value.s, tempIn2->value.s) <= 0? true : false;
             
+                tempOut->initialized = true;
+                break;
+                
             case OP_GE:
                 tempOut = getVariable(frameStack, instruction->output);
                 tempIn1 = getVariable(frameStack, instruction->input1);
@@ -304,9 +292,6 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                 
                 if (!tempIn1->initialized || !tempIn2->initialized)
                     fatalError(ERR_UninitVar);
-                
-                //if (!tempOut->initialized)
-                //    tempOut->value = customMalloc(sizeof(TUnionValue));
                 
                 if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)
                     tempOut->value.i = (tempIn1->value.i >= tempIn2->value.i);
@@ -319,6 +304,7 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                 else
                     tempOut->value.i = strcmp(tempIn1->value.s, tempIn2->value.s) >= 0? true : false;
                 
+                tempOut->initialized = true;
                 break;
                 
             case OP_EQUALS:
@@ -328,9 +314,6 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                 
                 if (!tempIn1->initialized || !tempIn2->initialized)
                     fatalError(ERR_UninitVar);
-                
-                //if (!tempOut->initialized)
-                //    tempOut->value = customMalloc(sizeof(TUnionValue));
                 
                 if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)
                     tempOut->value.i = (tempIn1->value.i == tempIn2->value.i);
@@ -343,6 +326,7 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                 else
                     tempOut->value.i = !strcmp(tempIn1->value.s, tempIn2->value.s);
                 
+                tempOut->initialized = true;
                 break;
                 
             case OP_DIFF:
@@ -352,9 +336,6 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                 
                 if (!tempIn1->initialized || !tempIn2->initialized)
                     fatalError(ERR_UninitVar);
-                
-                //if (!tempOut->initialized)
-                //    tempOut->value = customMalloc(sizeof(TUnionValue));
                 
                 if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)
                     tempOut->value.i = (tempIn1->value.i != tempIn2->value.i);
@@ -367,6 +348,7 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                 else
                     tempOut->value.i = strcmp(tempIn1->value.s, tempIn2->value.s);
                 
+                tempOut->initialized = true;
                 break;
                 
             case OP_COUT:               // zatial fungovalo vzdy
@@ -400,35 +382,51 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
             case OP_CIN:
                 tempVar = getVariable(frameStack, (tVarCoordinates *)instruction->output);
                 switch (tempVar->type)
-				{
-					case VAR_INT:
-						if (scanf("%d", &inputInt) < 0)
-							fatalError(ERR_ReadInput);
-                    
-				//		if (!tempVar->initialized)
-				//			tempVar->value = customMalloc(sizeof(TUnionValue));
-						tempVar->value.i = inputInt;
-						tempVar->initialized = true;
-						break;
-                    
-					case VAR_DOUBLE:
-						if (scanf("%lf", &inputDouble) < 0)
-							fatalError(ERR_ReadInput);
-                    
-				//		if (!tempVar->initialized)
-				//			tempVar->value = customMalloc(sizeof(TUnionValue));
-						tempVar->value.d = inputDouble;
-						tempVar->initialized = true;
-						break;
-                    
-					case VAR_STRING:
-                        inputStr = inputString();
-                //        if (!tempVar->initialized)
-                //            tempVar->value = customMalloc(sizeof(TUnionValue));
-                        tempVar->value.s = inputStr;
+                {
+                    case VAR_INT:
+                        while (isspace(inputInt = getchar()))   // cleans the input off spaces
+                            if (inputInt == '\n')               // if no input -> error
+                                fatalError(ERR_ReadInput);
+                        ungetc(inputInt, stdin);                // returns the last loaded char (not a white char) to stdin
+                        
+                        if (!isdigit(inputInt = getchar()))     // checks if the first char of non-white char input is a valid number
+                            fatalError(ERR_ReadInput);
+                        ungetc(inputInt, stdin);                // if the previous condition is valid, returns the checked char back to stdin stream for scanf
+                        
+                        if (scanf("%d", &inputInt) < 0)
+                            fatalError(ERR_ReadInput);
+                        printf("inputInt: %d\n", inputInt);
+                        tempVar->value.i = inputInt;
                         tempVar->initialized = true;
-						break;
-				}
+                        
+                        if ((inputInt = getchar()) != '\n')     // cleans the stdin off '\n'
+                            ungetc(inputInt, stdin);
+                        break;
+                        
+                    case VAR_DOUBLE:
+                        while (isspace(inputInt = getchar()))   // cleans the input off spaces
+                            if (inputInt == '\n')               // if no input -> error
+                                fatalError(ERR_ReadInput);
+                        ungetc(inputInt, stdin);                // returns the last loaded char (not a white char) to stdin
+                        
+                        if (!isdigit(inputInt = getchar()))     // checks if the first char of non-white char input is a valid number
+                            fatalError(ERR_ReadInput);
+                        ungetc(inputInt, stdin);                // if the previous condition is valid, returns the checked char back to stdin stream for scanf
+                        
+                        if (scanf("%lf", &inputDouble) < 0)
+                            fatalError(ERR_ReadInput);
+                        tempVar->value.d = inputDouble;
+                        tempVar->initialized = true;
+                        
+                        if ((inputInt = getchar()) != '\n')     // cleans stdin off '\n'
+                            ungetc(inputInt, stdin);
+                        break;
+                        
+                    case VAR_STRING:
+                        tempVar->value.s = inputString();
+                        tempVar->initialized = true;
+                        break;
+                }
                 break;
                 
             case OP_GOTO:
@@ -448,6 +446,7 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                 
             case OP_CREATE_VAR:
                 tempVar = getVariable(frameStack, instruction->output);
+                //printf("int: %d double: %lf string: %s\n", *(int *)instruction->input1, *(double *)instruction->input1, instruction->input1);
                 tempVar->type = *(int *)instruction->input1;
                 break;
                 
@@ -510,7 +509,6 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                         break;
                         
                     case VAR_STRING:
-                        //printf("%s", instruction->input1);
                         tempOut->value.s = instruction->input1;
                         break;
                 }
@@ -519,10 +517,9 @@ void interpret(tInstruction * instruction)              // TODO frameStack, inst
                 
             default:
                 printf("NEIMPLEMENTOVANA INSTRUKCIA.\n");
-                
         }
         
-        //printf("Last operation was %s\n",instrOp[instruction->operator]);
+        //printf("Spravil som %s.\n\n",instrOp[instruction->operator]);
         
         instruction = instruction->next;
     }
