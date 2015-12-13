@@ -252,6 +252,11 @@ void SemId(tExpr* identifier)
 {
     
     hashElem* element = findVar(identifier->data);
+    if (element == NULL)
+    {
+        fatalError(ERR_UndefinedVariable);
+        return;
+    }
     tVarCoordinates * coordinates;
     //coordinates = customMalloc(sizeof(tVarCoordinates));
     coordinates = varToFrame(identifier->data);
