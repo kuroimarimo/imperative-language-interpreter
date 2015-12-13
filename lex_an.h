@@ -57,8 +57,6 @@ enum {
 
     EXCLAMATION_MARK,   ///         !
     NEGATION,           ///         !=
-/*  AND,                ///         &&
-    OR,                 ///         ||  */
     STRING,             ///         ".."
     STRING_ESCAPE,      ///
     ESCAPE_HEXADECIMAL, ///
