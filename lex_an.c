@@ -694,7 +694,7 @@ int scanner () {
 
             if (token.int_numb <= 0 || token.int_numb > 255)  //number is only 8-bit
             {
-                fatalError (ERR_LEXICAL);
+                fatalError (ERR_UnknownChar);
             }
         }
         else if (token.type == DOUBLE_NUMBER)
