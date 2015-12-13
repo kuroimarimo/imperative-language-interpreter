@@ -267,6 +267,13 @@ void rule_statement(int pushAllowed)
 		return;
 	}
 
+	/*else if ((token.type == INCREMENT) || (token.type == DECREMENT))
+	{
+		ungetToken();
+		PrecedencniSA(tableStackTop(localSTstack), CALL_EXPRESSION);
+		return;
+	}*/
+
 	fatalError(ERR_SxStatement);
 }
 

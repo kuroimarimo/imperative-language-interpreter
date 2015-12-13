@@ -246,36 +246,35 @@ return pomocna;
 
 
 int find(char*s, char*search){
-    
+
     int SIndex=0;
     int SearchIndex=0;  //pomocne indexy
-    
+
     int lenght_s=(int)strlen (s);
     int lenght_search=(int) strlen (search);
-    
-    
+
+
     int k;              ///pomocne - pro  pozici kde jsem práve v pomocném poli
     int r;
-    
+
     int *fail = customMalloc(sizeof(int)*(lenght_search+1));
-    if(fail==NULL)
-        return -1111;
+
     fail[0]=-1;                                 //první pozice -1
     for (k=1;k<=lenght_search;k++)              //procházím dokud nedojdu na konec substringu
     {
         r=fail[k-1];
-        
+
         while ((r>0) && (s[r]!=s[k-1]))         // zkratové vyhodnocení, abych nepřistupoval mimo přidělenou paměť
         {
-            
+
             r=fail[r];
         }
         fail[k]=r+1;    //přidej index na aktuální pozici
     }
-    
+
     while ((SIndex<lenght_s) && (SearchIndex<lenght_search)){
-        
-        
+
+
         if ((SearchIndex==-1) || (s[SIndex]==search[SearchIndex]))  //jestli jsi na začátku nebo se písmena rovnají
         {
             SIndex++;
@@ -285,14 +284,14 @@ int find(char*s, char*search){
             SearchIndex=fail[SearchIndex];  //jinak ulož číslo indexu z pomocného pole
         }
     }
-    
-    
+
+
     if (SearchIndex>=lenght_search)   //jestli jsi našel tak vrať první substring - pozice počítaná od nuly
         return SIndex-lenght_search;
-    
+
     else
         return -1;  //  not found
-    
+
 }
 
 
