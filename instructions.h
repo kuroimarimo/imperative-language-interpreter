@@ -31,13 +31,7 @@
 #define INITIAL_SIZE 512
 
 // INSTRUCTION ARRAY
-typedef struct
-{
-	int type;				//|STRING, INT_NUMBER, DOUBLE_NUMBER|	|VAR_STRING, VAR_INT, VAR_DOUBLE|
-	void * operand;			//|---pointer-to-a-constant-value---|	|--------tVarCoordinates--------|
-} tOperand;
-
-tInstrList * instructionList;					//TODO separatne zoznamy instrukcii pre kazdu funkciu
+tInstrList * instructionList;
 
 bool expandInstrList();
 bool addInstruction(tInstruction * instr);
@@ -51,8 +45,6 @@ typedef struct {
     int size;
     tInstruction ** elems;
 } tInstrStack;
-
-tInstrStack * instrStack;
 
 tInstrStack * instrStackInit(int size);
 void instrStackResize(tInstrStack * stack);

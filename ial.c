@@ -90,17 +90,6 @@ void hashElemInit (hashElem * elem)
 	elem->data.value.int_value = 0;
 	elem->data.params = NULL;
 	elem->data.baseFrameSize = NULL;
-
-    //if (elem->data.fParamTypes != NULL)
-   /*     free(elem->data.fParamTypes);
-    elem->data.fParamTypes = NULL;*/
-
-    //if (elem->data.localTable != NULL)
-    //    hTabFree(elem->data.localTable);
-    //elem->data.localTable = NULL;
-
-    //if (elem->key != NULL)
-        //free(elem->key);
     elem->key = NULL;
 }
 
@@ -121,15 +110,13 @@ hTab * expandTab(hTab * table)
 			tmp = tmp->next;
 		}
     }
-
-    hTabFree(table);
+    table = NULL;       // remove the working reference (freed lated by garebage collector)
     return newTable;
 }
 
-/* Deep-copies the data from 'srcData' to 'destData' given that both are of type tData.
-    (Except params, 'cause reasons. (╯°□°）╯︵ ┻━┻ )
-   Returns true upon successful completion, otherwise false.*/
-bool tDataCopy (tData * destData, tData * srcData)
+/* Copies the data from 'srcData' to 'destData' given that both are of type tData.
+ Returns true upon successful completion, otherwise false.*/
+void tDataCopy (tData * destData, tData * srcData)
 {
     destData->type = srcData->type;
     destData->state = srcData->state;
@@ -137,26 +124,7 @@ bool tDataCopy (tData * destData, tData * srcData)
 	destData->numberOfParams = srcData->numberOfParams;
 	destData->baseFrameSize = srcData->baseFrameSize;
 	destData->index = srcData->index;
-
-    //destData->localTable = srcData->localTable;   // not used if the element is variable; if it's a function, the table is later initialized
-
-    /*if (srcData->fParamTypes != NULL)			// there's data to copy
-    //    return (strDuplicate(&destData->fParamTypes, &srcData->fParamTypes));
-    {
-        destData->fParamTypes = malloc((strlen(srcData->fParamTypes)+1) * sizeof(char));
-        strcpy(destData->fParamTypes, srcData->fParamTypes);
-
-        return destData->fParamTypes;
-    }
-
-    else
-    {
-        destData->fParamTypes = NULL;
-        return true;
-    }*/
 	destData->params = srcData->params;
-	return true;
-
 }
 
 /* adds new element to a hash table */
@@ -175,10 +143,7 @@ hashElem * addElem (hTab * table, char * key, tData * data)
     {
         if (!strcmp(key, newElem->key)) // if there's already an element with such key, replace the data it holds
         {
-            if (tDataCopy(&newElem->data, data))
-            {
-                return NULL;                    // Malloc failed.
-            }
+            tDataCopy(&newElem->data, data);
             return newElem;
         }
 
@@ -191,19 +156,8 @@ hashElem * addElem (hTab * table, char * key, tData * data)
         return NULL;        // malloc failed ERROR!
 
     newElem->next = table->table[hFunct(key, table->size)];
-
-    /*newElem->key = customMalloc(((int) strlen(key) + 1) * sizeof(char));
-    strcpy(newElem->key, key);*/
 	newElem->key = strDuplicate(key);
-
-//    if (!strDuplicate(&newElem->key, &key))
-//        return NULL;                    // Malloc failed.
-
-    if (!tDataCopy(&newElem->data, data) || !newElem->key)
-    {
-        return NULL;                    // Malloc failed.
-    }
-
+    tDataCopy(&newElem->data, data);
     table->table[hFunct(key, table->size)] = newElem;
 
     ++table->numStoredElem;
@@ -234,20 +188,6 @@ void removeElem (hTab * table, char * key)
     if (!strcmp(key, tmp->key))      // no synonyms pointing to the element that's being removed
     {
         table->table[hFunct(key, table->size)] = tmp->next;
-
-        /*if (tmp->data.type == VAR_STRING)
-            free(tmp->data.value.string_value);*/
-
-        /*if (tmp->data.fParamTypes != NULL)
-            free(tmp->data.fParamTypes);
-
-        if (tmp->data.localTable != NULL)
-            hTabFree(tmp->data.localTable);*/
-
-		/*if (tmp->data.params != NULL)
-			free(tmp->data.params);
-
-        free(tmp);*/
         return;
     }
 
@@ -261,60 +201,8 @@ void removeElem (hTab * table, char * key)
         }
 
         removed = tmp->next;
-        tmp->next = removed->next;              // relinks the linked list, so the element 'removed' can be freed
-
-        /*if (removed->data.type == VAR_STRING)
-            free(removed->data.value.string_value);*/
-
-        /*if (removed->data.fParamTypes != NULL)
-            free(removed->data.fParamTypes);
-
-        if (removed->data.localTable != NULL)
-            hTabFree(removed->data.localTable);*/
-		/*if (removed->data.params != NULL)
-			free(tmp->data.params);
-
-        free(removed->key);
-        free(removed);*/
+        tmp->next = removed->next;              // relinks the linked list
     }
-}
-
-
-/* frees the whole table */
-void hTabFree (hTab * table)
-{
-    hashElem * tmp = NULL;
-    hashElem * elem;
-
-    for (unsigned int i = 0; i < table->size; ++i)
-    {
-        elem = table->table[i];
-        while (elem)
-        {
-            tmp = elem->next;
-
-            /*if (elem->data.type == VAR_STRING)
-                free(elem->data.value.string_value);
-			elem->data.value.string_value = NULL;*/
-
-           /* if (elem->data.fParamTypes != NULL)
-                free(elem->data.fParamTypes);
-			elem->data.fParamTypes = NULL;
-
-            if (elem->data.localTable != NULL)
-                hTabFree(elem->data.localTable);*/
-
-			/*if (elem->data.params != NULL)
-				free(elem->data.params);
-
-            free(elem->key);
-            free(elem);*/
-            elem = tmp;
-        }
-    }
-    /*free(table->table);
-    free(table);*/
-	table = NULL;
 }
 
 int length(char *s)
@@ -323,8 +211,8 @@ int length(char *s)
 
 }
 
-char *substr (char *s, int i, int n) {
-
+char *substr (char *s, int i, int n)
+{
     if (s == NULL || i < 0 || i > ((int) strlen(s)) || n < 0) {
         fatalError(ERR_SegmentationFault);
         return NULL;
@@ -343,23 +231,22 @@ char *substr (char *s, int i, int n) {
 }
 
 
-char *concat (char *s1, char *s2){
+char *concat (char *s1, char *s2)
+{
+int lenght1=(int) strlen(s1);
+int lenght2=(int) strlen(s2);
 
-int lenght1=(int) strlen(s1);  //delka prvního
-int lenght2=(int) strlen(s2);   //delka druhého
-
-char *pomocna= customMalloc((lenght1 + lenght2 + 1)*sizeof(char));  // naalokuju si pamět velikosti prvniho a druheho řetězce
-if(pomocna==NULL) return NULL ;
-strncpy(pomocna,s1,lenght1);  //zkopiruju prvni řetězec do pomocne
-strncpy(pomocna+lenght1,s2,lenght2);  //zkopiruju druhy řetězec na pozici lenght1 -1  musime odstranit (\0)
+char *pomocna = customMalloc((lenght1 + lenght2 + 1)*sizeof(char));
+strncpy(pomocna,s1,lenght1);
+strncpy(pomocna+lenght1,s2,lenght2);  //druhy řetězec na pozici lenght1 -1 -> musime odstranit (\0)
 pomocna[lenght1 + lenght2] = '\0';
 return pomocna;
 }
 
 
 
-int find(char*s, char*search){
-
+int find(char*s, char*search)
+{
 int SIndex=0;
 int SearchIndex=0;  //pomocne indexy
 
@@ -388,31 +275,48 @@ for (k=1;k<=lenght_search;k++){   //procházím dokud nedojdu na konec substring
 }
 
 
+<<<<<<< HEAD
+while ((SIndex<lenght_s) && (SearchIndex<lenght_search))
+{
+    if ((SearchIndex==-1) || (s[SIndex]==search[SearchIndex])){  //jestli jsi na začátku nebo se písmena rovnají 
+=======
 while ((SIndex<lenght_s) && (SearchIndex<lenght_search)){
 
 
     if ((SearchIndex==-1) || (s[SIndex]==search[SearchIndex])){  //jestli jsi na začátku nebo se písmena rovnají
+>>>>>>> 0561473c41c7d5b0622cb41cc095d4b020c9e721
         SIndex++;
         SearchIndex++;
     }
-    else{
+    else
+    {
         SearchIndex=fail[SearchIndex];  //jinak ulož číslo indexu z pomocného pole
     }
+<<<<<<< HEAD
+    }
+=======
 }
 
 
+>>>>>>> 0561473c41c7d5b0622cb41cc095d4b020c9e721
     if (SearchIndex>=lenght_search)   //jestli jsi našel tak vrať první substring - pozice počítaná od nuly
         return SIndex-lenght_search;
 
     else
+<<<<<<< HEAD
+        return -1;  // not found
+}
+=======
         return -1;  ///jestli jsi nenašel vrať -1
 
 
 }  //end of function
 
 
+>>>>>>> 0561473c41c7d5b0622cb41cc095d4b020c9e721
 
-char *sort (char *s) {
+char *sort (char *s)
+{
     int left = 0;
     int right = (int) (strlen(s)) - 1;
 
@@ -421,8 +325,8 @@ char *sort (char *s) {
     return s;
 }
 
-char *sort_recursive(char *s, int left_poc, int right_poc) {
-
+char *sort_recursive(char *s, int left_poc, int right_poc)
+{
     int left = left_poc;
     int right = right_poc;
     int middle = s[(left_poc + right_poc) / 2]; /// pseudomedián

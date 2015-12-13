@@ -51,7 +51,7 @@ void tableStackPop(tableStack * stack)
 	if (tableStackEmpty(stack))
 		return;
 	else
-		hTabFree(stack->elems[stack->top--]);
+		--stack->top;
 }
 
 hTab * tableStackPush(tableStack * stack, hTab * table)
@@ -74,7 +74,7 @@ void tableStackResize(tableStack * stack)
 void tableStackDispose(tableStack * stack)
 {
 	for (int i = 0; i <= stack->top; i++)
-		hTabFree(stack->elems[i]);
+		stack->elems[i] = NULL;                 // removes working references to symbol tables
 }
 
 hTab * getTableStackElem(tableStack * stack, int index)

@@ -1,19 +1,19 @@
 /*
-*  Project name:
-*  Implementace interpretu imperativního jazyka IFJ15
-*
-*  Date: 13.12.2015
-*
-*  Repository:
-*  https://github.com/kuroimarimo/imperative-language-interpreter
-*
-*  Team:
-*  Votjěch Václavík	(xvacla22)
-*  Peter Vančo			(xvanco05)
-*  Filip Vaško         (xvasko10)
-*  Dominik Vašek		(xvasek06)
-*  Valentína Straková	(xstrak27)
-*/
+ *  Project name:
+ *  Implementace interpretu imperativního jazyka IFJ15
+ *
+ *  Date: 13.12.2015
+ *
+ *  Repository:
+ *  https://github.com/kuroimarimo/imperative-language-interpreter
+ *
+ *  Team:
+ *  Votjěch Václavík	(xvacla22)
+ *  Peter Vančo			(xvanco05)
+ *  Filip Vaško         (xvasko10)
+ *  Dominik Vašek		(xvasek06)
+ *  Valentína Straková	(xstrak27)
+ */
 
 #include "parser.h"
 
@@ -123,7 +123,7 @@ void rule_funcDefined(hashElem * activeElem)
 	if (!strcmp(temp->key, F_MAIN))
 		generateInstruction(OP_CREATE_FRAME, &tableStackTop(localSTstack)->numStoredElem, NULL, NULL);	//main is called first, it creates it's own base frame
 																										//other functions will have it created before calling them and filled with parameters
-	
+
 	scanner();
 	rule_stList();									//process function body
 
@@ -1150,36 +1150,36 @@ void processParam(int * paramIndex, hashElem * funcCall, int builtIn)			//proces
 
 	switch (token.type)
 	{
-		case R_BRACKET:
-			return;
+	case R_BRACKET:
+		return;
 
-		case INT_NUMBER:
-			addParam(funcCall, "", VAR_INT);
-			data = customMalloc(sizeof(int));
-			*(int *)data = token.int_numb;
-			break;
+	case INT_NUMBER:
+		addParam(funcCall, "", VAR_INT);
+		data = customMalloc(sizeof(int));
+		*(int *)data = token.int_numb;
+		break;
 
-		case DOUBLE_NUMBER:
-			addParam(funcCall, "", VAR_DOUBLE);
-			data = customMalloc(sizeof(double));
-			*(double *)data = token.double_numb;
-			break;
+	case DOUBLE_NUMBER:
+		addParam(funcCall, "", VAR_DOUBLE);
+		data = customMalloc(sizeof(double));
+		*(double *)data = token.double_numb;
+		break;
 
-		case STRING:
-			addParam(funcCall, "", VAR_STRING);
-			data = strDuplicate(token.area);
-			break;
+	case STRING:
+		addParam(funcCall, "", VAR_STRING);
+		data = strDuplicate(token.area);
+		break;
 
-		case IDENTIFIER:
-			if ((temp = findVar(token.area)) == NULL)
-				fatalError(ERR_UndefinedVariable);
+	case IDENTIFIER:
+		if ((temp = findVar(token.area)) == NULL)
+			fatalError(ERR_UndefinedVariable);
 
-			addParam(funcCall, "", temp->data.type);
+		addParam(funcCall, "", temp->data.type);
 
-			coordinates = varToFrame(token.area);
-			break;
+		coordinates = varToFrame(token.area);
+		break;
 
-		default:
+	default:
 			fatalError(ERR_ExpectedParameter);
 	}
 
