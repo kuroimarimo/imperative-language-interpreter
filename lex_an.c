@@ -132,7 +132,6 @@ int scanner () {
     char array_x [9];
     int counter = 0;
     int base = 0;
-    bool empty;
     int value = START;
     bool test = true;
 
@@ -389,26 +388,17 @@ int scanner () {
             break;
 
         case STRING:
-            empty = true;
-
-            if (c == '\\') {
+            if (c == '\\')
                 value = STRING_ESCAPE;
-                empty = false;
-            }
             else if (c <= 31)
                 fatalError (ERR_StringChar);
-            else if (c == '"') {
-                if (empty == true)
-                    fillToken('\0');
-
+            else if (c != '"')
+                fillToken(c);
+            else {
+                fillToken('\0');
                 token.type = STRING;    /// ungetc(c, source); - vytvari nekonecny cyklus
                 test = false;
             }
-            else {
-                fillToken(c);
-                empty = false;
-            }
-
             break;
 
         case STRING_ESCAPE:
