@@ -485,6 +485,7 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
 
             case OP_FUNC_CALL:
 				instrStackPush(instrStack, instruction->next);
+				topToBase(frameStack);
 				instruction = ((tInstrList *)instruction->input1)->first;
 				continue;
 
