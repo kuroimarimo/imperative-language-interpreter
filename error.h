@@ -51,6 +51,7 @@ typedef enum
     //// INTERPRETER
     ERR_ReadInput           = 700,
     ERR_UninitVar           = 800,
+	ERR_NoReturn,
     ERR_ZeroDivision        = 900,
     ERR_OtherRunningErr     = 1000,            // TODO prepisat ked budeme mat konkretne chybove stavy
     ERR_SegmentationFault,

@@ -99,6 +99,9 @@ void printErrorDetails (EErrorTypes state)
         case ERR_InvalidCommndLineArgs:
             fprintf(stderr, "Invalid command line arguments.\n");
             break;
+		case ERR_NoReturn:
+			fprintf(stderr, "The function doesn't return any value.\n");
+			break;
         default:
 			fprintf(stderr, "Undefined error.\n");
             break;
