@@ -122,7 +122,6 @@ tVarCoordinates * constToVar(int constType, void * data)
         case INT_NUMBER:
             sprintf(str, "#%d", *(int *)data);
             constID = strDuplicate(str);
-            //constID = concat("#", constID);
             
             if (!findVar(constID))
                 addVar(constID, getTableStackElem(localSTstack, 0), VAR_INT);
