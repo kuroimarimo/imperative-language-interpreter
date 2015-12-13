@@ -301,7 +301,7 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
     if (expr1->type == IDENTIFIER)
         SemId(expr1);
     if (gramatika != 11) 
-    { // TO DO: update after bool types are added
+    {
         if (expr2->type == IDENTIFIER)
             SemId(expr2);
         if (expr3->type == IDENTIFIER)

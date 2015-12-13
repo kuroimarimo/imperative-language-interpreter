@@ -20,9 +20,6 @@
 #define INIT_INPUT_SIZE 16
 #define INIT_FRAMESTACK 64
 
-#define OPERATION(a,b,x) (a) x (b)
-#define stringify(x) #x
-
 /* Reads a string terminated by white space character from input.
    Returns pointer to the string. */
 char * inputString()
@@ -44,58 +41,21 @@ char * inputString()
     return customRealloc(str, len * sizeof(char));
 }
 
-void interpret(tInstruction * instruction)                  // TODO frameStack, instrStack UNGLOBALIZE
+void interpret(tInstruction * instruction)               
 {
+    tFrameStack * frameStack;
     frameStack = frameStackInit(frameStack, INIT_FRAMESTACK);
+    
+    tInstrStack * instrStack;
     instrStack = instrStackInit(INIT_FRAMESTACK);
     int inputInt;
     double inputDouble;
 	char * string1, *string2;								// temp variables for built in functions
     tVariable *tempVar, *tempIn1, *tempIn2, *tempOut;
 	tVariable returnValue;
-    //	char * inputStr;
-
-    //int i = 0;
-    
-    /*const char* instrOp[] =                               // debugging purposes only
-    {
-        stringify(OP_ASSIGN),
-        stringify(OP_SUM),
-        stringify(OP_MINUS),
-        stringify(OP_MUL),
-        stringify(OP_DIV),
-        stringify(OP_MOD),
-        stringify(OP_LT),
-        stringify(OP_GT),
-        stringify(OP_LE),
-        stringify(OP_GE),
-        stringify(OP_EQUALS),
-        stringify(OP_DIFF),
-        stringify(OP_COUT),
-        stringify(OP_CIN),
-        stringify(OP_IF),
-        stringify(OP_ELSE),
-        stringify(OP_LABEL),
-        stringify(OP_GOTO),
-        stringify(OP_RETURN),
-        stringify(OP_SET_CONSTANT),
-        stringify(OP_CREATE_VAR),
-        stringify(OP_CREATE_FRAME),
-        stringify(OP_SET_TOP_TO_BASE),
-        stringify(OP_DISPOSE_FRAME),
-        stringify(OP_IF_JUMP),
-        stringify(OP_IFNOT_JUMP),
-        stringify(OP_FUNC_CALL),
-        stringify(OP_BUILT_IN),
-        stringify(OP_GET_RETURN_VALUE),
-        stringify(OP_NOP)
-    };*/
-
     
     while (instruction != NULL)
     {
-        //printf("Instrukcia %d.\n", i++);
-        
         switch (instruction->operator)
         {
             case OP_ASSIGN:
@@ -113,7 +73,6 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
 							case VAR_INT:
 								tempOut->value.i = tempIn1->value.i;
                                 tempOut->initialized = true;
-                                printf("out: %d in1: %d\n", tempOut->value.i, tempIn1->value.i);
 								break;
 
 							case VAR_DOUBLE:
@@ -158,12 +117,26 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
                 switch (tempOut->type)
                 {
                     case VAR_INT:
-                        tempOut->value.i = tempIn1->value.i + tempIn2->value.i;
+                        if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int + int
+                            tempOut->value.i = (tempIn1->value.i + tempIn2->value.i);
+                        else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int + double
+                            tempOut->value.i = (tempIn1->value.i + tempIn2->value.d);
+                        else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double + int
+                            tempOut->value.i = (tempIn1->value.d + tempIn2->value.i);
+                        else                                                                        // double + double
+                            tempOut->value.i = (tempIn1->value.d + tempIn2->value.d);
                         tempOut->initialized = true;
                         break;
                         
                     case VAR_DOUBLE:
-                        tempOut->value.d = tempIn1->value.d + tempIn2->value.d;
+                        if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int + int
+                            tempOut->value.d = (tempIn1->value.i + tempIn2->value.i);
+                        else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int + double
+                            tempOut->value.d = (tempIn1->value.i + tempIn2->value.d);
+                        else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double + int
+                            tempOut->value.d = (tempIn1->value.d + tempIn2->value.i);
+                        else                                                                        // double + double
+                            tempOut->value.d = (tempIn1->value.d + tempIn2->value.d);
                         tempOut->initialized = true;
                         break;
                 }
@@ -181,12 +154,27 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
                 switch (tempOut->type)
                 {
                     case VAR_INT:
-                        tempOut->value.i = tempIn1->value.i - tempIn2->value.i;
+                        if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int - int
+                            tempOut->value.i = (tempIn1->value.i - tempIn2->value.i);
+                        else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int - double
+                            tempOut->value.i = (tempIn1->value.i - tempIn2->value.d);
+                        else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double - int
+                            tempOut->value.i = (tempIn1->value.d - tempIn2->value.i);
+                        else                                                                        // double - double
+                            tempOut->value.i = (tempIn1->value.d - tempIn2->value.d);
                         tempOut->initialized = true;
                         break;
                         
                     case VAR_DOUBLE:
-                        tempOut->value.d = tempIn1->value.d - tempIn2->value.d;
+                        if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int - int
+                            tempOut->value.d = (tempIn1->value.i - tempIn2->value.i);
+                        else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int - double
+                            tempOut->value.d = (tempIn1->value.i - tempIn2->value.d);
+                        else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double - int
+                            tempOut->value.d = (tempIn1->value.d - tempIn2->value.i);
+                        else                                                                        // double - double
+                            tempOut->value.d = (tempIn1->value.d - tempIn2->value.d);
+                        tempOut->initialized = true;
                         tempOut->initialized = true;
                         break;
                 }
@@ -204,12 +192,26 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
                 switch (tempOut->type)
                 {
                     case VAR_INT:
-                        tempOut->value.i = tempIn1->value.i * tempIn2->value.i;
+                        if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int * int
+                            tempOut->value.i = (tempIn1->value.i / tempIn2->value.i);
+                        else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int * double
+                            tempOut->value.i = (tempIn1->value.i / tempIn2->value.d);
+                        else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double * int
+                            tempOut->value.i = (tempIn1->value.d / tempIn2->value.i);
+                        else                                                                        // double * double
+                            tempOut->value.i = (tempIn1->value.d / tempIn2->value.d);
                         tempOut->initialized = true;
                         break;
                         
                     case VAR_DOUBLE:
-                        tempOut->value.d = tempIn1->value.d * tempIn2->value.d;
+                        if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int * int
+                            tempOut->value.d = (tempIn1->value.i / tempIn2->value.i);
+                        else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int * double
+                            tempOut->value.d = (tempIn1->value.i / tempIn2->value.d);
+                        else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double * int
+                            tempOut->value.d = (tempIn1->value.d / tempIn2->value.i);
+                        else                                                                        // double * double
+                            tempOut->value.d = (tempIn1->value.d / tempIn2->value.d);
                         tempOut->initialized = true;
                         break;
                 }
@@ -230,12 +232,26 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
                 switch (tempOut->type)
                 {
                     case VAR_INT:
-                        tempOut->value.i = tempIn1->value.i / tempIn2->value.i;
+                        if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int / int
+                            tempOut->value.i = (tempIn1->value.i / tempIn2->value.i);
+                        else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int / double
+                            tempOut->value.i = (tempIn1->value.i / tempIn2->value.d);
+                        else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double / int
+                            tempOut->value.i = (tempIn1->value.d / tempIn2->value.i);
+                        else                                                                        // double / double
+                            tempOut->value.i = (tempIn1->value.d / tempIn2->value.d);
                         tempOut->initialized = true;
                         break;
                         
                     case VAR_DOUBLE:
-                        tempOut->value.d = tempIn1->value.d / tempIn2->value.d;
+                        if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int / int
+                            tempOut->value.d = (tempIn1->value.i / tempIn2->value.i);
+                        else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int / double
+                            tempOut->value.d = (tempIn1->value.i / tempIn2->value.d);
+                        else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double / int
+                            tempOut->value.d = (tempIn1->value.d / tempIn2->value.i);
+                        else                                                                        // double / double
+                            tempOut->value.d = (tempIn1->value.d / tempIn2->value.d);
                         tempOut->initialized = true;
                         break;
                 }
@@ -541,18 +557,14 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
                 
             case OP_CREATE_VAR:
                 tempVar = getVariable(frameStack, instruction->output);
-                //printf("int: %d double: %lf string: %s\n", *(int *)instruction->input1, *(double *)instruction->input1, instruction->input1);
                 tempVar->type = *(int *)instruction->input1;
                 break;
                 
             case OP_CREATE_FRAME:       // recursion and blocks
-				//printf("Velkost zakladneho ramca v instrukcii: %d. \n", (unsigned int) *findElem(globalST, "fififi")->data.baseFrameSize);
-				//int a = (signed int) *(int *)instruction->input1;
-				//printf("_______________________%d______________________\n", a);
                 frameCreateAndPush(frameStack, *(int *)instruction->input1);
                 break;
                 
-            case OP_SET_TOP_TO_BASE:    // nastavenie zakl ramca kvoli returnu a odstranovaniu
+            case OP_SET_TOP_TO_BASE:    // sets the base frame for deleting and return
                 topToBase(frameStack);
                 break;
                 
@@ -682,7 +694,7 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
 				frameStackPop(frameStack);
 				break;
                 
-            case OP_NOP:            // <3
+            case OP_NOP:
                 break;
 
 			case OP_SET_CONSTANT:
@@ -703,12 +715,7 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
                 }
 				tempOut->initialized = true;
 				break;
-                
-            default:
-                printf("NEIMPLEMENTOVANA INSTRUKCIA.\n");
         }
-        
-        //printf("Spravil som %s.\n\n",instrOp[instruction->operator]);
         
         instruction = instruction->next;
     }

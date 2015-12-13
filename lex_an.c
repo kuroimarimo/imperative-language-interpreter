@@ -17,6 +17,8 @@
 
 #include "lex_an.h"
 
+#define SWAP(x, y, T) do { T TMP = x; x = y; y = TMP; } while (0)
+
 int tokenCopy (tToken *dst, tToken src)
 {
 
@@ -300,7 +302,7 @@ int scanner () {
             }
             else
             {
-                fatalError (ERR_NumberShape);
+                fatalError (ERR_NumberFormat);
             }
 
             break;
@@ -332,7 +334,7 @@ int scanner () {
             }
             else
                 {                              // za E nejsou cifry
-                    fatalError (ERR_NumberShape);
+                    fatalError (ERR_NumberFormat);
                 }
 
             break;
@@ -345,7 +347,7 @@ int scanner () {
             }
             else
             {
-                fatalError (ERR_NumberShape);
+                fatalError (ERR_NumberFormat);
             }
 
             break;
@@ -517,7 +519,7 @@ int scanner () {
         else if (c == 'x')
             value = HEXADECIMAL;
         else {
-            fatalError (ERR_NumberShape);
+            fatalError (ERR_NumberFormat);
         }
 
         break;
@@ -678,10 +680,6 @@ int scanner () {
         }   // end main switch
     }   // end while
 
-
-
-
-
     if (token.area != NULL)
     {
         if (token.type == IDENTIFIER)
@@ -697,7 +695,7 @@ int scanner () {
 
             if (token.int_numb <= 0 || token.int_numb > 255)
             {
-                fatalError (ERR_LEXICAL);
+                fatalError (ERR_NumberFormat);
             }
         }
         else if (token.type == DOUBLE_NUMBER)

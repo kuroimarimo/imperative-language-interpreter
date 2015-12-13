@@ -37,7 +37,7 @@ enum adressCode {
 	OP_ELSE, 				// pokud neplati in1 -> out
 	OP_LABEL,				// in1 <- navesti pro goto
 	OP_GOTO,				// skok pro for -> out
-	OP_RETURN,				// converts input1 to type input2 and stores the result somewhere //TODO where?
+	OP_RETURN,				// converts input1 to type input2 and stores the result 
 	
 	
 	OP_SET_CONSTANT,		// assigns value *input1 to frame variable output

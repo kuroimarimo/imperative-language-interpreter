@@ -29,8 +29,7 @@ typedef enum
     ERR_None,
 
     //// LEXIS
-    ERR_LEXICAL             = 100,          // TODO prepisat ked budeme mat konkretne chybove stavy
-    ERR_NumberShape,
+    ERR_NumberFormat         = 100,
     ERR_StringEscape,
     ERR_NumberEscape,
     ERR_StringChar,
@@ -57,8 +56,7 @@ typedef enum
     ERR_AutoNoInit,
 
     // other semantic errors
-    ERR_OTHERSEMANTIC       = 600,              // TODO prepisat ked budeme mat konkretne chybove stavy
-    ERR_NFunction,                              // precedence analysis is unable to process function call, syntax has to handle it
+    ERR_NFunction           = 600,     // precedence analysis is unable to process function call, syntax has to handle it
 	ERR_NCondition,
 
     //// INTERPRETER
@@ -66,7 +64,7 @@ typedef enum
     ERR_UninitVar           = 800,
 	ERR_NoReturn,
     ERR_ZeroDivision        = 900,
-    ERR_OtherRunningErr     = 1000,            // TODO prepisat ked budeme mat konkretne chybove stavy
+    ERR_OtherRunningErr     = 1000,           
     ERR_SegmentationFault,
 
     //// INTERNAL INTERPRETER ERRORS

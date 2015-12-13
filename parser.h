@@ -65,7 +65,7 @@ void processParam(int * paramIndex, hashElem * funcCall, int builtIn);
 void checkFuncDefinitions();
 
 																	
-//functions simulating LL grammar rules             TODO
+//functions simulating LL grammar rules
 
 void rule_stList();									// <st-list> -> <statement> <st-list>     |   } 
 void rule_statement(int pushAllowed);								// <statement> -> type id <var-def> ;   ||      id = <expression> ;      ||        id (<param-list>) ;      ||      <keyword>	|| { <st-list>
@@ -91,7 +91,7 @@ int rule_do();										// <do-loop> -> <statement> while ( <expression> )
 void rule_expression(hashElem * assignee);			//calls precedence SA for expressions or rule_function() for functions
 int rule_funcCall(hashElem * assignee);
 void rule_callParam(hashElem * funcCall, int  * paramIndex, int builtIn);
-void rule_callParamList(hashElem * funcCall, int  * paramIndex, int builtIn);		//TODO
+void rule_callParamList(hashElem * funcCall, int  * paramIndex, int builtIn);
 
 //rules for built-in functions
 int rule_builtIn(hashElem * assignee);

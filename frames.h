@@ -68,7 +68,4 @@ tVariable * getVariable(tFrameStack * stack, tVarCoordinates * coordinates);	//r
 
 void topToBase(tFrameStack * stack);										//sets the top frame as base frame
 tVarCoordinates * varToFrame(char * key);
-
-tFrameStack * frameStack;
-
 #endif
