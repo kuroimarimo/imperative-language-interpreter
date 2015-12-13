@@ -226,34 +226,63 @@ void interpret(tInstruction * instruction)
                 if (!tempIn1->initialized || !tempIn2->initialized)
                     fatalError(ERR_UninitVar);
                 
-                if (!tempIn2->value.i || !tempIn2->value.d)
-                    fatalError(ERR_ZeroDivision);
-                
                 switch (tempOut->type)
                 {
                     case VAR_INT:
                         if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int / int
+                        {
+                            if (!tempIn2->value.i || !tempIn2->value.i)
+                                fatalError(ERR_ZeroDivision);
                             tempOut->value.i = (tempIn1->value.i / tempIn2->value.i);
+                        }
                         else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int / double
+                        {
+                            if (!tempIn2->value.i || !tempIn2->value.d)
+                                fatalError(ERR_ZeroDivision);
                             tempOut->value.i = (tempIn1->value.i / tempIn2->value.d);
+                        }
                         else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double / int
+                        {
+                            if (!tempIn2->value.d || !tempIn2->value.i)
+                                fatalError(ERR_ZeroDivision);
                             tempOut->value.i = (tempIn1->value.d / tempIn2->value.i);
-                        else                                                                        // double / double
-                            tempOut->value.i = (tempIn1->value.d / tempIn2->value.d);
+                        }
+                            else                                                                        // double / double
+                            {
+                                if (!tempIn2->value.d || !tempIn2->value.d)
+                                    fatalError(ERR_ZeroDivision);
+                                tempOut->value.i = (tempIn1->value.d / tempIn2->value.d);
+                            }
                         tempOut->initialized = true;
                         break;
                         
                     case VAR_DOUBLE:
                         if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int / int
+                        {
+                            if (!tempIn2->value.i || !tempIn2->value.i)
+                                fatalError(ERR_ZeroDivision);
                             tempOut->value.d = (tempIn1->value.i / tempIn2->value.i);
+                        }
                         else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int / double
+                        {
+                            if (!tempIn2->value.i || !tempIn2->value.d)
+                                fatalError(ERR_ZeroDivision);
                             tempOut->value.d = (tempIn1->value.i / tempIn2->value.d);
+                        }
                         else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double / int
+                        {
+                            if (!tempIn2->value.d || !tempIn2->value.i)
+                                fatalError(ERR_ZeroDivision);
                             tempOut->value.d = (tempIn1->value.d / tempIn2->value.i);
+                        }
                         else                                                                        // double / double
+                        {
+                            if (!tempIn2->value.d || !tempIn2->value.d)
+                                fatalError(ERR_ZeroDivision);
                             tempOut->value.d = (tempIn1->value.d / tempIn2->value.d);
+                        }
                         tempOut->initialized = true;
-                        break;
+                    break;
                 }
 				tempOut->initialized = true;
                 break;
@@ -517,9 +546,6 @@ void interpret(tInstruction * instruction)
 				frameStackPopUntilBase(frameStack);
 				instruction = instrStackPop(instrStack);
 				continue;
-                //else: store return value (somewhere), pop all frames up to base, jump to *tInstruction on top of the stack
-                //               printf("Najskor treba dorobit volanie funkcie.\n");
-                //               break;
                 
 			case OP_GET_RETURN_VALUE:
 				tempOut = getVariable(frameStack, instruction->output);
