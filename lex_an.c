@@ -106,7 +106,7 @@ void stringEscape (int counter)
 }
 
 void fillToken (char character) {  // naplnit  token
-    // int extension_tok = 0;
+
 
         /// prvni inicializace
     if (token.counter == 0)
