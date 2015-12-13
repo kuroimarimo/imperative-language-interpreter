@@ -227,16 +227,16 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
                 if (!tempIn1->initialized || !tempIn2->initialized)
                     fatalError(ERR_UninitVar);
                 
-                if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)
+                if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int < int
                     tempOut->value.i = (tempIn1->value.i < tempIn2->value.i);
-                else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)
+                else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int < double
                     tempOut->value.i = (tempIn1->value.i < tempIn2->value.d);
-                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)
+                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double < int
                     tempOut->value.i = (tempIn1->value.d < tempIn2->value.i);
-                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_DOUBLE)
+                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_DOUBLE)        // double < double
                     tempOut->value.i = (tempIn1->value.d < tempIn2->value.d);
                 else
-                    tempOut->value.i = strcmp(tempIn1->value.s, tempIn2->value.s) < 0? true : false;
+                    tempOut->value.i = strcmp(tempIn1->value.s, tempIn2->value.s) < 0? true : false;    // string < string
                 
                 tempOut->initialized = true;
                 break;
@@ -249,16 +249,16 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
                 if (!tempIn1->initialized || !tempIn2->initialized)
                     fatalError(ERR_UninitVar);
                 
-                if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)
+                if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int > int
                     tempOut->value.i = (tempIn1->value.i > tempIn2->value.i);
-                else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)
+                else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int > double
                     tempOut->value.i = (tempIn1->value.i > tempIn2->value.d);
-                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)
+                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double > int
                     tempOut->value.i = (tempIn1->value.d > tempIn2->value.i);
-                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_DOUBLE)
+                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_DOUBLE)        // double > double
                     tempOut->value.i = (tempIn1->value.d > tempIn2->value.d);
                 else
-                    tempOut->value.i = strcmp(tempIn1->value.s, tempIn2->value.s) > 0? true : false;
+                    tempOut->value.i = strcmp(tempIn1->value.s, tempIn2->value.s) > 0? true : false;    // string > string
                 
                 tempOut->initialized = true;
                 break;
@@ -271,16 +271,16 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
                 if (!tempIn1->initialized || !tempIn2->initialized)
                     fatalError(ERR_UninitVar);
                 
-                if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)
+                if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int <= int
                     tempOut->value.i = (tempIn1->value.i <= tempIn2->value.i);
-                else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)
+                else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int <= double
                     tempOut->value.i = (tempIn1->value.i <= tempIn2->value.d);
-                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)
+                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double <= int
                     tempOut->value.i = (tempIn1->value.d <= tempIn2->value.i);
-                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_DOUBLE)
+                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_DOUBLE)        // double <= double
                     tempOut->value.i = (tempIn1->value.d <= tempIn2->value.d);
                 else
-                    tempOut->value.i = strcmp(tempIn1->value.s, tempIn2->value.s) <= 0? true : false;
+                    tempOut->value.i = strcmp(tempIn1->value.s, tempIn2->value.s) <= 0? true : false;   // string <= string
             
                 tempOut->initialized = true;
                 break;
@@ -293,16 +293,16 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
                 if (!tempIn1->initialized || !tempIn2->initialized)
                     fatalError(ERR_UninitVar);
                 
-                if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)
+                if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int >= int
                     tempOut->value.i = (tempIn1->value.i >= tempIn2->value.i);
-                else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)
+                else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int >= double
                     tempOut->value.i = (tempIn1->value.i >= tempIn2->value.d);
-                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)
+                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double >= int
                     tempOut->value.i = (tempIn1->value.d >= tempIn2->value.i);
-                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_DOUBLE)
+                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_DOUBLE)        // double >= double
                     tempOut->value.i = (tempIn1->value.d >= tempIn2->value.d);
                 else
-                    tempOut->value.i = strcmp(tempIn1->value.s, tempIn2->value.s) >= 0? true : false;
+                    tempOut->value.i = strcmp(tempIn1->value.s, tempIn2->value.s) >= 0? true : false;   // string >= string
                 
                 tempOut->initialized = true;
                 break;
@@ -315,16 +315,16 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
                 if (!tempIn1->initialized || !tempIn2->initialized)
                     fatalError(ERR_UninitVar);
                 
-                if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)
+                if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int == int
                     tempOut->value.i = (tempIn1->value.i == tempIn2->value.i);
-                else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)
+                else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int == double
                     tempOut->value.i = (tempIn1->value.i == tempIn2->value.d);
-                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)
+                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double == int
                     tempOut->value.i = (tempIn1->value.d == tempIn2->value.i);
-                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_DOUBLE)
+                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_DOUBLE)        // double == double
                     tempOut->value.i = (tempIn1->value.d == tempIn2->value.d);
                 else
-                    tempOut->value.i = !strcmp(tempIn1->value.s, tempIn2->value.s);
+                    tempOut->value.i = !strcmp(tempIn1->value.s, tempIn2->value.s);         // string == string
                 
                 tempOut->initialized = true;
                 break;
@@ -337,21 +337,21 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
                 if (!tempIn1->initialized || !tempIn2->initialized)
                     fatalError(ERR_UninitVar);
                 
-                if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)
+                if (tempIn1->type == VAR_INT && tempIn2->type == VAR_INT)                   // int != int
                     tempOut->value.i = (tempIn1->value.i != tempIn2->value.i);
-                else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)
+                else if (tempIn1->type == VAR_INT && tempIn2->type == VAR_DOUBLE)           // int != double
                     tempOut->value.i = (tempIn1->value.i != tempIn2->value.d);
-                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)
+                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_INT)           // double != int
                     tempOut->value.i = (tempIn1->value.d != tempIn2->value.i);
-                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_DOUBLE)
+                else if (tempIn1->type == VAR_DOUBLE && tempIn2->type == VAR_DOUBLE)        // double != double
                     tempOut->value.i = (tempIn1->value.d != tempIn2->value.d);
                 else
-                    tempOut->value.i = strcmp(tempIn1->value.s, tempIn2->value.s);
+                    tempOut->value.i = strcmp(tempIn1->value.s, tempIn2->value.s);          // string != string
                 
                 tempOut->initialized = true;
                 break;
                 
-            case OP_COUT:               // zatial fungovalo vzdy
+            case OP_COUT:
 				tempOut = getVariable(frameStack, instruction->output);
                 switch (tempOut->type)
 				{
@@ -385,13 +385,9 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
                 {
                     case VAR_INT:
                         while (isspace(inputInt = getchar()))   // cleans the input off spaces
-                            if (inputInt == '\n')               // if no input -> error
+                            if (inputInt == '\n' || !isdigit(inputInt))     // throws an error if there's no or non-numerical input
                                 fatalError(ERR_ReadInput);
-                        ungetc(inputInt, stdin);                // returns the last loaded char (not a white char) to stdin
-                        
-                        if (!isdigit(inputInt = getchar()))     // checks if the first char of non-white char input is a valid number
-                            fatalError(ERR_ReadInput);
-                        ungetc(inputInt, stdin);                // if the previous condition is valid, returns the checked char back to stdin stream for scanf
+                        ungetc(inputInt, stdin);                // returns the last loaded char (not white char) to stdin
                         
                         if (scanf("%d", &inputInt) < 0)
                             fatalError(ERR_ReadInput);
@@ -405,14 +401,10 @@ void interpret(tInstruction * instruction)                  // TODO frameStack, 
                         
                     case VAR_DOUBLE:
                         while (isspace(inputInt = getchar()))   // cleans the input off spaces
-                            if (inputInt == '\n')               // if no input -> error
+                            if (inputInt == '\n' || !isdigit(inputInt))     // throws an error if there's no or non-numerical input
                                 fatalError(ERR_ReadInput);
-                        ungetc(inputInt, stdin);                // returns the last loaded char (not a white char) to stdin
-                        
-                        if (!isdigit(inputInt = getchar()))     // checks if the first char of non-white char input is a valid number
-                            fatalError(ERR_ReadInput);
-                        ungetc(inputInt, stdin);                // if the previous condition is valid, returns the checked char back to stdin stream for scanf
-                        
+                        ungetc(inputInt, stdin);                // returns the last loaded char (not white char) to stdin
+
                         if (scanf("%lf", &inputDouble) < 0)
                             fatalError(ERR_ReadInput);
                         tempVar->value.d = inputDouble;
