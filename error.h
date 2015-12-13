@@ -1,19 +1,19 @@
 /*
- *  Project name:
- *  Implementace interpretu imperativního jazyka IFJ15
- *
- *  Date: 13.12.2015
- *
- *  Repository:
- *  https://github.com/kuroimarimo/imperative-language-interpreter
- *
- *  Team:
- *  Votjěch Václavík	(xvacla22)
- *  Peter Vančo			(xvanco05)
- *  Filip Vaško         (xvasko10)
- *  Dominik Vašek		(xvasek06)
- *  Valentína Straková	(xstrak27)
- */
+*  Project name:
+*  Implementace interpretu imperativního jazyka IFJ15
+*
+*  Date: 13.12.2015
+*
+*  Repository:
+*  https://github.com/kuroimarimo/imperative-language-interpreter
+*
+*  Team:
+*  Votjěch Václavík	(xvacla22)
+*  Peter Vančo			(xvanco05)
+*  Filip Vaško         (xvasko10)
+*  Dominik Vašek		(xvasek06)
+*  Valentína Straková	(xstrak27)
+*/
 
 #ifndef ERROR_H
 #define ERROR_H
@@ -26,19 +26,31 @@
 
 typedef enum
 {
-    ERR_None,
+	ERR_None,
 
-    //// LEXIS
-    ERR_LEXICAL             = 100,          // TODO prepisat ked budeme mat konkretne chybove stavy
-    ERR_NumberShape,
-    ERR_StringEscape,
-    ERR_NumberEscape,
-    ERR_StringChar,
-    ERR_UnknownChar,
-    ERR_Comment,
+	//// LEXIS
+	ERR_LEXICAL				= 100,
+	ERR_NumberShape,
+	ERR_StringEscape,
+	ERR_NumberEscape,
+	ERR_StringChar,
+	ERR_UnknownChar,
+	ERR_Comment,
 
-    //// SYNTAX
-    ERR_SYNTAX              = 200,          // TODO prepisat ked budeme mat konkretne chybove stavy
+	//// SYNTAX
+	ERR_SYNTAX				= 200,
+	ERR_DATA_TYPE_EXPECTED,
+	ERR_ExpectedIdentifier,
+	ERR_FuncDeclEnd,
+	ERR_LBracket,
+	ERR_SyntaxParam,
+	ERR_SxStatement,
+	ERR_SxAuto,
+	ERR_SxCout,
+	ERR_SxCin,
+	ERR_ExpectedAssignment,
+	ERR_ExpectedSemicol,
+	ERR_ExpectedParameter,
 
     //// SEMANTICS
     // semantic errors in program

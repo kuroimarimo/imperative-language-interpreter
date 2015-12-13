@@ -1,19 +1,19 @@
 /*
- *  Project name:
- *  Implementace interpretu imperativního jazyka IFJ15
- *
- *  Date: 13.12.2015
- *
- *  Repository:
- *  https://github.com/kuroimarimo/imperative-language-interpreter
- *
- *  Team:
- *  Votjěch Václavík	(xvacla22)
- *  Peter Vančo			(xvanco05)
- *  Filip Vaško         (xvasko10)
- *  Dominik Vašek		(xvasek06)
- *  Valentína Straková	(xstrak27)
- */
+*  Project name:
+*  Implementace interpretu imperativního jazyka IFJ15
+*
+*  Date: 13.12.2015
+*
+*  Repository:
+*  https://github.com/kuroimarimo/imperative-language-interpreter
+*
+*  Team:
+*  Votjěch Václavík	(xvacla22)
+*  Peter Vančo			(xvanco05)
+*  Filip Vaško         (xvasko10)
+*  Dominik Vašek		(xvasek06)
+*  Valentína Straková	(xstrak27)
+*/
 
 #include "error.h"
 
@@ -114,6 +114,42 @@ void printErrorDetails (EErrorTypes state)
             break;
 		case ERR_NoReturn:
 			fprintf(stderr, "The function doesn't return any value.\n");
+			break;
+		case ERR_DATA_TYPE_EXPECTED:
+			fprintf(stderr, "Data type expected.\n");
+			break;
+		case ERR_ExpectedIdentifier:
+			fprintf(stderr, "Identifier expected.\n");
+			break;
+		case ERR_FuncDeclEnd:
+			fprintf(stderr, "\";\" or \"{\" expected.\n");
+			break;
+		case ERR_LBracket:
+			fprintf(stderr, "\"(\" expected.\n");
+			break;
+		case ERR_SyntaxParam:
+			fprintf(stderr, "\",\" or \")\" expected.\n");
+			break;
+		case ERR_SxStatement:
+			fprintf(stderr, "Identifier or a keyword expected.\n");
+			break;
+		case ERR_SxAuto:
+			fprintf(stderr, "Modofier \"auto\" requires an expression.\n");
+			break;
+		case ERR_SxCout:
+			fprintf(stderr, "\"<<\" expected.\n");
+			break;
+		case ERR_SxCin:
+			fprintf(stderr, "\">>\" expected.\n");
+			break;
+		case ERR_ExpectedAssignment:
+			fprintf(stderr, "Assignment expected.\n");
+			break;
+		case ERR_ExpectedSemicol:
+			fprintf(stderr, "Semicolon \";\" expected.\n");
+			break;
+		case ERR_ExpectedParameter:
+			fprintf(stderr, "Parameter expected.\n");
 			break;
         default:
 			fprintf(stderr, "Undefined error.\n");

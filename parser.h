@@ -35,51 +35,48 @@
 #include "interpret.h"
 
 #define INIT_ST_SIZE	16							//initial table stack and symnbol table size
-#define F_MAIN			"main"
 #define DENY_PUSH		0
 #define ALLOW_PUSH		1
+#define F_MAIN			"main"
 
 tSymbolType functionType;							//return type of the currently processed function
 
-//hashElem activeElem;								// symbol table element being modified
-//tData STdata;										// tData being created
 
-
-					/*Function definitions*/
-
-int getType(int tokenType);							//converts keyword token type to tSymbolType for variables
+int	getType(int tokenType);							//converts keyword token type to tSymbolType for variables
 int exprType(int type);								//converts number token type to tSymbolType for variables
 int getFuncType(int tokenType);						//  -||- for functions									//merge var/func types?
 void parse();										// parse the code
 int isKeyword(int tokenType);						//checks whether the given token represents a keyword
-hashElem * findVar(char *key);						// checks whether the symbol with given key exists anywhere on symbol table stack
+
+hashElem * findVar(char *key);						// checks whether the symbol with given key exists anywhere in the symbol table stack
 													//and return fist found match
 hashElem * isDeclaredOnTheSameLevel(char *key);		//looks for element with given key in the hashTable on top of table stack
 hashElem * isFunct(char * key);						//checks whether there is a function with given key
 hashElem * addVar(char * key, hTab * table, int type);				//adds variable into the given hashTable
+tParam * addParam(hashElem * elem, char * key, tSymbolType type);	//adds parameter to the parameter array
 int compareParams(hashElem * elem1, hashElem * elem2);				//compares parameters of given elements
 int compareSymbol(hashElem * elem, hashElem * activeElem);			// compares 2 hashElem symbols
-tParam * addParam(hashElem * elem, char * key, tSymbolType type);	//adds parameter to the parameter array
 int convertType(tSymbolType inType, tSymbolType outType);			//type conversion
 void processParam(int * paramIndex, hashElem * funcCall, int builtIn);
 void checkFuncDefinitions();
 
 																	
-//functions simulating LL grammar rules             TODO
+//functions simulating LL grammar rules
 
 void rule_stList();									// <st-list> -> <statement> <st-list>     |   } 
-void rule_statement(int pushAllowed);								// <statement> -> type id <var-def> ;   ||      id = <expression> ;      ||        id (<param-list>) ;      ||      <keyword>	|| { <st-list>
-void rule_varDecl(hashElem * assignee);									// <var-decl> -> ;    |   = <expression> ;
-void rule_funcdef(hashElem * activeElem);            // <prog> -> type id <param-list> <func-defined> 
-void rule_funcDefined(hashElem * activeElem);        // <func-defined> -> { <st-list> <prog>     ||      ; <prog>
-void rule_paramList(hashElem * activeElem);          // <param-list> -> ( <param> <param-next>
-void rule_param(hashElem * activeElem);              // <param> -> type id
-void rule_paramNext(hashElem * activeElem);          // <param-next> -> , <param> <param-next>       |   )
-void rule_keyword();									// <keyword> -> auto <auto-decl>    ||      cin <cin> <cin-list>    ||  cout <cout> <cout-list>
+void rule_statement(int pushAllowed);				// <statement> -> type id <var-def> ;   ||      id = <expression> ;      ||        id (<param-list>) ;      ||      <keyword>	|| { <st-list>
+void rule_varDecl(hashElem * assignee);				// <var-decl> -> ;    |   = <expression> ;
+void rule_funcdef(hashElem * activeElem);           // <prog> -> type id <param-list> <func-defined> 
+void rule_funcDefined(hashElem * activeElem);       // <func-defined> -> { <st-list> <prog>     ||      ; <prog>
+void rule_paramList(hashElem * activeElem);         // <param-list> -> ( <param> <param-next>
+void rule_param(hashElem * activeElem);             // <param> -> type id
+void rule_paramNext(hashElem * activeElem);         // <param-next> -> , <param> <param-next>       |   )
+void rule_keyword();								// <keyword> -> auto <auto-decl>    ||      cin <cin> <cin-list>    ||  cout <cout> <cout-list>
 													// ||   for <for-decl>  ||  if <if-decl>    ||  return <rule-return>	|| while <while_loop>	|| do <do-loop>
+
 void rule_auto();									// <auto-decl> -> id = <expression>
 int rule_cin();										// <cin> -> >> id
-void rule_cinList();									// <cin-list> -> <cin> <cin-list>   ||  ;
+void rule_cinList();								// <cin-list> -> <cin> <cin-list>   ||  ;
 int rule_cout();									// <cout> -> << id
 void rule_coutList();								// <cout-list> -> <cout> <cout-list>   ||  ;
 int rule_for();										// <for-decl> -> ( id <var-decl> <expression> id = <expression> ) <st-list>
@@ -91,9 +88,7 @@ int rule_do();										// <do-loop> -> <statement> while ( <expression> )
 void rule_expression(hashElem * assignee);			//calls precedence SA for expressions or rule_function() for functions
 int rule_funcCall(hashElem * assignee);
 void rule_callParam(hashElem * funcCall, int  * paramIndex, int builtIn);
-void rule_callParamList(hashElem * funcCall, int  * paramIndex, int builtIn);		//TODO
-
-//rules for built-in functions
-int rule_builtIn(hashElem * assignee);
+void rule_callParamList(hashElem * funcCall, int  * paramIndex, int builtIn);
+int rule_builtIn(hashElem * assignee);				// processes built-in functions calls
 
 #endif
