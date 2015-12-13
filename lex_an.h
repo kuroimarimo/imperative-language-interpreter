@@ -89,8 +89,6 @@ enum {
 
         /// typy tokenu
     IDENTIFIER = 60,    ///
-//    KEY_WORD,           ///
-//    BUILT_IN_FUNCTION,  ///
     INT_NUMBER,         ///
     DOUBLE_NUMBER,      ///
 
@@ -138,14 +136,12 @@ typedef struct {
 #define COUNT_OF_KEY_WORDS 15
 #define COUNT_OF_BUILT_IN_FUNCTIONS 5
 
-    /// globalni promenne
+    // globalni promenne
 tToken token, oldToken;
 FILE *source;
 
-    /// prototypy funkci
-
+    // prototypy funkci
 void ungetToken();               //ungets the latest token, can be used only once in a row
-//void tokenSwap();
 int tokenCopy (tToken *dst, tToken src);   //"copies" the contents of src token to the dst token
 void initToken (); // function for inicialization Token .. it's called when you need delete old variables
 void fillToken (char character); // comes some character and function saves it to variable
@@ -153,6 +149,6 @@ int scanner ();  // its scanner, heart of lex_an ... it's automata
 
 
 
-int ungotToken;                 //TODO: inicializovať na 0 >_<
+int ungotToken;
 
 #endif
