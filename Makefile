@@ -1,4 +1,4 @@
-CFLAGS=-std=c99 -Wall -pedantic -g
+CFLAGS=-std=c99 -Wall -pedantic -g -O3
 CC=gcc
 RM=rm
 

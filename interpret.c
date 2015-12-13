@@ -43,7 +43,7 @@ char * inputString()
 
 void interpret(tInstruction * instruction)               
 {
-    tFrameStack * frameStack;
+    tFrameStack * frameStack = NULL;
     frameStack = frameStackInit(frameStack, INIT_FRAMESTACK);
     
     tInstrStack * instrStack;

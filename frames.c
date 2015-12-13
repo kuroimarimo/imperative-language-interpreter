@@ -92,7 +92,6 @@ tVarCoordinates * varToFrame(char * key)
     hashElem * temp = NULL;
     int i;
     
-    
     for (i = localSTstack->top; i >= 0; i--)
         if ((temp = findElem(getTableStackElem(localSTstack, i), key)) != NULL)
             break;
@@ -103,7 +102,6 @@ tVarCoordinates * varToFrame(char * key)
     tVarCoordinates * coordinates = customMalloc(sizeof(tVarCoordinates));
     coordinates->frameOffset = localSTstack->top - i;
     coordinates->index = temp->data.index;
-    
     
     return coordinates;
 }
