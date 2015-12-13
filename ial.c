@@ -360,32 +360,30 @@ return pomocna;
 }
 
 
+
 int find(char*s, char*search){
 
-
-
 int SIndex=0;
-int SearchIndex=0;  //pomocne indexy - kde prave jsem 
+int SearchIndex=0;  //pomocne indexy 
 
 int lenght_s=(int)strlen (s);
-int lenght_search=(int) strlen (search);  //delky stringu 
+int lenght_search=(int) strlen (search);  
 
 
 int k;  ///pomocne - pro  pozici kde jsem práve v pomocném poli 
 int r;
 
-int *fail = malloc(sizeof(int)*lenght_search);  //alokace pomocného pole 
+int *fail = customMalloc(sizeof(int)*lenght_search);   
     if(fail==NULL)
         return -1111;
-fail[0]=-1;   //nastavím si na první pozici -1
+fail[0]=-1;   //první pozice -1
 for (k=1;k<=lenght_search;k++){   //procházím dokud nedojdu na konec substringu 
-    r=fail[k-1];  //v první iteraci si uložím -1 poté vždy číslo v pomocném poli 
+    r=fail[k-1];  
 
-        while ((r>0) && (s[r]!=s[k-1]))      //použito zkratové vyhodnocení !!!  abch nepřistupoval mimo přidělenou paměť  
-        {                                   // za předpokladu že je r větší jak nula a nejsou stejné písmena na těchto indexech 
+        while ((r>0) && (s[r]!=s[k-1]))      //použito zkratové vyhodnocení !!!  abych nepřistupoval mimo přidělenou paměť  
+        {                                   
 
-            r=fail[r];   //změň r 
-            
+            r=fail[r];   
         }
     fail[k]=r+1;  //přidej index na aktuální pozici 
 
@@ -393,21 +391,18 @@ for (k=1;k<=lenght_search;k++){   //procházím dokud nedojdu na konec substring
 } 
 
 
+while ((SIndex<lenght_s) && (SearchIndex<lenght_search)){  
 
 
-while ((SIndex<lenght_s) && (SearchIndex<lenght_search)){  //dokud nejsi na konci slov
-
-
-    if ((SearchIndex==-1) || (s[SIndex]==search[SearchIndex])){  //jestli jsi na začátku nebo se písmena rovnojí 
-        SIndex++;  //zvedni indexy 
+    if ((SearchIndex==-1) || (s[SIndex]==search[SearchIndex])){  //jestli jsi na začátku nebo se písmena rovnají 
+        SIndex++;  
         SearchIndex++;
     }
     else{
-        SearchIndex=fail[SearchIndex];  //jinak ulož číslo indexu z pomocné tabulky
+        SearchIndex=fail[SearchIndex];  //jinak ulož číslo indexu z pomocného pole
     }
 }
 
-    //printf("%d \n %d ",SIndex-lenght_search, SearchIndex);
 
     if (SearchIndex>=lenght_search)   //jestli jsi našel tak vrať první substring - pozice počítaná od nuly 
         return SIndex-lenght_search;

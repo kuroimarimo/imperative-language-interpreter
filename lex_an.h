@@ -133,7 +133,7 @@ typedef struct {
 } tToken;
 
 
-#define COUNT_OF_KEY_WORDS 15
+#define COUNT_OF_KEY_WORDS 12
 #define COUNT_OF_BUILT_IN_FUNCTIONS 5
 
     // globalni promenne
@@ -145,8 +145,10 @@ void ungetToken();               //ungets the latest token, can be used only onc
 int tokenCopy (tToken *dst, tToken src);   //"copies" the contents of src token to the dst token
 void initToken (); // function for inicialization Token .. it's called when you need delete old variables
 void fillToken (char character); // comes some character and function saves it to variable
-int scanner ();  // its scanner, heart of lex_an ... it's automata
-
+int scanner ();                   // it's automata which decode every lex which comes char by char ...
+void cmpKeyWords ();             //comare indetifier if it is a keyword 
+void numberConverter(int base); // it covrets number (string) of chosen base to dec (int)
+void stringEscape (int counter); // it controls if it stringescape ok if isnt it calls fatalerror
 
 
 int ungotToken;
