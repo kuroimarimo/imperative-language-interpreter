@@ -342,22 +342,25 @@ tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table
         case 8:
         case 9:
         case 10:
-            if (expr1->identifier == 0 && expr3->identifier == 0)
+            if (expr1->type == INT_NUMBER && expr3->type == DOUBLE_NUMBER) 
             {
-                if (expr1->type == INT_NUMBER && expr3->type == DOUBLE_NUMBER) 
+                if (expr1->identifier == 0)
                 {
                     int docasna_prom = *((int *)expr1->data);
                     expr1->data = customRealloc(expr1->data, sizeof(double));
                     *((double*)expr1->data) = docasna_prom;
-                    expr1->type = DOUBLE_NUMBER;
                 }
-                if (expr1->type == DOUBLE_NUMBER && expr3->type == INT_NUMBER) 
+                expr1->type = DOUBLE_NUMBER;
+            }
+            if (expr1->type == DOUBLE_NUMBER && expr3->type == INT_NUMBER) 
+            {
+                if (expr3->identifier == 0)
                 {
                     int docasna_prom = *((int *)expr3->data);
                     expr3->data = customRealloc(expr3->data, sizeof(double));
                     *((double*)expr3->data) = docasna_prom;
-                    expr3->type = DOUBLE_NUMBER;
                 }
+                expr3->type = DOUBLE_NUMBER;
             }
             if ((expr1->type == INT_NUMBER && expr3->type == INT_NUMBER) ||
             (expr1->type == DOUBLE_NUMBER && expr3->type == DOUBLE_NUMBER) ||
