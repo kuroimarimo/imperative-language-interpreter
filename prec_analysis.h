@@ -56,18 +56,18 @@ typedef struct {            // ukazatel prvniho prvku
 } tList;
 
 tExpr* NextToken();
-inline void Init (tList *Z);
-inline void Push (tList *Z, tExpr *val);
-inline tExpr* Pop (tList *Z);
-inline void InsertAbove(tList *Z, tExpr* cur, tExpr* new);
+void Init (tList *Z);
+void Push (tList *Z, tExpr *val);
+tExpr* Pop (tList *Z);
+void InsertAbove(tList *Z, tExpr* cur, tExpr* new);
 
 int PrecG(tExpr *pred3, tExpr *pred2, tExpr *pred1);
-inline tVarCoordinates *PomTrojAdres(tExpr* expr);
+tVarCoordinates *PomTrojAdres(tExpr* expr);
 void TrojAdres(int gramatika, tExpr* input1, tExpr* input2, tExpr* output);
-inline void SemId(tExpr* identifier);
+void SemId(tExpr* identifier);
 tExpr* SemA(tExpr *expr3, tExpr *expr2, tExpr *expr1, int gramatika, hTab *table);
 
-inline int OperatorToIndex (tExpr* op);
+int OperatorToIndex (tExpr* op);
 
 int PrecedencniSA (hTab *table, int PrecType);
 

@@ -419,7 +419,7 @@ int rule_cout()
 
 	void * data;
 
-	tVarCoordinates * coordinates;
+	tVarCoordinates * coordinates = NULL;
 
 	scanner();
 	switch (token.type)
@@ -902,6 +902,19 @@ int rule_funcCall(hashElem * assignee)	//id ( <call_list> ;
 	generateInstruction(OP_CREATE_FRAME, findElem(globalST, funcCall.key)->data.baseFrameSize, NULL, NULL);
 	//int numberOfParams = findElem(globalST, funcCall.key)->data.numberOfParams;
 
+	int numberOfParams = findElem(globalST, funcCall.key)->data.numberOfParams;
+
+	// create frame variables for parameters
+	for (int i = 0; i < numberOfParams; i++)
+	{
+	tVarCoordinates * param = customMalloc(sizeof(tVarCoordinates));
+	param->frameOffset = 0;
+	param->index = i;
+	int * type = customMalloc(sizeof(int));
+	*type = (int) findElem(globalST, funcCall.key)->data.params[i].type;
+	generateInstruction(OP_CREATE_VAR, type, NULL, param);
+	}
+
 	int paramIndex = 0;			// counter of parameters
 
 	scanner();
@@ -930,6 +943,8 @@ int rule_funcCall(hashElem * assignee)	//id ( <call_list> ;
 void rule_callParam(hashElem * funcCall, int  * paramIndex, int builtIn)
 {
 	scanner();
+	if (token.type == R_BRACKET)
+		return;
 
 	processParam(paramIndex, funcCall, builtIn);			// process the first parameter
 
@@ -961,7 +976,7 @@ void rule_callParamList(hashElem * funcCall, int  * paramIndex, int builtIn)		//
 
 int rule_builtIn(hashElem * assignee)					//processes the built-in function calls
 {
-	int funcType;
+	int funcType = 0;
 	int * function = customMalloc(sizeof(int));
 	*function = token.type;
 	int * paramCount = customMalloc(sizeof(int));
@@ -1154,9 +1169,9 @@ void processParam(int * paramIndex, hashElem * funcCall, int builtIn)			//proces
 	variableOut->index = *paramIndex;
 	++(*paramIndex);
 
-	void * data;
+	void * data = NULL;
 
-	tVarCoordinates * coordinates;
+	tVarCoordinates * coordinates = NULL;
 
 	switch (token.type)
 	{

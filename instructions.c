@@ -24,13 +24,7 @@
 /* Adds instruction to the global instruction list.
  Returns true upon successful completion, else returns false. (realloc failed) */
 bool addInstruction(tInstruction * instr)
-{
-    /*if (instructionList->lenght < (instructionList->occupied + 1) && !expandInstrList())
-     return false;
-     instructionList->array[instructionList->occupied] = *instr;
-     ++instructionList->occupied;
-     return true;*/
-    
+{    
     instr->next = NULL;
     
     if (instructionList->last == NULL)
@@ -46,13 +40,7 @@ bool addInstruction(tInstruction * instr)
 /* Initialises the instruction list.
  Returns true upon successful completion, else returns false. (malloc failed)*/
 bool initInstrList()
-{
-    /*int size = INITIAL_SIZE;
-     instructionList = customMalloc(sizeof(tInstrList));
-     instructionList->array = customMalloc(size * sizeof(tInstruction));
-     instructionList->lenght = size;
-     instructionList->occupied = 0;*/
-    
+{    
     instructionList = customMalloc(sizeof(tInstrList));
     instructionList->last = instructionList->first = NULL;
     return true;
@@ -110,8 +98,8 @@ bool instrStackEmpty(tInstrStack * stack)
 tVarCoordinates * constToVar(int constType, void * data)
 {
     int * type = customMalloc(sizeof(int));
-    tVarCoordinates * coordinates;
-    void * outData;
+    tVarCoordinates * coordinates = NULL;
+    void * outData = NULL;
     char str[512];
     char * constID;
     
@@ -133,7 +121,6 @@ tVarCoordinates * constToVar(int constType, void * data)
         case DOUBLE_NUMBER:
             sprintf(str, "#%f", *(double *)data);
             constID = strDuplicate(str);
-            //constID = concat("#", constID);
             
             if (!findVar(constID))
                 addVar(constID, getTableStackElem(localSTstack, 0), VAR_DOUBLE);
@@ -159,8 +146,6 @@ tVarCoordinates * constToVar(int constType, void * data)
     
     generateInstruction(OP_CREATE_VAR, type, NULL, coordinates);
     generateInstruction(OP_SET_CONSTANT, outData, NULL, coordinates);
-    /*     operand->type = expr->type;
-     operand->operand = expr->data;*/
     
     return coordinates;
 }
@@ -168,8 +153,8 @@ tVarCoordinates * constToVar(int constType, void * data)
 tVarCoordinates * tempToVar(int constType)
 {
 	int * type = customMalloc(sizeof(int));
-	tVarCoordinates * coordinates;
-	void * outData;
+	tVarCoordinates * coordinates = NULL;
+	void * outData = NULL;
 	char str[512];
 	char * tempID;
 

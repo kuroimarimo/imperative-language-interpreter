@@ -26,6 +26,6 @@
 #include "lex_an.h"
 
 void interpret(tInstruction * instruction);
-static inline char * inputString();
+char * inputString();
 
 #endif

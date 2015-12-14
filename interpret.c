@@ -53,6 +53,7 @@ void interpret(tInstruction * instruction)
 	char * string1, *string2;								// temp variables for built in functions
     tVariable *tempVar, *tempIn1, *tempIn2, *tempOut;
 	tVariable returnValue;
+	returnValue.type = 0;
     
     while (instruction != NULL)
     {
@@ -654,7 +655,7 @@ void interpret(tInstruction * instruction)
 					case B_SUBSTR:
 						tempIn1 = getVariable(frameStack, tempParam);
 						char * string;
-						int start, end;
+						int start = 0, end = 0;
 
 						string = tempIn1->value.s;						// the first parameter
 						++(tempParam->index);							// move on to the next parameter

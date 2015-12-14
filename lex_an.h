@@ -132,13 +132,13 @@ FILE *source;
 
     // prototypy funkci
 void ungetToken();               //ungets the latest token, can be used only once in a row
-inline int tokenCopy (tToken *dst, tToken src);   //"copies" the contents of src token to the dst token
-inline void initToken ();        // function for inicialization Token ..called when you need delete old variables
-inline void fillToken (char character); // comes some character and function saves it to variable
+int tokenCopy (tToken *dst, tToken src);   //"copies" the contents of src token to the dst token
+void initToken ();        // function for inicialization Token ..called when you need delete old variables
+void fillToken (char character); // comes some character and function saves it to variable
 int scanner ();                         // automata to decode every lexem which comes char by char ...
-inline void cmpKeyWords ();             // compare indetifier if it is a keyword
-inline void numberConverter(int base);  // it covrets number (string) of chosen base to dec (int)
-inline void stringEscape (int counter); // it controls if it stringescape ok if isnt it calls fatalerror
+void cmpKeyWords ();             // compare indetifier if it is a keyword
+void numberConverter(int base);  // it covrets number (string) of chosen base to dec (int)
+void stringEscape (int counter); // it controls if it stringescape ok if isnt it calls fatalerror
 
 
 int ungotToken;
