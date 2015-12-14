@@ -31,7 +31,8 @@ void printErrorDetails (EErrorTypes state)
  * Prints information about the occurred error - line number and appropriate message.
  */
 {
-    fprintf(stderr, "\nError on line number %d. \n", token.counter_of_lines);
+    if ((state < 700) || (state >=9900))
+		fprintf(stderr, "\nError on line number %d. \n", token.counter_of_lines);
 
     switch (state)
     {
