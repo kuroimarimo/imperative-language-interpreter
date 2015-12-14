@@ -670,7 +670,6 @@ void interpret(tInstruction * instruction)
 								start = (int) getVariable(frameStack, tempParam)->value.d;
 								break;
 						}
-
 						++(tempParam->index);
 
 						tempIn1 = getVariable(frameStack, tempParam);
@@ -684,7 +683,6 @@ void interpret(tInstruction * instruction)
 								end = (int)getVariable(frameStack, tempParam)->value.d;
 								break;
 						}
-
 						tempOut->value.s = substr(string, start, end);
 						break;
 
@@ -719,7 +717,6 @@ void interpret(tInstruction * instruction)
 						}
 						break;
 				}
-
 				tempOut->initialized = true;
 				frameStackPop(frameStack);
 				break;
@@ -746,9 +743,7 @@ void interpret(tInstruction * instruction)
 				tempOut->initialized = true;
 				break;
         }
-        
         instruction = instruction->next;
     }
-    
     fatalError(ERR_NoReturn);
 }

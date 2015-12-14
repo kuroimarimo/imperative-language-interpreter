@@ -40,16 +40,12 @@ typedef struct
 typedef struct instr
 {
     int operator;
-    int type;
     void *input1, *input2, *output;
     struct instr * next;
 } tInstruction;
 
 typedef struct
 {
-    /*int lenght;
-     int occupied;
-     tInstruction * array;*/
     tInstruction * first, *last;
 } tInstrList;
 

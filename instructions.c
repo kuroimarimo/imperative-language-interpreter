@@ -62,8 +62,6 @@ tInstruction * generateInstruction(int operation, void * input1, void * input2, 
 {
     tInstruction * instruction = customMalloc(sizeof(tInstruction));
     instruction->operator = operation;
-    instruction->type = -1;
-    
     
     instruction->input1 = input1;
     instruction->input2 = input2;

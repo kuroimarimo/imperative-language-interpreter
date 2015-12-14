@@ -31,7 +31,7 @@ typedef union unionValue
 
 typedef struct {
 	bool initialized;
-	TUnionValue /***/ value;
+	TUnionValue value;
 	int type;
 } tVariable;
 

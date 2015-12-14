@@ -251,7 +251,7 @@ void TrojAdres(int gramatika, tExpr* input1, tExpr* input2, tExpr* output)
     tInstruction* instrBeingAdded;
     instrBeingAdded = customMalloc(sizeof(tInstruction));
     instrBeingAdded->operator = operator;
-    instrBeingAdded->type = OPERAND;
+
     
     instrBeingAdded->input1 = in1;
     if(input2 != NULL)
