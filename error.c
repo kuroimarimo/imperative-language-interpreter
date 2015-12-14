@@ -80,9 +80,6 @@ void printErrorDetails (EErrorTypes state)
         case ERR_UnderivableType:
             fprintf(stderr, "The type of variable cannot be derived.\n");
             break;
-        case ERR_AutoNoInit:
-            fprintf(stderr, "Using \'auto\', but initialization is missing.\n");
-            break;
         case ERR_ReadInput:
             fprintf(stderr, "Interpreter error while reading from the input.\n");
             break;

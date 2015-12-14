@@ -44,7 +44,7 @@ typedef enum
 	ERR_LBracket,
 	ERR_SyntaxParam,
 	ERR_SxStatement,
-	ERR_SxAuto,
+
 	ERR_SxCout,
 	ERR_SxCin,
 	ERR_ExpectedAssignment,
@@ -65,7 +65,7 @@ typedef enum
 
     // type derivation errors
     ERR_UnderivableType     = 500,
-    ERR_AutoNoInit,
+    ERR_SxAuto,
 
     // other semantic errors
     ERR_NFunction           = 600,     // precedence analysis is unable to process function call, syntax has to handle it
